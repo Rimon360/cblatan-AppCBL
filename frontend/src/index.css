@@ -1,0 +1,51 @@
+* {
+  box-sizing: border-box;
+}
+
+@import "tailwindcss";
+
+.login input {
+  @apply w-full rounded p-2 mb-2;
+}
+
+button {
+  @apply cursor-pointer;
+}
+
+hr {
+  @apply rounded mb-2 border-orange-300;
+}
+
+input:hover {
+  @apply border-orange-500;
+}
+
+table {
+  @apply min-w-full table-auto border-collapse border border-gray-300;
+}
+
+th {
+  @apply bg-gray-200 text-gray-700;
+  @apply px-4 py-2 border border-gray-300 sticky top-[-2px];
+}
+
+td {
+  @apply border border-gray-300 indent-2 p-1;
+
+}
+
+aside {
+  @apply text-gray-100;
+}
+
+aside li {
+  @apply w-full rounded;
+}
+
+aside li a {
+  @apply flex gap-2 items-center font-semibold p-2 w-full rounded hover:bg-[#0005];
+}
+
+input {
+  @apply mt-1 p-2 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500;
+}
