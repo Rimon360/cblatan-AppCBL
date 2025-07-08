@@ -8,6 +8,8 @@ const dbConfig = require("./config/dbConfig");
 const cors = require("cors");
 const app = express();
 const verifyToken = require("./middlewares/verifyToken");
+
+app.set('trust proxy', true); // for Express
 app.use(cors());
 app.use(express.json());
 const port = process.env.PORT || 8000;
@@ -19,6 +21,8 @@ mongoose
   .catch((err) => {
     console.error("MongoDB connection error:", err);
   });
+
+
 app.use("/api/users", userRoutes);
 
 app.use('/api/products', productRoutes)

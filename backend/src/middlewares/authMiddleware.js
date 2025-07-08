@@ -59,8 +59,8 @@ const memberMiddleware = async (req, res, next) => {
 const ipTrackMiddleware = async (req, res, next) => {
   const authHeader = req.headers.authorization;
   const token = authHeader?.split(" ")[1];
-  const ip = (req.headers['x-forwarded-for'] || req.connection.remoteAddress || '').split(',')[0].trim();
-
+  const ip = req.headers['x-forwarded-for']?.split(',')[0] || req.socket.remoteAddress;
+  if (!ip) return res.status(400).json({ message: "IP address not found" });
   if (!token) return res.status(401).json({ message: "Authorization token missing" });
 
   try {

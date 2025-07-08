@@ -38,7 +38,8 @@ module.exports.registerUser = async (req, res) => {
 
 exports.loginUser = async (req, res) => {
   const { email, password } = req.body;
-  const ip = (req.headers['x-forwarded-for'] || req.connection.remoteAddress || '').split(',')[0].trim();
+  const ip = req.headers['x-forwarded-for']?.split(',')[0] || req.socket.remoteAddress;
+  if (!ip) return res.status(400).json({ message: "IP address not found" });
   try {
     const user = await UserModel.findOne({ email });
 
