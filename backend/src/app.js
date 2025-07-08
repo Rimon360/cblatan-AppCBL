@@ -35,4 +35,7 @@ app.use((req, res) => {
 
 // module.exports = app;
 
-app.listen(port, () => console.log("Server running on port 3000"));
+
+app.listen(port, "0.0.0.0", () => {
+  console.log("Server running on port: " + port);
+}); 
