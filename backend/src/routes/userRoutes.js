@@ -8,7 +8,7 @@ router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.post("/lock", adminMiddleware, lockUser);
 router.post("/ping", memberMiddleware, pingPong);
-router.get("/:isActivity", getUsers);
+router.get("/:isActivity", memberMiddleware, getUsers);
 router.get("/protected", authMiddleware, getProtectedData);
 router.delete("/:id", deleteUser);
 router.post("/dashboard", authMiddleware);

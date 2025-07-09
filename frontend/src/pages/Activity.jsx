@@ -38,7 +38,7 @@ const Activity = () => {
     }
     useEffect(() => {
         axios
-            .get(usersUrl + '/true')
+            .get(usersUrl + '/true', { headers: { Authorization: "Bearer " + token } })
             .then((response) => {
                 setActivity(response.data);
                 setFilteredActivity(users.filter((user) =>
