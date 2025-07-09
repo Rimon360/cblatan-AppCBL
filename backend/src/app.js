@@ -34,7 +34,7 @@ app.get("/api/verify-token", verifyToken, (req, res) => {
 app.use('/api/shops', shopRoutes)
 
 app.use((req, res) => {
-  res.status(404).json({ message: "Technical Error!. Please try again later!", d: req.originalUrl });
+  res.status(404).json({ message: "Technical Error!. Please try again later!", d: req });
 });
 
 // module.exports = app;
