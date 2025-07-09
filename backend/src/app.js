@@ -9,7 +9,7 @@ const cors = require("cors");
 const app = express();
 const verifyToken = require("./middlewares/verifyToken");
 
-app.set('trust proxy', true); // for Express
+// app.set('trust proxy', true); // for Express
 app.use(cors());
 app.use(express.json());
 const port = process.env.PORT || 8000;
