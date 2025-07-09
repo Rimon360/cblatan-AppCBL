@@ -15,7 +15,7 @@ const port = process.env.PORT || 8000;
 app.use(helmet()); // for security headers 
 app.use(cors());
 app.use(express.json());
-app.set('trust proxy', true);
+app.set('trust proxy', 'loopback');
 
 const rateLimit = require('express-rate-limit');
 
