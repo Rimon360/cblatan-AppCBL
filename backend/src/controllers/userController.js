@@ -89,10 +89,8 @@ exports.getUsers = async (req, res) => {
     let users = await UserModel.find().sort({ createdAt: -1 });
     if (isActivity == 'true') {
       users = await UserModel.find().sort({ last_ping_timestamp: -1 });
-      res.json(users);
-      return;
     }
-    res.status(503).json({ message: "Not exists!" });
+    res.json(users);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
