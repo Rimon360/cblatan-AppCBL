@@ -19,6 +19,7 @@ const Users = () => {
   const [selectedId, setSelectedId] = useState(null);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const { current_user } = useGlobal();
+  const token = localStorage.getItem("token");
   const role = current_user.role;
   if (role !== "admin") {
     return <h1 className="text-center text-red-500 mt-20">
@@ -30,7 +31,7 @@ const Users = () => {
   }
   useEffect(() => {
     axios
-      .get(usersUrl + '/false')
+      .get(usersUrl + '/false', { headers: { Authorization: `Bearer ${token}` } })
       .then((response) => {
         setUsers(response.data);
         setFilteredUsers(users.filter((user) =>
