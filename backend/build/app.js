@@ -10,10 +10,18 @@ var dbConfig = require("./config/dbConfig");
 var cors = require("cors");
 var app = express();
 var verifyToken = require("./middlewares/verifyToken");
-app.set('trust proxy', true); // for Express
+var helmet = require("helmet");
+var port = process.env.PORT || 8000;
+app.use(helmet()); // for security headers 
 app.use(cors());
 app.use(express.json());
-var port = process.env.PORT || 8000;
+var rateLimit = require('express-rate-limit');
+var limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  // 15 min
+  max: 100 // limit each IP
+});
+app.use(limiter);
 mongoose.connect(dbConfig.url).then(function () {
   console.log("MongoDB connected");
 })["catch"](function (err) {
@@ -30,7 +38,8 @@ app.get("/api/verify-token", verifyToken, function (req, res) {
 app.use('/api/shops', shopRoutes);
 app.use(function (req, res) {
   res.status(404).json({
-    message: "Technical Error!. Please try again later!"
+    message: "Technical Error!. Please try again later!",
+    d: req.protocol + "://" + req.get("host") + req.originalUrl
   });
 });
 

@@ -8,11 +8,27 @@ const dbConfig = require("./config/dbConfig");
 const cors = require("cors");
 const app = express();
 const verifyToken = require("./middlewares/verifyToken");
+const helmet = require("helmet");
+const port = process.env.PORT || 8000;
 
-// app.set('trust proxy', true); // for Express
+
+app.use(helmet()); // for security headers 
 app.use(cors());
 app.use(express.json());
-const port = process.env.PORT || 8000;
+
+const rateLimit = require('express-rate-limit');
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 min
+  max: 100, // limit each IP
+});
+
+app.use(limiter);
+
+
+
+
+
 mongoose
   .connect(dbConfig.url)
   .then(() => {
