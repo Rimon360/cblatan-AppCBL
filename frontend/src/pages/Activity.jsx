@@ -172,7 +172,7 @@ const Activity = () => {
                                         let readAbleDate = (new Date(lastActive)).toLocaleString();
                                         let lastActiveSeconds = Math.floor((Date.now() - lastActive) / 1000);
                                         if (lastActiveSeconds > 1751920500) readAbleDate = 'N/A'
-                                        if (lastActiveSeconds > 60) {
+                                        if (lastActiveSeconds > 120) {
                                             user.status = 'Inactive'
                                         } else {
                                             user.status = 'Active';
