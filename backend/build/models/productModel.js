@@ -1,6 +1,7 @@
-const mongoose = require("mongoose");
+"use strict";
 
-const productSchema = new mongoose.Schema({
+var mongoose = require("mongoose");
+var productSchema = new mongoose.Schema({
   course_name: {
     type: String,
     required: true
@@ -21,16 +22,18 @@ const productSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  seq: { type: Number, default: 0 },
+  seq: {
+    type: Number,
+    "default": 0
+  },
   shop_id: {
     type: String,
     required: true
   },
   createdAt: {
     type: Date,
-    default: Date.now,
-  },
+    "default": Date.now
+  }
 });
-
-const UserModel = mongoose.model("products", productSchema);
-module.exports = UserModel; 
+var UserModel = mongoose.model("products", productSchema);
+module.exports = UserModel;

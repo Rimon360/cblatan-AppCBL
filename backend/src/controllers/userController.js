@@ -3,8 +3,9 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const { seq } = require("../utils/util");
 module.exports.registerUser = async (req, res) => {
-  let { email, usagsLimit, password, role } = req.body;
+  let { email, usagsLimit, password, role, client } = req.body;
   if (!role) role = "member";
+  if (client) role = "member";
   if (!email || !password) {
     return res.status(400).json({ message: "Email and password are required" });
   }
@@ -31,7 +32,7 @@ module.exports.registerUser = async (req, res) => {
     res.status(200).json({
       message: "User registered successfully",
       user: { email, role, _id, createdAt, ip_address, seq },
-      token: generateToken(user._id),
+      token: generateToken(user),
     });
   }
 };
@@ -67,7 +68,7 @@ exports.loginUser = async (req, res) => {
     }
 
 
-    const token = jwt.sign({ _id: user._id, email: user.email, role: user.role }, process.env.JWT_SECRET || "abc123", { expiresIn: "30d" });
+    const token = generateToken(user)
 
     return res.json({ token });
   } catch (err) {
@@ -77,10 +78,8 @@ exports.loginUser = async (req, res) => {
 };
 
 // Generate jwt
-const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET || "abc123", {
-    expiresIn: "30d",
-  });
+const generateToken = (user) => {
+  return jwt.sign({ _id: user._id, email: user.email, role: user.role }, process.env.JWT_SECRET || "abc123", { expiresIn: "30d" });
 };
 
 exports.getUsers = async (req, res) => {

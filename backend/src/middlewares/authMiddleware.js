@@ -15,6 +15,16 @@ const authMiddleware = (req, res, next) => {
     return res.status(400).json({ message: "Invalid token" });
   }
 };
+const validateFields = (req, res, next) => {
+  const { shop_id, domain, email, password, course_name } = req.body;
+
+
+  const file_path = req?.file; // Assuming the file upload is handled by multer and file_path is available
+  if (!shop_id || !domain || !email || !password || !course_name || !file_path) {
+    return res.status(400).json({ message: "Every field is required!" });
+  }
+  next();
+};
 const adminMiddleware = (req, res, next) => {
   const authHeader = req.headers.authorization;
   const token = authHeader?.split(" ")[1];
@@ -98,5 +108,6 @@ module.exports = {
   authMiddleware,
   adminMiddleware,
   memberMiddleware,
-  ipTrackMiddleware
+  ipTrackMiddleware,
+  validateFields
 };

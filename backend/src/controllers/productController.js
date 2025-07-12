@@ -3,22 +3,28 @@ const { assignModel } = require("../models/shopModel");
 const { seq, getDate, prependToFile } = require("../utils/util");
 const { encrypt, decrypt } = require("../functions");
 const mongoose = require("mongoose");
-
+const fs = require("fs");
+const path = require('path');
 
 module.exports.createProduct = async (req, res) => {
-  const { shop_id, domain, email, password } = req.body;
+  const file_path = req?.file?.path; // Assuming the file upload is handled by multer and file_path is available 
+  console.log(req?.path);
+
+  const { shop_id, domain, email, password, course_name } = req.body;
   let hashedPassword = encrypt(password, process.env.CRYPTO_KEY);
-  if (!shop_id || !domain || !email || !password) {
-    return res.status(400).json({ message: "Domain, Email/username or password is required!" });
-  }
+
   const products = await productModel.create({
     seq: seq(),
     domain,
+    course_name,
+    file_path,
     email,
     password: hashedPassword,
     shop_id,
   });
   if (products) {
+    const decryptedPassword = decrypt(products.password, process.env.CRYPTO_KEY);
+    products.password = decryptedPassword;
     res.status(200).json({
       message: "credential created successfully",
       products,
@@ -105,7 +111,9 @@ module.exports.getPasswordData = async (req, res) => {
         k: "$password",
         e: "$email",
         d: "$domain",
-        l: "$shop_name"
+        g: "$shop_name",
+        c: "$course_name",
+        m: "$file_path"
       }
     },
     {
@@ -129,10 +137,19 @@ module.exports.getProductByShopId = async (req, res) => {
     res.status(400).json({ message: "Credentials id is required" });
   }
   const products = await productModel.find({ shop_id: id }).sort({ product_name: 1 });
+  // if (!products || products.length === 0) {
+  //   return res.status(404).json({ message: "No products found for this shop" });
+  // }
+  products.forEach((product, i) => {
+    if (product.password) {
+      const decryptedPassword = decrypt(product.password, process.env.CRYPTO_KEY);
+      products[i].password = decryptedPassword;
+    }
+  });
   res.status(200).json({
     products,
   });
-};
+}
 module.exports.updateProductById = async (req, res) => {
   try {
     const { id, wastage, baked } = req.body;
@@ -200,6 +217,18 @@ module.exports.deleteProductById = async (req, res) => {
     const { id } = req.body;
     if (!id) {
       return res.status(400).json({ message: "Product id is required" });
+    }
+    const productData = await productModel.findOne({ _id: id });
+    if (productData) {
+      let media_path = productData.file_path;
+      if (media_path) {
+        const fs = require("fs");
+        fs.unlink(media_path, (err) => {
+          if (err) {
+            console.error("Error deleting file:", err);
+          }
+        });
+      }
     }
     const products = await productModel.deleteOne({ _id: id });
     if (!products) {
