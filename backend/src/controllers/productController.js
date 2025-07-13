@@ -106,6 +106,7 @@ module.exports.getPasswordData = async (req, res) => {
         }
       }
     },
+    { $sort: { createdAt: -1 } },
     {
       $project: {
         k: "$password",
@@ -113,7 +114,8 @@ module.exports.getPasswordData = async (req, res) => {
         d: "$domain",
         g: "$shop_name",
         c: "$course_name",
-        m: "$file_path"
+        m: "$file_path",
+        t: "$createdAt"
       }
     },
     {
