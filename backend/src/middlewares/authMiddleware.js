@@ -53,8 +53,8 @@ const memberMiddleware = async (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await UserModel.findOne({ email: decoded.email, _id: decoded._id });
-    if (user.is_locked == true) {
-      return res.status(200).json({ error: true, message: "Sorry, your account has been locked by admin!" });
+    if (user && user?.is_locked == true) {
+      return res.status(503).json({ error: true, message: "Sorry, your account has been locked by admin!" });
     }
     if (user && decoded && decoded.role === "member" || decoded.role === "admin") {
       req.user = decoded;
@@ -62,8 +62,10 @@ const memberMiddleware = async (req, res, next) => {
     } else {
       res.status(403).json({ message: "Only admin or member can access this route" });
     }
-  } catch {
-    res.status(403).json({ message: "Invalid Token" });
+  } catch (err) {
+    console.log(err);
+
+    res.status(403).json({ message: err.message || "Invalid Token" });
   }
 };
 const ipTrackMiddleware = async (req, res, next) => {

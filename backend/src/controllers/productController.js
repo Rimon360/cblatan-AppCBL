@@ -152,54 +152,20 @@ module.exports.getProductByShopId = async (req, res) => {
     products,
   });
 }
+
 module.exports.updateProductById = async (req, res) => {
   try {
-    const { id, wastage, baked } = req.body;
-    const username = req?.user?.username || "--";
-
-    const products = await productModel.updateOne({ _id: id }, { $set: { wastage, baked } });
-    const data = await productModel.aggregate([
-      {
-        $addFields: {
-          shop_id: { $toObjectId: "$shop_id" },
-        },
-      },
-      {
-        $match: { _id: new mongoose.Types.ObjectId(id) }, // replace with actual ID
-      },
-      {
-        $lookup: {
-          from: "shops",
-          localField: "shop_id",
-          foreignField: "_id",
-          as: "shops",
-        },
-      },
-      { $unwind: "$shops" },
-      {
-        $project: {
-          product_name: 1,
-          seq: 1,
-          shop_name: "$shops.shop_name",
-        },
-      },
-    ]);
-
-    let logData = `${getDate()};${data[0].shop_name};${username};${data[0].seq};${data[0].product_name};${baked};${wastage}\n`;
-
-    prependToFile("../backend", logData);
-
-
-    res.status(200).json({
-      message: "success",
-      products,
-    });
+    const { id, password, ...updateData } = req.body;
+    const decrypted = encrypt(password);
+    updateData.password = decrypted;
+    const result = await productModel.updateOne({ _id: id }, { $set: updateData });
+    if (result.modifiedCount === 0) return res.status(400).json({ message: "Update failed!" });
+    res.status(200).json({ message: "success" });
   } catch (error) {
-    res.status(400).json({
-      message: error.message,
-    });
+    res.status(400).json({ message: error.message });
   }
 };
+
 
 module.exports.resetWastage = async (req, res) => {
   try {

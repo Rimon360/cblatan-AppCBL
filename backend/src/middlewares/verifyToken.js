@@ -10,7 +10,7 @@ const verifyToken = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     let user = await UserModel.findOne({ email: decoded.email });
     if (user.is_locked == true) {
-      return res.status(200).json({ error: true, message: "Sorry, your account has been locked by admin!" });
+      return res.status(503).json({ error: true, message: "Sorry, your account has been locked by admin!" });
     }
     if (user) {
       req.user = decoded;

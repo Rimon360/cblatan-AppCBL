@@ -42,6 +42,7 @@ const Users = () => {
 
       })
       .catch((error) => {
+        toast.error(error.response.data?.message);
         console.error("Error fetching users:", error);
       });
   }, []);
@@ -106,7 +107,7 @@ const Users = () => {
         setUsers((prev) => [...prev, response.data.user]);
       })
       .catch((error) => {
-        toast.error(error.response.data.message);
+        toast.error(error.response.data?.message);
         console.error("Error creating user:", error);
       });
   };

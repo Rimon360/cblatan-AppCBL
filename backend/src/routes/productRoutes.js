@@ -13,7 +13,7 @@ router.post("/create", adminMiddleware, upload.single('file'), validateFields, c
 router.get("/get_report", getReports);
 router.get("/reset_wastage", resetWastage);
 router.get("/getpassworddata/:id", memberMiddleware, ipTrackMiddleware, getPasswordData);
-router.post("/update", memberMiddleware, updateProductById);
+router.post("/update", adminMiddleware, updateProductById);
 router.delete("/delete", adminMiddleware, deleteProductById);
 router.get("/:id", adminMiddleware, getProductByShopId);
 

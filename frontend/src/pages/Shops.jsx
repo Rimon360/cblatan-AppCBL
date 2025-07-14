@@ -10,6 +10,7 @@ import { useGlobal } from "../context/GlobalStete";
 import Swal from "sweetalert2";
 import { decrypt, isValidURL } from "../functions";
 import { getDomain } from "../functions";
+import { CiEdit } from "react-icons/ci";
 const Shops = () => {
   const [selectedShopId, setSelectedShopId] = useState(null);
   const [shop_name, setShopName] = useState([]);
@@ -26,6 +27,9 @@ const Shops = () => {
   const [decryptionData, setDecryptionData] = useState(null);
   const [decryptedPassword, setDecryptedPassword] = useState("");
   const [file, setFile] = useState(null);
+  const [courseSearchQuery, setCourseSearchQuery] = useState('');
+  const [reservedProducts, setReservedProducts] = useState([]);
+
   useEffect(() => {
     if (shop_id != null) {
       setSelectedShopId(shop_id);
@@ -55,7 +59,7 @@ const Shops = () => {
       },
     }));
   };
-
+  const [isUpdated, setIsUpdated] = useState(false);
   useEffect(() => {
     let url = shopsURL;
     if (!isAdmin) return;
@@ -99,6 +103,7 @@ const Shops = () => {
       .then((res) => {
         if (res.data.products) {
           setProducts(res.data.products);
+          setReservedProducts(res.data.products);
         }
         else {
           toast.success("No Product Found!");
@@ -107,7 +112,7 @@ const Shops = () => {
       .catch((e) => {
         toast.error(e.message);
       });
-  }, [selectedShopId]);
+  }, [selectedShopId, isUpdated]);
 
   const handleCreateShop = (e) => {
     if (e.keyCode == 13) {
@@ -132,52 +137,83 @@ const Shops = () => {
       toast.error("Invalid domain field value. eg: https://exmaple.com/login")
       return
     }
-    const formData = new FormData();
-    formData.append('shop_id', selectedShopId);
-    formData.append('email', email);
-    formData.append('domain', domain);
-    formData.append('password', password);
-    formData.append('course_name', courseName);
-    formData.append('file', file);
-    if (!file) {
-      toast.error("Please upload a file.");
-      return;
+    if (!editAbleData.id) {
+      const formData = new FormData();
+      formData.append('shop_id', selectedShopId);
+      formData.append('email', email);
+      formData.append('domain', domain);
+      formData.append('password', password);
+      formData.append('course_name', courseName);
+      formData.append('file', file);
+      if (!file) {
+        toast.error("Please upload a file.");
+        return;
+      }
+      axios
+        .post(productCreateURL, formData, { headers: { Authorization: "Bearer " + token, 'Content-Type': 'multipart/form-data' } })
+        .then((res) => {
+          setProductName("");
+          setProducts((prev) => [...prev, res.data.products]);
+          setEmail("");
+          setDomain("");
+          setCourseName("");
+          setPassword("");
+          setFile(null);
+          toast.success("Credential created successfully!");
+        })
+        .catch((e) => {
+          toast.error(e.response.data.message);
+        });
+    } else {
+      axios
+        .post(productUpdateURL, { course_name: courseName, domain, email, password, id: editAbleData.id }, { headers: { Authorization: "Bearer " + token } })
+        .then((res) => {
+          setProductName("");
+          // setProducts((prev) => [...prev, res.data.products]);
+          setEmail("");
+          setDomain("");
+          setCourseName("");
+          setPassword("");
+          setFile(null);
+          setIsUpdated(Date.now());
+          toast.success("Credential created successfully!");
+        })
+        .catch((e) => {
+          toast.error(e.response.data.message);
+        });
+
     }
-    axios
-      .post(productCreateURL, formData, { headers: { Authorization: "Bearer " + token, 'Content-Type': 'multipart/form-data' } })
-      .then((res) => {
-        setProductName("");
-        setProducts((prev) => [...prev, res.data.products]);
-        setEmail("");
-        setDomain("");
-        setCourseName("");
-        setPassword("");
-        setFile(null);
-        toast.success("Credential created successfully!");
-      })
-      .catch((e) => {
-        toast.error(e.response.data.message);
-      });
+
     return false;
   };
-  const handleProductUpdate = (id) => {
-    Swal.fire({
-      title: "Do you really want to updete?",
-      showCancelButton: true,
-      confirmButtonText: "Yes",
-      cancelButtonText: "No",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        axios
-          .post(productUpdateURL, { id, wastage: productStates[id]?.wastage || 0, baked: productStates[id]?.baked || 0 }, { headers: { Authorization: "Bearer " + token } })
-          .then((res) => {
-            toast.success("Product changes have been saved!");
-          })
-          .catch((e) => {
-            toast.error(e.response.data.message);
-          });
-      }
-    });
+
+  const [editAbleData, setEditAbleData] = useState({})
+
+  useEffect(() => {
+    if (editAbleData.id) {
+      setEmail(editAbleData.email);
+      setDomain(editAbleData.domain);
+      setPassword(editAbleData.password);
+      setCourseName(editAbleData.course_name);
+    }
+
+  }, [editAbleData])
+
+  const handleProductUpdate = (id, course_name, domain, email, password) => {
+
+    setEditAbleData({ id, course_name, domain, email, password })
+
+
+    // if (result.isConfirmed) {
+    //   axios
+    //     .post(productUpdateURL, { id, course_name, domain, email, password }, { headers: { Authorization: "Bearer " + token } })
+    //     .then((res) => {
+    //       toast.success("Product changes have been saved!");
+    //     })
+    //     .catch((e) => {
+    //       toast.error(e.response.data.message);
+    //     });
+    // }
   };
   useEffect(() => {
     const initialState = {};
@@ -242,8 +278,24 @@ const Shops = () => {
       nav("/");
     }
   };
+  const handleCourseSearch = (query) => {
+    setCourseSearchQuery(query);
+    if (!query) {
+      setProducts(reservedProducts);
+      return;
+    }
+
+    if (reservedProducts.length === 0) return setProducts([]);
+    const filteredProducts = reservedProducts?.filter(product =>
+      product.course_name.toLowerCase().includes(query.trim().toLowerCase())
+    );
+
+    setProducts(filteredProducts);
+  };
+
   return (
     <>
+
       <section className="shop-section p-6">
 
         {isAdmin ? (
@@ -347,7 +399,7 @@ const Shops = () => {
                     placeholder="Enter passsword"
                   />
                 </label>
-                <label tabIndex="0" htmlFor="file" className=" sticky top-0 bg-green-200 text-green-500 hover:text-white hover:bg-green-300 cursor-pointer rounded-md p-2 mt-5" >
+                {!editAbleData.id ? (<label tabIndex="0" htmlFor="file" className=" sticky top-0 bg-green-200 text-green-500 hover:text-white hover:bg-green-300 cursor-pointer rounded-md p-2 mt-5" >
                   Upload media
                   <input
                     id="file"
@@ -357,22 +409,55 @@ const Shops = () => {
                     className="opacity-0 absolute w-0 h-0"
                     type="file"
                   />
-                </label>
+                </label>) : ""}
+
               </div>
 
-              <label className="bg-red-400" >
-                <button type="submit" className="flex items-center gap-2 create-user   py-2 px-4 bg-orange-500 text-white rounded-lg hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500">
-                  Create credential<IoMdAdd className="ml-[-6px] text-2xl" />
-                </button>
-              </label>
+              <div className="w-fit" >
+                {editAbleData.id ? (<div className="flex gap-2">
+                  <button type="button" onClick={() => {
+                    setEditAbleData({});
+                    setEmail("");
+                    setDomain("");
+                    setPassword("");
+                    setCourseName("");
+                  }} className="flex items-center gap-2 create-user   py-2 px-4 bg-red-400 text-white rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400">
+                    Cancel
+                    <IoMdAdd className="ml-[-6px] text-2xl" />
+                  </button>
+
+                  <button type="submit" className="flex items-center gap-2 create-user   py-2 px-4 bg-green-500 text-white rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500">
+                    Update Credential
+                    <IoMdAdd className="ml-[-6px] text-2xl" />
+                  </button>
+
+
+                </div>
+
+                ) : (<>             <button type="submit" className="flex items-center gap-2 create-user   py-2 px-4 bg-orange-500 text-white rounded-lg hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500">
+                  Create Credential
+                  <IoMdAdd className="ml-[-6px] text-2xl" />
+                </button></>)}
+              </div>
             </form>
           ) : (
             <p className="text-gray-400 mb-2 bg-gray-50 text-center ">
               No course group selected.
             </p>
           )}
-          {products.length > 0 ? (
+          {selectedShopId ? (<div>
+            <input
+              type="search"
+              value={courseSearchQuery}
+              placeholder="Search course by name"
+              onChange={(e) => handleCourseSearch(e.target.value)}
+            />
+          </div>) : ""}
+
+          {products.length > 0 ? (<>
+
             <div className="overflow-auto mt-5 rounded-md ">
+
               <table  >
                 <thead>
                   <tr>
@@ -381,24 +466,37 @@ const Shops = () => {
                     <th>Domain</th>
                     <th>Email/Username</th>
                     <th>Password</th>
+                    <th>Edit</th>
                     {isAdmin ? <th>Del</th> : ""}
                   </tr>
                 </thead>
                 <tbody>
-                  {products.map((product) => {
+                  {products.map((p) => {
                     return (
-                      <tr key={product._id} className="hover:bg-gray-100">
-                        <td className="text-orange-500 select-all " ><img crossOrigin="annonyms" className="max-w-[50px] max-h-[50px] " src={import.meta.env.VITE_BACKEND_URL + "/" + product.file_path} alt="" /></td>
-                        <td className="text-orange-500 select-all " >{product.course_name}</td>
-                        <td className="text-green-500 select-all " >{getDomain(product.domain)}</td>
-                        <td className="text-blue-500 select-all " >{product.email}</td>
-                        <td className="text-gray-400 select-all " >{product.password}</td>
+                      <tr key={p._id} className="hover:bg-gray-100">
+                        <td className="text-orange-500 select-all " ><img crossOrigin="annonyms" className="max-w-[50px] max-h-[50px] " src={import.meta.env.VITE_BACKEND_URL + "/" + p.file_path} alt="" /></td>
+                        <td className="text-orange-500 select-all " >{p.course_name}</td>
+                        <td className="text-green-500 select-all " >{getDomain(p.domain)}</td>
+                        <td className="text-blue-500 select-all " >{p.email}</td>
+                        <td className="text-gray-400 select-all " >{p.password}</td>
+                        <td>
+                          <div className="flex items-center justify-center">
+                            <button
+                              onClick={() => {
+                                handleProductUpdate(p._id, p.course_name, p.domain, p.email, p.password);
+                              }}
+                              className="px-2 py-2 text-green-400 rounded hover:bg-green-200"
+                            >
+                              <CiEdit />
+                            </button>
+                          </div>
+                        </td>
                         {isAdmin ? (
                           <td>
                             <div className="flex items-center justify-center">
                               <button
                                 onClick={() => {
-                                  handleProductDelete(product._id);
+                                  handleProductDelete(p._id);
                                 }}
                                 className="px-2 py-2 text-orange-400 rounded hover:bg-orange-200"
                               >
@@ -409,17 +507,18 @@ const Shops = () => {
                         ) : (
                           ""
                         )}
+
                       </tr>
                     );
                   })}
                 </tbody>
               </table>
-            </div>
+            </div></>
           ) : (
             <div className="text-gray-400 text-center p-4">
               {
                 selectedShopId
-                  ? "No password found in this title"
+                  ? "No password found in this group."
                   : ""
               }
             </div>

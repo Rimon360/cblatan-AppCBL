@@ -54,7 +54,7 @@ exports.loginUser = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
     if (user.is_locked == true) {
-      return res.status(200).json({ error: true, message: "Sorry, your account has been locked by admin!" });
+      return res.status(503).json({ error: true, message: "Sorry, your account has been locked by admin!" });
     }
 
     // check ip
