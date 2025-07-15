@@ -11,6 +11,7 @@ import Swal from "sweetalert2";
 import { decrypt, isValidURL } from "../functions";
 import { getDomain } from "../functions";
 import { CiEdit } from "react-icons/ci";
+import { FaUpload } from "react-icons/fa";
 const Shops = () => {
   const [selectedShopId, setSelectedShopId] = useState(null);
   const [shop_name, setShopName] = useState([]);
@@ -293,6 +294,31 @@ const Shops = () => {
     setProducts(filteredProducts);
   };
 
+  const handleProductImageUpdate = (id, file) => {
+    if (!file) {
+      return;
+    }
+    const formData = new FormData();
+    formData.append('id', id);
+    formData.append('file', file);
+
+    axios
+      .post(productUpdateURL + '/image', formData, {
+        headers: {
+          Authorization: "Bearer " + token,
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+      .then((res) => {
+        toast.success("Product image updated successfully!");
+        setIsUpdated(Date.now());
+      })
+      .catch((e) => {
+        toast.error(e.response?.data?.message || e.message);
+      });
+
+  }
+
   return (
     <>
 
@@ -461,24 +487,40 @@ const Shops = () => {
               <table  >
                 <thead>
                   <tr>
-                    <th>Thumnail</th>
+                    <th>#</th>
                     <th>Course name</th>
                     <th>Domain</th>
                     <th>Email/Username</th>
                     <th>Password</th>
+                    <th>Change image</th>
                     <th>Edit</th>
                     {isAdmin ? <th>Del</th> : ""}
                   </tr>
                 </thead>
                 <tbody>
-                  {products.map((p) => {
+                  {products.map((p, i) => {
                     return (
                       <tr key={p._id} className="hover:bg-gray-100">
-                        <td className="text-orange-500 select-all " ><img crossOrigin="annonyms" className="max-w-[50px] max-h-[50px] " src={import.meta.env.VITE_BACKEND_URL + "/" + p.file_path} alt="" /></td>
+                        <td className="text-orange-500 select-all " >
+                          {i + 1}
+                        </td>
                         <td className="text-orange-500 select-all " >{p.course_name}</td>
                         <td className="text-green-500 select-all " >{getDomain(p.domain)}</td>
                         <td className="text-blue-500 select-all " >{p.email}</td>
                         <td className="text-gray-400 select-all " >{p.password}</td>
+                        <td>
+                          <div className="flex items-center justify-center">
+                            <label
+                              onChange={(e) => {
+                                handleProductImageUpdate(p._id, e.target.files[0]);
+                              }}
+                              className="px-2 py-2 text-green-400 rounded  hover:bg-green-200 cursor-pointer"
+                            >
+                              <input accept="image/*" type="file" className=" opacity-1 absolute !w-0 !h-0 !z-0" />
+                              <FaUpload />
+                            </label>
+                          </div>
+                        </td>
                         <td>
                           <div className="flex items-center justify-center">
                             <button

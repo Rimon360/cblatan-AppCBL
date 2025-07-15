@@ -81,7 +81,7 @@ const ipTrackMiddleware = async (req, res, next) => {
       req.user = decoded;
       next();
     }
-    if (decoded && decoded.role === "member" || decoded.role === "admin") {
+    if (decoded && decoded.role === "member") {
       const user = await UserModel.findOne({ email: decoded.email, _id: decoded._id })
       if (user && user.ip_address && user.ip_address != 'null' && user.ip_address == ip || user.ip_address == null) {
         if (user.ip_address == null) {

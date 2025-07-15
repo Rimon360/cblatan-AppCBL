@@ -4,7 +4,7 @@ const { seq, getDate, prependToFile } = require("../utils/util");
 const { encrypt, decrypt } = require("../functions");
 const mongoose = require("mongoose");
 const fs = require("fs");
-const path = require('path');
+
 
 module.exports.createProduct = async (req, res) => {
   const file_path = req?.file?.path; // Assuming the file upload is handled by multer and file_path is available 
@@ -161,6 +161,31 @@ module.exports.updateProductById = async (req, res) => {
     const result = await productModel.updateOne({ _id: id }, { $set: updateData });
     if (result.modifiedCount === 0) return res.status(400).json({ message: "Update failed!" });
     res.status(200).json({ message: "success" });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+module.exports.updateProductImageById = async (req, res) => {
+  try {
+    const { id } = req.body;
+    const file_path = 'uploads\\' + req.file?.filename
+    const product = await productModel.findById(id);
+    console.log(file_path, product.file_path);
+
+    if (product) {
+      let media_path = product.file_path;
+      if (media_path) {
+        const fs = require("fs");
+        fs.unlink(media_path, (err) => {
+          if (err) {
+            console.error("Error deleting file:", err);
+          }
+        });
+      }
+    }
+    const result = await productModel.updateOne({ _id: id }, { file_path });
+    if (result.modifiedCount === 0) return res.status(400).json({ message: "Image chaning failed!" });
+    res.status(200).json({ message: "Image changed successfully" });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }

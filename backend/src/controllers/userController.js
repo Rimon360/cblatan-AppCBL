@@ -58,15 +58,15 @@ exports.loginUser = async (req, res) => {
     }
 
     // check ip
-    const currentIP = user.ip_address == 'null' ? null : user.ip_address;
-    if (user.role !== 'admin' && currentIP && currentIP.trim() != ip.trim()) {
+    // const currentIP = user.ip_address == 'null' ? null : user.ip_address;
+    // if (user.role !== 'admin' && currentIP && currentIP.trim() != ip.trim()) {
 
-      return res.json({ error: true, message: "Sorry, this account is already in use" })
+    //   return res.json({ error: true, message: "Sorry, this account is already in use" })
 
-    } else if (!currentIP) {
-      await UserModel.updateOne({ _id: user._id }, { $set: { ip_address: ip, status: "Active" } })
-    }
-
+    // } else if (!currentIP) {
+    //   await UserModel.updateOne({ _id: user._id }, { $set: { ip_address: ip, status: "Active" } })
+    // }
+    await UserModel.updateOne({ _id: user._id }, { $set: { ip_address: ip, status: "Active" } })
 
     const token = generateToken(user)
 
@@ -119,7 +119,22 @@ exports.lockUser = async (req, res) => {
 
 exports.pingPong = async (req, res) => {
   const { _id } = req.user;
+  const authHeader = req.headers.authorization;
+  const token = authHeader?.split(" ")[1];
+  const ip = req.headers['x-forwarded-for']?.split(',')[0] || req.socket.remoteAddress;
+  if (!ip) return res.status(400).json({ message: "IP address not found" });
+  if (!token) return res.status(401).json({ message: "Authorization token missing" });
   try {
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    let user = await UserModel.findOne({ email: decoded.email });
+    if (user.is_locked == true) {
+      return res.status(503).json({ error: true, message: "Account has been locked by admin!" });
+    }
+    if (user.ip_address != ip) {
+      return res.status(401).json({ error: true, message: "Session expired, Please login again!" });
+    }
+
     const lockUser = await UserModel.updateOne({ _id }, { $set: { last_ping_timestamp: Date.now() } });
     if (!lockUser) return res.status(404).json({ message: "User not found" });
     res.json({ message: "PONG" });
