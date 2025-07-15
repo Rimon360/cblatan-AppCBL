@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { TiUserAdd } from "react-icons/ti";
-import axios from "axios";
+import axios from '../../axiosConfig';
 import { Navigate, Link } from "react-router-dom";
 import { registerURL, usersUrl, usersLockingUrl } from "../routes/Url";
 import toast from "react-hot-toast";
@@ -27,7 +27,7 @@ const Activity = () => {
         const interval = setInterval(() => {
             setLastUpdate(Date.now());
             setRefresh(prev => !prev);
-        }, 60 * 1000); // 60 seconds 
+        }, 30 * 1000); // 60 seconds 
         return () => clearInterval(interval);
     }, []);
 
@@ -146,10 +146,10 @@ const Activity = () => {
         <>
             <section className="users p-6">
                 <div className="users-container mt-6">
-                    <input type="search" placeholder="Search user" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="p-2 sticky top-0 mb-4 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                    <input type="search" placeholder="Search user" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="p-2 sticky top-0 mb-4 w-full border border-gray-300 bg-white z-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" />
                     <hr />
                     <small>Last updated at {(new Date(lastUpdate)).toLocaleString()} </small>
-                    <div className=" max-h-[300px] overflow-auto">
+                    <div className=" overflow-auto">
                         <table className="w-full max-h-300 overflow-auto mt-4 text-left border-collapse">
                             <thead>
                                 <tr className="bg-gray-200">

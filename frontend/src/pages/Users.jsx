@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { TiUserAdd } from "react-icons/ti";
-import axios from "axios";
+import axios from '../../axiosConfig';
 import { Navigate, Link } from "react-router-dom";
 import { registerURL, usersUrl } from "../routes/Url";
 import toast from "react-hot-toast";

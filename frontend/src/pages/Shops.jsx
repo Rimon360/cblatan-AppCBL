@@ -3,7 +3,7 @@ import { FaCheck, FaMinus } from "react-icons/fa6";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { useState, useEffect, use } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import axios from '../../axiosConfig';
 import { shopCreateURL, productCreateURL, shopsURL, productsURL, productUpdateURL, memberShopsURL, productDeleteURL, shopDeleteURL } from "../routes/Url";
 import toast from "react-hot-toast";
 import { useGlobal } from "../context/GlobalStete";

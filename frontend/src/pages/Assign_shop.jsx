@@ -4,7 +4,7 @@ import { RiDeleteBin6Line } from "react-icons/ri";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { BsArrowRight } from "react-icons/bs";
-import axios from "axios";
+import axios from '../../axiosConfig';
 import { shopCreateURL, productCreateURL, shopsURL, productsURL, productUpdateURL, unassignURL, assignURL, getassignedshopsURL } from "../routes/Url";
 import toast from "react-hot-toast";
 import { useGlobal } from "../context/GlobalStete";

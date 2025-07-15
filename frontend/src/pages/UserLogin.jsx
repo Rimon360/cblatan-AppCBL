@@ -1,11 +1,11 @@
-import {NavLink, useNavigate, useParams} from "react-router-dom";
-import {useState, useEffect} from "react";
-import axios from "axios";
-import {Toaster, toast} from "react-hot-toast";
-import {loginUrl} from "../routes/Url";
+import { NavLink, useNavigate, useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import axios from '../../axiosConfig';
+import { Toaster, toast } from "react-hot-toast";
+import { loginUrl } from "../routes/Url";
 
 function UserLogin() {
-  const {user_id, username} = useParams("");
+  const { user_id, username } = useParams("");
   const [pin, setPIN] = useState("");
   const navigate = useNavigate();
 
@@ -23,7 +23,7 @@ function UserLogin() {
     }
 
     try {
-      const response = await axios.post(loginUrl, {username, password: pin});
+      const response = await axios.post(loginUrl, { username, password: pin });
       if (response.data.token) {
         localStorage.setItem("token", response.data.token);
         navigate("/dashboard/shops"); // Redirect to the dashboard with the user ID

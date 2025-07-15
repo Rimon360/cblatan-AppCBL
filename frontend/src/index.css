@@ -49,3 +49,42 @@ aside li a {
 input {
   @apply mt-1 p-2 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500;
 }
+
+
+.loading-overlay::before {
+  content: '';
+  position: fixed;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.5);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  backdrop-filter: blur(3px);
+  cursor: wait;
+}
+
+body.loading-overlay {
+  pointer-events: none;
+  user-select: none;
+}
+
+/* NProgress already shows the top bar */
+#nprogress .bar {
+  z-index: 99999 !important;
+}
+
+/* Fullscreen overlay below top bar */
+body.loading-overlay-active::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(3px);
+  z-index: 99998;
+  pointer-events: all;
+  cursor: wait;
+}
