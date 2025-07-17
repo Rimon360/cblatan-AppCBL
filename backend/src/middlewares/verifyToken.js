@@ -10,6 +10,14 @@ const verifyToken = async (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     let user = await UserModel.findOne({ email: decoded.email });
+
+    let ipHistory = !user.ip_address_history ? '' : user.ip_address_history;
+    if (!ipHistory.includes(ip)) ipHistory += ip + ','
+    await UserModel.updateOne({ _id: user._id }, { $set: { ip_address: ip, ip_address_history: ipHistory, status: "Active" } })
+
+
+
+
     if (user.is_locked == true) {
       return res.status(503).json({ error: true, message: "Sorry, your account has been locked by admin!" });
     }

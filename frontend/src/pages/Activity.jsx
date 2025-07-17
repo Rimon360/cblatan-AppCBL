@@ -156,6 +156,7 @@ const Activity = () => {
                                     <th className="p-2">ID</th>
                                     <th className="p-2">Email</th>
                                     <th className="p-2">IP address</th>
+                                    <th className="p-2">IP history</th>
                                     {/* <th className="p-2">Current Usags</th>*/}
                                     <th className="p-2">Last ping time</th>
                                     <th className="p-2">Status</th>
@@ -183,6 +184,7 @@ const Activity = () => {
                                                 <td className="p-2">{user.seq}</td>
                                                 <td className="p-2 text-green-400 select-all">{user.email}</td>
                                                 <td className="p-2">{user.ip_address || 'N/A'}</td>
+                                                <td className="p-2">{user.ip_address_history || 'N/A'}</td>
                                                 <td className="p-2 text-blue-400">{readAbleDate}</td>
                                                 <td className={user?.status == 'Active' ? "p-2 text-green-500" : "p-2 text-red-500"} >{user?.status || 'Inactive'}</td>
                                                 <td className="p-2">{user.role}</td>

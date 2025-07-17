@@ -8,7 +8,7 @@ const fs = require("fs");
 
 module.exports.createProduct = async (req, res) => {
   const file_path = req?.file?.path; // Assuming the file upload is handled by multer and file_path is available 
-  console.log(req?.path);
+
 
   const { shop_id, domain, email, password, course_name } = req.body;
   let hashedPassword = encrypt(password, process.env.CRYPTO_KEY);
@@ -170,7 +170,6 @@ module.exports.updateProductImageById = async (req, res) => {
     const { id } = req.body;
     const file_path = 'uploads\\' + req.file?.filename
     const product = await productModel.findById(id);
-    console.log(file_path, product.file_path);
 
     if (product) {
       let media_path = product.file_path;

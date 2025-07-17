@@ -58,15 +58,9 @@ exports.loginUser = async (req, res) => {
     }
 
     // check ip
-    // const currentIP = user.ip_address == 'null' ? null : user.ip_address;
-    // if (user.role !== 'admin' && currentIP && currentIP.trim() != ip.trim()) {
-
-    //   return res.json({ error: true, message: "Sorry, this account is already in use" })
-
-    // } else if (!currentIP) {
-    //   await UserModel.updateOne({ _id: user._id }, { $set: { ip_address: ip, status: "Active" } })
-    // }
-    await UserModel.updateOne({ _id: user._id }, { $set: { ip_address: ip, status: "Active" } })
+    let ipHistory = !user.ip_address_history ? '' : user.ip_address_history;
+    if (!ipHistory.includes(ip)) ipHistory += ip + ','
+    await UserModel.updateOne({ _id: user._id }, { $set: { ip_address: ip, ip_address_history: ipHistory, status: "Active" } })
 
     const token = generateToken(user)
 

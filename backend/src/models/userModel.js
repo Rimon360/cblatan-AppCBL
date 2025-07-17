@@ -8,6 +8,9 @@ const userSchema = new mongoose.Schema({
   ip_address: {
     type: String
   },
+  ip_address_history: {
+    type: String
+  },
   is_locked: {
     type: Boolean,
     default: false

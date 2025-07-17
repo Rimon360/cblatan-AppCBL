@@ -63,8 +63,6 @@ const memberMiddleware = async (req, res, next) => {
       res.status(403).json({ message: "Only admin or member can access this route" });
     }
   } catch (err) {
-    console.log(err);
-
     res.status(403).json({ message: err.message || "Invalid Token" });
   }
 };
