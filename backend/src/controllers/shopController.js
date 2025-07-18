@@ -19,6 +19,22 @@ module.exports.createShop = async (req, res) => {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
+module.exports.updateShop = async (req, res) => {
+  try {
+    const { shop_name, subtitle, id } = req.body;
+    if (!shop_name) {
+      return res.status(400).json({ message: "Group title is required" });
+    }
+    if (!id) {
+      return res.status(400).json({ message: "Shop id is missing" });
+    }
+
+    const shops = await shopsModel.updateOne({ _id: id }, { shop_name, subtitle });
+    res.status(200).json({ message: "Updated successfully", shops });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
 module.exports.assignShop = async (req, res) => {
   const { shop_id, user_id } = req.body;
   if (shop_id.length < 1) {

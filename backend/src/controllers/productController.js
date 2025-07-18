@@ -102,7 +102,7 @@ module.exports.getPasswordData = async (req, res) => {
     {
       $replaceRoot: {
         newRoot: {
-          $mergeObjects: ["$products", { shop_name: "$shop.shop_name" }]
+          $mergeObjects: ["$products", { shop_name: "$shop.shop_name", subtitle: "$shop.subtitle" }]
         }
       }
     },
@@ -115,7 +115,8 @@ module.exports.getPasswordData = async (req, res) => {
         g: "$shop_name",
         c: "$course_name",
         m: "$file_path",
-        t: "$createdAt"
+        t: "$createdAt",
+        st: "$subtitle"
       }
     },
     {

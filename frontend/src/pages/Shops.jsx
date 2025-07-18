@@ -61,6 +61,7 @@ const Shops = () => {
     }));
   };
   const [isUpdated, setIsUpdated] = useState(false);
+  const [isShopUpdated, setIsShopUpdated] = useState(false);
   useEffect(() => {
     let url = shopsURL;
     if (!isAdmin) return;
@@ -76,10 +77,11 @@ const Shops = () => {
       .catch((e) => {
         toast.error(e.message);
       });
-  }, []);
-
-  const handleShopClick = (id) => {
+  }, [isShopUpdated]);
+  const [selectedShop, setSelectedShop] = useState([]);
+  const handleShopClick = (id, shop) => {
     setSelectedShopId(id);
+    setSelectedShop(shop);
     axios
       .get(productsURL + "/" + id, { headers: { Authorization: "Bearer " + token } })
       .then((res) => {
@@ -318,6 +320,32 @@ const Shops = () => {
       });
 
   }
+  const [groupTitle, setGroupTitle] = useState('');
+  const [groupSubtitle, setGroupSubtitle] = useState('');
+  useEffect(() => {
+    setGroupTitle(selectedShop?.shop_name)
+    setGroupSubtitle(selectedShop?.subtitle || '')
+  }, [selectedShop])
+  const handleProductTitleUpdate = (e) => {
+    e.preventDefault();
+    console.log(groupSubtitle, groupTitle);
+
+    axios
+      .post(shopsURL + '/update', { shop_name: groupTitle, subtitle: groupSubtitle, id: selectedShop._id }, {
+        headers: {
+          Authorization: "Bearer " + token
+        }
+      })
+      .then((res) => {
+        toast.success("Updated successfully!");
+        setIsShopUpdated(Date.now());
+      })
+      .catch((e) => {
+        toast.error(e.response?.data?.message || e.message);
+      });
+
+    // return false;
+  }
 
   return (
     <>
@@ -339,12 +367,15 @@ const Shops = () => {
                     <li
                       key={shop._id}
                       onClick={(e) => {
-                        handleShopClick(shop._id);
+                        handleShopClick(shop._id, shop);
                       }}
                       className={`flex justify-between items-center p-[4px] cursor-pointer bg-gray-200 m-0.5 rounded   ${selectedShopId == shop._id ? "text-white bg-gray-900  " : "text-black-400 hover:text-blue-500 capitalize hover:bg-gray-300"}`}
                     >
-                      <p className="font-semibold ml-2">
+                      <p className="font-semibold ml-2 text-sm">
                         {shop.shop_name}
+                        <br />
+                        {shop.subtitle ? (<small className="ml-2" >- {shop.subtitle}</small>) : ""}
+
                       </p>
                       <button
                         onClick={(e) => {
@@ -371,101 +402,112 @@ const Shops = () => {
 
         <div className="product-list mt-4">
           {selectedShopId != null && isAdmin ? (
-            <form onSubmit={handleProductCreate} className="  bg-gray-100 p-4 rounded-2xl  " >
-              <div className="flex gap-2 bg-gray-100  rounded-2xl items-center" >
-                <label>
-                  Course name:
-                  <input
-                    required
-                    value={courseName}
-                    onChange={(e) => {
-                      setCourseName(e.target.value);
-                    }}
-                    className="mb-2  sticky top-0 bg-white"
-                    type="text"
-                    placeholder="Enter course name"
-                  />
-                </label>
-                <label>
-                  Domain:
-                  <input
-                    required
-                    value={domain}
-                    onChange={(e) => {
-                      setDomain(e.target.value);
-                    }}
-                    className="mb-2  sticky top-0 bg-white"
-                    type="text"
-                    placeholder="Enter domain name"
-                  />
-                </label>
-                <label>
-                  Email/username:
-                  <input
-                    required
-                    value={email}
-                    onChange={(e) => {
-                      setEmail(e.target.value);
-                    }}
-                    className="mb-2  sticky top-0 bg-white"
-                    type="text"
-                    placeholder="Enter Emali/username"
-                  />
-                </label>
-                <label>
-                  Password:
-                  <input
-                    required
-                    value={password}
-                    onChange={(e) => {
-                      setPassword(e.target.value);
-                    }}
-                    className="mb-2  sticky top-0 bg-white"
-                    type="text"
-                    placeholder="Enter passsword"
-                  />
-                </label>
-                {!editAbleData.id ? (<label tabIndex="0" htmlFor="file" className=" sticky top-0 bg-green-200 text-green-500 hover:text-white hover:bg-green-300 cursor-pointer rounded-md p-2 mt-5" >
-                  Upload media
-                  <input
-                    id="file"
-                    required
-                    accept=".png, .jpg, .jpeg, .webp,.svg, .gif"
-                    onChange={e => setFile(e.target.files[0])}
-                    className="opacity-0 absolute w-0 h-0"
-                    type="file"
-                  />
-                </label>) : ""}
-
-              </div>
-
-              <div className="w-fit" >
-                {editAbleData.id ? (<div className="flex gap-2">
-                  <button type="button" onClick={() => {
-                    setEditAbleData({});
-                    setEmail("");
-                    setDomain("");
-                    setPassword("");
-                    setCourseName("");
-                  }} className="flex items-center gap-2 create-user   py-2 px-4 bg-red-400 text-white rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400">
-                    Cancel
-                    <IoMdAdd className="ml-[-6px] text-2xl" />
-                  </button>
-
-                  <button type="submit" className="flex items-center gap-2 create-user   py-2 px-4 bg-green-500 text-white rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500">
-                    Update Credential
-                    <IoMdAdd className="ml-[-6px] text-2xl" />
-                  </button>
-
+            <>
+              <form onSubmit={handleProductTitleUpdate} className="mb-2" >
+                <div className="flex gap-2 mb-2" >
+                  <input value={groupTitle} onInput={(e) => setGroupTitle(e.target.value)} type="text" placeholder="Group title..." />
+                  <input value={groupSubtitle} onInput={(e) => setGroupSubtitle(e.target.value)} type="text" placeholder="Group subtitle..." />
+                </div>
+                <button type="submit" className="flex items-center gap-2 create-user   py-2 px-4 bg-green-500 text-white rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500">
+                  Update
+                </button>
+              </form>
+              <hr />
+              <form onSubmit={handleProductCreate} className="  bg-gray-100 p-4 rounded-2xl  " >
+                <div className="flex gap-2 bg-gray-100  rounded-2xl items-center" >
+                  <label>
+                    Course name:
+                    <input
+                      required
+                      value={courseName}
+                      onChange={(e) => {
+                        setCourseName(e.target.value);
+                      }}
+                      className="mb-2  sticky top-0 bg-white"
+                      type="text"
+                      placeholder="Enter course name"
+                    />
+                  </label>
+                  <label>
+                    Domain:
+                    <input
+                      required
+                      value={domain}
+                      onChange={(e) => {
+                        setDomain(e.target.value);
+                      }}
+                      className="mb-2  sticky top-0 bg-white"
+                      type="text"
+                      placeholder="Enter domain name"
+                    />
+                  </label>
+                  <label>
+                    Email/username:
+                    <input
+                      required
+                      value={email}
+                      onChange={(e) => {
+                        setEmail(e.target.value);
+                      }}
+                      className="mb-2  sticky top-0 bg-white"
+                      type="text"
+                      placeholder="Enter Emali/username"
+                    />
+                  </label>
+                  <label>
+                    Password:
+                    <input
+                      required
+                      value={password}
+                      onChange={(e) => {
+                        setPassword(e.target.value);
+                      }}
+                      className="mb-2  sticky top-0 bg-white"
+                      type="text"
+                      placeholder="Enter passsword"
+                    />
+                  </label>
+                  {!editAbleData.id ? (<label tabIndex="0" htmlFor="file" className=" sticky top-0 bg-green-200 text-green-500 hover:text-white hover:bg-green-300 cursor-pointer rounded-md p-2 mt-5" >
+                    Upload media
+                    <input
+                      id="file"
+                      required
+                      accept=".png, .jpg, .jpeg, .webp,.svg, .gif"
+                      onChange={e => setFile(e.target.files[0])}
+                      className="opacity-0 absolute w-0 h-0"
+                      type="file"
+                    />
+                  </label>) : ""}
 
                 </div>
 
-                ) : (<>             <button type="submit" className="flex items-center gap-2 create-user   py-2 px-4 bg-orange-500 text-white rounded-lg hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500">
-                  Create Credential
-                  <IoMdAdd className="ml-[-6px] text-2xl" />
-                </button></>)}
-              </div>
-            </form>
+                <div className="w-fit" >
+                  {editAbleData.id ? (<div className="flex gap-2">
+                    <button type="button" onClick={() => {
+                      setEditAbleData({});
+                      setEmail("");
+                      setDomain("");
+                      setPassword("");
+                      setCourseName("");
+                    }} className="flex items-center gap-2 create-user   py-2 px-4 bg-red-400 text-white rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400">
+                      Cancel
+                      <IoMdAdd className="ml-[-6px] text-2xl" />
+                    </button>
+
+                    <button type="submit" className="flex items-center gap-2 create-user   py-2 px-4 bg-green-500 text-white rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500">
+                      Update Credential
+                    </button>
+
+
+                  </div>
+
+                  ) : (<>             <button type="submit" className="flex items-center gap-2 create-user   py-2 px-4 bg-orange-500 text-white rounded-lg hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500">
+                    Create Credential
+                    <IoMdAdd className="ml-[-6px] text-2xl" />
+                  </button></>)}
+                </div>
+              </form>
+            </>
           ) : (
             <p className="text-gray-400 mb-2 bg-gray-50 text-center ">
               No course group selected.

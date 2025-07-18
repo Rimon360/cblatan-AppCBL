@@ -4,13 +4,16 @@ const shopSchema = new mongoose.Schema({
   shop_name: {
     type: String,
     required: true
-  }, 
+  },
+  subtitle: {
+    type: String
+  },
   seq: { type: Number, default: 0 },
   createdAt: {
     type: Date,
     default: Date.now,
   },
-}); 
+});
 
 const assignedShopSchema = new mongoose.Schema({
   shop_id: {
@@ -28,6 +31,6 @@ const assignedShopSchema = new mongoose.Schema({
   },
 });
 
-const shopsModel = mongoose.model("shops", shopSchema); 
-const assignModel = mongoose.model("assigned_shops", assignedShopSchema); 
-module.exports = {shopsModel, assignModel};
+const shopsModel = mongoose.model("shops", shopSchema);
+const assignModel = mongoose.model("assigned_shops", assignedShopSchema);
+module.exports = { shopsModel, assignModel };
