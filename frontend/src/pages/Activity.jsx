@@ -187,7 +187,7 @@ const Activity = () => {
                                                 <td className="p-2">{user.ip_address || 'N/A'}</td>
                                                 <td>
                                                     <div className="!max-w-[500px] !max-h-[100px] overflow-auto ">
-                                                        {user.ip_address_history || 'N/A'} Lorem ipsum dolor sit amet consectetur adipisicing elit. Dicta, fugiat obcaecati mollitia fugit saepe voluptatem exercitationem delectus veritatis quaerat minus nam odit voluptatibus eveniet, consequuntur quo recusandae perspiciatis corporis perferendis.
+                                                        {user.ip_address_history || 'N/A'}
                                                     </div>
                                                 </td>
                                                 <td className="p-2 text-blue-400">{readAbleDate}</td>
