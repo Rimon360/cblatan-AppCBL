@@ -185,7 +185,11 @@ const Activity = () => {
                                                 <td className="p-2">{user.seq}</td>
                                                 <td className="p-2 text-green-400 select-all">{user.email}</td>
                                                 <td className="p-2">{user.ip_address || 'N/A'}</td>
-                                                <td className="p-2">{user.ip_address_history || 'N/A'}</td>
+                                                <td>
+                                                    <div className="!max-w-[500px] !max-h-[100px] overflow-auto ">
+                                                        {user.ip_address_history || 'N/A'} Lorem ipsum dolor sit amet consectetur adipisicing elit. Dicta, fugiat obcaecati mollitia fugit saepe voluptatem exercitationem delectus veritatis quaerat minus nam odit voluptatibus eveniet, consequuntur quo recusandae perspiciatis corporis perferendis.
+                                                    </div>
+                                                </td>
                                                 <td className="p-2 text-blue-400">{readAbleDate}</td>
                                                 <td className={user?.status == 'Active' ? "p-2 text-green-500" : "p-2 text-red-500"} >{user?.status || 'Inactive'}</td>
                                                 <td className="p-2">{user.role}</td>
