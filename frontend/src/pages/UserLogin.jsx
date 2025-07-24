@@ -37,17 +37,17 @@ function UserLogin() {
   };
 
   return (
-    <section className="login-section w-full h-screen flex items-center justify-center  from-orange-100 to-yellow-50 login">
-      <div className="form w-full max-w-sm p-6 bg-white rounded-2xl shadow-lg border border-orange-300">
-        <h2 className="mb-6 text-center text-2xl font-semibold text-orange-400">PIN</h2>
+    <section className="login-section w-full h-screen flex items-center justify-center  from-blue-100 to-yellow-50 login">
+      <div className="form w-full max-w-sm p-6 bg-white rounded-2xl shadow-lg border border-blue-300">
+        <h2 className="mb-6 text-center text-2xl font-semibold text-blue-400">PIN</h2>
         <form onSubmit={handleLogin} className="space-y-4">
-          <input type="number" value={pin} onChange={(e) => setPIN(e.target.value)} placeholder="Enter PIN" required className="w-full h-[60px] px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-300" />
-          <button type="submit" className="w-full bg-orange-400 h-[60px] text-white py-2 rounded-lg hover:bg-orange-500 transition">
+          <input type="number" value={pin} onChange={(e) => setPIN(e.target.value)} placeholder="Enter PIN" required className="w-full h-[60px] px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300" />
+          <button type="submit" className="w-full bg-blue-400 h-[60px] text-white py-2 rounded-lg hover:bg-blue-500 transition">
             SUBMIT
           </button>
         </form>
-        <NavLink to={"/"} className="flex items-center justify-center mt-4 text-orange-500 hover:text-orange-600">
-          <button type="submit" className="w-full   text-orange-400 py-2 rounded-lg hover:bg-orange-100 transition">
+        <NavLink to={"/"} className="flex items-center justify-center mt-4 text-blue-500 hover:text-blue-600">
+          <button type="submit" className="w-full   text-blue-400 py-2 rounded-lg hover:bg-blue-100 transition">
             Cancel
           </button>
         </NavLink>

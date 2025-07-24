@@ -1,7 +1,8 @@
-const { shopsModel, assignModel } = require("../models/shopModel");
+const { shopsModel, assignModel, subtitleModel } = require("../models/shopModel");
 const productModel = require("../models/productModel");
 const { seq } = require("../utils/util");
 const UserModel = require("../models/userModel");
+const fs = require('fs');
 module.exports.createShop = async (req, res) => {
   try {
     const { shop_name } = req.body;
@@ -19,9 +20,33 @@ module.exports.createShop = async (req, res) => {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
+module.exports.createSubtitle = async (req, res) => {
+  try {
+    const { subtitle, shop_id } = req.body;
+    if (!subtitle) {
+      return res.status(400).json({ message: "subtitle is required" });
+    }
+    const shops = await subtitleModel.create({ subtitle, shop_id });
+    res.status(200).json({ message: "Subtitle created successfully", shops });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+module.exports.getSubtitle = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({ message: "id is required" });
+    }
+    const subtitle = await subtitleModel.find({ shop_id: id });
+    res.status(200).json({ message: "Subtitle created successfully", subtitle });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
 module.exports.updateShop = async (req, res) => {
   try {
-    const { shop_name, subtitle, id } = req.body;
+    const { shop_name, id } = req.body;
     if (!shop_name) {
       return res.status(400).json({ message: "Group title is required" });
     }
@@ -29,7 +54,23 @@ module.exports.updateShop = async (req, res) => {
       return res.status(400).json({ message: "Shop id is missing" });
     }
 
-    const shops = await shopsModel.updateOne({ _id: id }, { shop_name, subtitle });
+    const shops = await shopsModel.updateOne({ _id: id }, { shop_name });
+    res.status(200).json({ message: "Updated successfully", shops });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+module.exports.updateSubtitle = async (req, res) => {
+  try {
+    const { subtitle, id } = req.body;
+    if (!subtitle) {
+      return res.status(400).json({ message: "Group title is required" });
+    }
+    if (!id) {
+      return res.status(400).json({ message: "Shop id is missing" });
+    }
+
+    const shops = await subtitleModel.updateOne({ _id: id }, { subtitle });
     res.status(200).json({ message: "Updated successfully", shops });
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });
@@ -80,9 +121,46 @@ module.exports.deleteShop = async (req, res) => {
     return res.status(400).json({ message: "Group id is required" });
   }
   const deleted = await shopsModel.deleteOne({ _id: id });
+  const subtitles = await subtitleModel.find({ shop_id: id });
+
+  for (const s of subtitles) {
+    let products = await productModel.find({ shop_id: s._id });
+    for (const p of products) {
+      fs.unlink(p.file_path, (err) => {
+        console.log(err);
+      })
+    }
+    await productModel.deleteMany({ shop_id: s._id });
+  }
+
+  const subtitleDeleted = await subtitleModel.deleteMany({ shop_id: id });
+
+
   const assignDeleted = await assignModel.deleteMany({ shop_id: id });
   const assignProduct = await productModel.deleteMany({ shop_id: id });
-  res.status(200).json({ message: "Group deleted successfully", deleted, assignDeleted, assignProduct });
+  res.status(200).json({ message: "Group deleted successfully", deleted, assignDeleted, assignProduct, subtitleDeleted });
+};
+module.exports.deleteSubtitle = async (req, res) => {
+  const { id } = req.body;
+  if (!id) {
+    return res.status(400).json({ message: "Group id is required" });
+  }
+  await subtitleModel.deleteOne({ _id: id });
+
+  let products = await productModel.find({ shop_id: id });
+  for (const p of products) {
+    fs.unlink(p.file_path, (err) => {
+      console.log(err);
+    })
+  }
+  await productModel.deleteMany({ shop_id: id });
+
+  const subtitleDeleted = await subtitleModel.deleteMany({ shop_id: id });
+
+
+  const assignDeleted = await assignModel.deleteMany({ shop_id: id });
+  const assignProduct = await productModel.deleteMany({ shop_id: id });
+  res.status(200).json({ message: "Group deleted successfully", subtitleDeleted });
 };
 module.exports.getAssignedShops = async (req, res) => {
   const { user_id } = req.params;

@@ -31,7 +31,7 @@ const Shop_list = () => {
       <div className=" overflow-auto p-4 flex flex-wrap justify-center items-center">
         {shopList.length > 0 ? (
           shopList.map((shop) => (
-            <div key={shop._id} onClick={handleShopSelect(shop._id)} className="p-5 bg-orange-200 m-2 rounded-md shadow-md max-w-[300px] max-h-[200px] h-[200px] w-[300px] flex items-center justify-center cursor-pointer hover:bg-orange-300 transition duration-300 ease-in-out text-xl text-center">
+            <div key={shop._id} onClick={handleShopSelect(shop._id)} className="p-5 bg-blue-200 m-2 rounded-md shadow-md max-w-[300px] max-h-[200px] h-[200px] w-[300px] flex items-center justify-center cursor-pointer hover:bg-blue-300 transition duration-300 ease-in-out text-xl text-center">
               {shop.shop_name}
             </div>
           ))

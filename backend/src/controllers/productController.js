@@ -4,7 +4,7 @@ const { seq, getDate, prependToFile } = require("../utils/util");
 const { encrypt, decrypt } = require("../functions");
 const mongoose = require("mongoose");
 const fs = require("fs");
-
+const path = require('path');
 
 module.exports.createProduct = async (req, res) => {
   const file_path = req?.file?.path; // Assuming the file upload is handled by multer and file_path is available 
@@ -29,6 +29,35 @@ module.exports.createProduct = async (req, res) => {
       message: "credential created successfully",
       products,
     });
+  }
+};
+module.exports.copyProductToSubtitle = async (req, res) => {
+  const { subtitleId, p_id } = req.body;
+
+  const product = await productModel.findOne({ _id: p_id });
+  if (product) {
+    let tmp = {};
+    for (const i in product) {
+      if (i === '_id') continue;
+      tmp[i] = product[i];
+    }
+    tmp.shop_id = subtitleId;
+    const ext = path.extname(tmp.file_path);
+    let newPath = 'uploads\\' + Date.now() + ext;
+    fs.copyFile(tmp.file_path, newPath, (err) => {
+      if (err) throw err;
+      console.log('Image copied and renamed.');
+    });
+    tmp.file_path = newPath;
+    let result = await productModel.insertOne(tmp);
+    if (result) {
+      res.status(200).json({
+        message: "Copied"
+      });
+    } else {
+      res.status(400).json({ message: "Failed" });
+    }
+
   }
 };
 
@@ -76,33 +105,31 @@ module.exports.getPasswordData = async (req, res) => {
     { $match: { user_id: id } },
     {
       $lookup: {
-        from: "products",
-        localField: "shop_id",
-        foreignField: "shop_id",
-        as: "products"
+        from: 'subtitles',
+        localField: 'shop_id',
+        foreignField: 'shop_id',
+        as: 'subtitles'
+      }
+    },
+    { $unwind: "$subtitles" },
+    {
+      $addFields: {
+        "subtitleIdStr": { $toString: "$subtitles._id" }
+      }
+    },
+    {
+      $lookup: {
+        from: 'products',
+        localField: 'subtitleIdStr',
+        foreignField: 'shop_id',
+        as: 'products'
       }
     },
     { $unwind: "$products" },
     {
-      $lookup: {
-        from: "shops",
-        let: { shopId: "$shop_id" },
-        pipeline: [
-          {
-            $match: {
-              $expr: { $eq: ["$_id", { $toObjectId: "$$shopId" }] }
-            }
-          }
-        ],
-        as: "shop"
-      }
-    }
-    ,
-    { $unwind: "$shop" },
-    {
       $replaceRoot: {
         newRoot: {
-          $mergeObjects: ["$products", { shop_name: "$shop.shop_name", subtitle: "$shop.subtitle" }]
+          $mergeObjects: ["$products", { subtitle: "$subtitles.subtitle" }]
         }
       }
     },
@@ -112,11 +139,10 @@ module.exports.getPasswordData = async (req, res) => {
         k: "$password",
         e: "$email",
         d: "$domain",
-        g: "$shop_name",
+        g: "$subtitle",
         c: "$course_name",
         m: "$file_path",
-        t: "$createdAt",
-        st: "$subtitle"
+        t: "$createdAt"
       }
     },
     {
@@ -127,7 +153,9 @@ module.exports.getPasswordData = async (req, res) => {
         __v: 0,
         _id: 0 // include or exclude fields as needed
       }
-    }])
+    }
+
+  ])
 
   res.status(200).json({
     products,

@@ -138,20 +138,20 @@ const Users = () => {
 
             <label className="flex flex-col justify-between mb-2 w-full">
               Role:
-              <select className="px-4 w-full py-2 bg-gray-300 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:outline-none" value={userrole} onChange={(e) => setRole(e.target.value)}>
+              <select className="px-4 w-full py-2 bg-gray-300 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" value={userrole} onChange={(e) => setRole(e.target.value)}>
                 <option value="admin">Admin</option>
                 <option value="member">Member</option>
               </select>
             </label>
           </div>
-          <button type="submit" className="flex items-center gap-2 create-user mt-4 py-2 px-4 bg-orange-500 text-white rounded-lg hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500">
+          <button type="submit" className="flex items-center gap-2 create-user mt-4 py-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
             Create user <TiUserAdd />
           </button>
         </form>
         <hr />
 
         <div className="users-container mt-6">
-          <input type="search" placeholder="Search user" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="p-2 sticky top-0 mb-4 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" />
+          <input type="search" placeholder="Search user" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="p-2 sticky top-0 mb-4 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
           <div className=" max-h-[300px] overflow-auto">
             <table className="w-full max-h-300 overflow-auto mt-4 text-left border-collapse">
               <thead>
@@ -178,19 +178,22 @@ const Users = () => {
                       <td className="p-2">{new Date(user.createdAt).toLocaleDateString()}</td>
                       <td>
                         <div className="flex items-center justify-center">
-                          <Link to={"/dashboard/assign-product/" + user._id} className="text-orange-300 hover:text-orange-500">
+                          <Link to={"/dashboard/assign-product/" + user._id} className="text-blue-300 hover:text-blue-500">
                             <FaExternalLinkAlt />
                           </Link>
                         </div>
                       </td>
-                      <td className="p-2 flex justify-center">
-                        {
-                          user.role === "adminss" ? 'N/A' : (
-                            <button onClick={() => openModal(user._id, user.email)} className="px-2 py-1 text-orange-400 rounded hover:bg-orange-200">
-                              <RiDeleteBin6Line />
-                            </button>
-                          )
-                        }
+                      <td  >
+                        <div className=" flex items-center justify-center">
+                          {
+                            user.role === "adminss" ? 'N/A' : (
+                              <button onClick={() => openModal(user._id, user.email)} className="px-2 py-1 text-blue-400 rounded hover:bg-blue-200">
+                                <RiDeleteBin6Line />
+                              </button>
+                            )
+                          }
+                        </div>
+
                       </td>
 
                     </tr>

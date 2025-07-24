@@ -5,10 +5,25 @@ const shopSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  subtitle: {
-    type: String
+  type: {
+    type: String,
+    default: "title"
   },
   seq: { type: Number, default: 0 },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
+const subtitleSchema = new mongoose.Schema({
+  subtitle: {
+    type: String,
+    required: true
+  },
+  shop_id: {
+    type: String,
+    default: "title"
+  },
   createdAt: {
     type: Date,
     default: Date.now,
@@ -33,4 +48,5 @@ const assignedShopSchema = new mongoose.Schema({
 
 const shopsModel = mongoose.model("shops", shopSchema);
 const assignModel = mongoose.model("assigned_shops", assignedShopSchema);
-module.exports = { shopsModel, assignModel };
+const subtitleModel = mongoose.model("subtitles", subtitleSchema);
+module.exports = { shopsModel, assignModel, subtitleModel };

@@ -8,7 +8,8 @@ import toast from "react-hot-toast";
 import Swal from "sweetalert2";
 import { FaExternalLinkAlt } from "react-icons/fa";
 import { useGlobal } from "../context/GlobalStete";
-import { FaUserLock } from "react-icons/fa";
+import { FaLockOpen } from "react-icons/fa";
+import { FaLock } from "react-icons/fa6";
 
 const Activity = () => {
     const [email, setEmail] = useState("");
@@ -146,7 +147,7 @@ const Activity = () => {
         <>
             <section className="users p-6">
                 <div className="users-container mt-6">
-                    <input type="search" placeholder="Search user" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="p-2 sticky top-0 mb-4 w-full border border-gray-300 bg-white z-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                    <input type="search" placeholder="Search user" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="p-2 sticky top-0 mb-4 w-full border border-gray-300 bg-white z-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
                     <hr />
                     <small>Last updated at {(new Date(lastUpdate)).toLocaleString()} </small>
                     <div className=" overflow-auto">
@@ -188,16 +189,19 @@ const Activity = () => {
                                                 <td className="p-2 text-blue-400">{readAbleDate}</td>
                                                 <td className={user?.status == 'Active' ? "p-2 text-green-500" : "p-2 text-red-500"} >{user?.status || 'Inactive'}</td>
                                                 <td className="p-2">{user.role}</td>
-                                                <td className="p-2 flex items-center justify-center">
-                                                    <button
-                                                        onClick={() => {
-                                                            handleLockingUser(user._id, user.is_locked);
-                                                        }}
-                                                        className="px-2 py-2 text-orange-400 rounded flex items-center justify-center bg-red-100 gap-2 hover:bg-orange-200"
-                                                    >{user?.is_locked ? "Locked" : "Lock"}<FaUserLock className="inline" />
-                                                    </button>
+                                                <td>
+                                                    <div className=" flex items-center justify-center">
+                                                        <button
+                                                            onClick={() => {
+                                                                handleLockingUser(user._id, user.is_locked);
+                                                            }}
+                                                            className={`px-2 py-2 text-green-400 rounded flex items-center justify-center ${user?.is_locked ? "bg-red-100 text-red-400" : "bg-green-100 "} gap-2 hover:bg-green-200`}
+                                                        >{user?.is_locked ? <><FaLock /></> : <><FaLockOpen /></>}
+                                                        </button>
+                                                    </div>
+
                                                 </td>
-                                                <td className="p-2 text-orange-400">{new Date(user.createdAt).toLocaleDateString()}</td>
+                                                <td className="p-2 text-blue-400">{new Date(user.createdAt).toLocaleDateString()}</td>
                                             </tr>
                                         )
                                     })

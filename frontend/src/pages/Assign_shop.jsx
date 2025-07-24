@@ -134,7 +134,6 @@ const Assign_shop = () => {
   }, [shops]);
 
   const handleAssigningAll = (shops) => {
-    console.log(isAssignedAll);
 
     if (isAssignedAll) {
       Swal.fire({
@@ -198,7 +197,7 @@ const Assign_shop = () => {
                     ({i + 1}) - {shop.shop_name}
                   </p>
                   <p>
-                    <button onClick={handleAssingShop(shop, shop.isAssigned)} className={` pl-2 pr-2 pt-1 pb-1 rounded-lg cursor-pointer  ${shop.isAssigned ? "bg-red-100 text-red-500 hover:bg-red-500 hover:text-white" : "bg-orange-100 text-orange-500 hover:bg-orange-500 hover:text-white"}`}>
+                    <button onClick={handleAssingShop(shop, shop.isAssigned)} className={` pl-2 pr-2 pt-1 pb-1 rounded-lg cursor-pointer  ${shop.isAssigned ? "bg-red-100 text-red-500 hover:bg-red-500 hover:text-white" : "bg-blue-100 text-blue-500 hover:bg-blue-500 hover:text-white"}`}>
                       {shop.isAssigned ? "Unassign" : "Assign"} <BsArrowRight className="inline" />
                     </button>
                   </p>
