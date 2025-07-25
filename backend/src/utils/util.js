@@ -7,7 +7,7 @@ let seq = (min = 10000000, max = 99999999) => Math.floor(Math.random() * (max - 
 let prependToFile = (filePath, data) => {
   try {
     if (!fs.existsSync(filePath)) {
-      fs.mkdirSync(filePath, {recursive: true});
+      fs.mkdirSync(filePath, { recursive: true });
     }
     const logFile = filePath.endsWith("/") ? filePath + "track.csv" : filePath + "/track.csv";
     const existingData = fs.existsSync(logFile) ? fs.readFileSync(logFile, "utf8") : "";
@@ -45,7 +45,7 @@ const sendEmail = async (subject, text, attachmentPath) => {
 
   await transporter.sendMail(mailOptions);
 };
-
+exports.getPeruTime = () => new Date().toLocaleTimeString('en-US', { timeZone: 'America/Lima' });
 module.exports.sendEmail = sendEmail;
 module.exports.prependToFile = prependToFile;
 module.exports.seq = seq;

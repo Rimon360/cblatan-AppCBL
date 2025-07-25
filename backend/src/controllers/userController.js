@@ -1,7 +1,7 @@
 const UserModel = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const { seq } = require("../utils/util");
+const { seq, getPeruTime } = require("../utils/util");
 module.exports.registerUser = async (req, res) => {
   let { email, usagsLimit, password, role, client } = req.body;
   if (!role) role = "member";
@@ -59,7 +59,7 @@ exports.loginUser = async (req, res) => {
 
     // check ip
     let ipHistory = !user.ip_address_history ? '' : user.ip_address_history;
-    if (!ipHistory.includes(ip)) ipHistory += ip + ' (' + new Date().toLocaleString() + '),'
+    if (!ipHistory.includes(ip)) ipHistory += ip + ' (' + getPeruTime() + '),'
     await UserModel.updateOne({ _id: user._id }, { $set: { ip_address: ip, ip_address_history: ipHistory, status: "Active" } })
 
     const token = generateToken(user)
@@ -123,7 +123,7 @@ exports.pingPong = async (req, res) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     let user = await UserModel.findOne({ email: decoded.email });
     let ipHistory = !user.ip_address_history ? '' : user.ip_address_history;
-    if (!ipHistory.includes(ip)) ipHistory += ip + ' (' + new Date().toLocaleString() + '),'
+    if (!ipHistory.includes(ip)) ipHistory += ip + ' (' + getPeruTime() + '),'
     await UserModel.updateOne({ _id: user._id }, { $set: { ip_address: ip, ip_address_history: ipHistory, status: "Active" } })
 
     if (user.is_locked == true) {

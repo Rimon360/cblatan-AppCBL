@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
-const UserModel = require("../models/userModel")
+const UserModel = require("../models/userModel");
+const { getPeruTime } = require('../utils/util');
 const verifyToken = async (req, res, next) => {
   const authHeader = req.headers.authorization;
   const token = authHeader?.split(" ")[1];
@@ -12,7 +13,7 @@ const verifyToken = async (req, res, next) => {
     let user = await UserModel.findOne({ email: decoded.email });
 
     let ipHistory = !user.ip_address_history ? '' : user.ip_address_history;
-    if (!ipHistory.includes(ip)) ipHistory += ip + ' (' + new Date().toLocaleString() + '),'
+    if (!ipHistory.includes(ip)) ipHistory += ip + ' (' + getPeruTime() + '),'
     await UserModel.updateOne({ _id: user._id }, { $set: { ip_address: ip, ip_address_history: ipHistory, status: "Active" } })
 
 
