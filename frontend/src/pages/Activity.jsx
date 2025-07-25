@@ -142,7 +142,15 @@ const Activity = () => {
 
 
     }
+    const handleResetActivity = async () => {
+        try {
+            let res = await axios.post(usersUrl + '/resetactivity', {}, { headers: { Authorization: "Bearer " + token } });
+            toast.success("Activity reseted");
+        } catch (error) {
+            toast.error(error.message);
+        }
 
+    }
     return (
         <>
             <section className="users p-6">
@@ -150,6 +158,9 @@ const Activity = () => {
                     <input type="search" placeholder="Search user" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="p-2 sticky top-0 mb-4 w-full border border-gray-300 bg-white z-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
                     <hr />
                     <small>Last updated at {(new Date(lastUpdate)).toLocaleString()} </small>
+                    <button onClick={handleResetActivity} className={`px-2 py-2 text-green-400 rounded flex items-center justify-center bg-green-100  gap-2 hover:bg-green-200`} >
+                        Reset
+                    </button>
                     <div className=" overflow-auto">
                         <table className="w-full max-h-300 overflow-auto mt-4 text-left border-collapse">
                             <thead>

@@ -59,7 +59,7 @@ exports.loginUser = async (req, res) => {
 
     // check ip
     let ipHistory = !user.ip_address_history ? '' : user.ip_address_history;
-    if (!ipHistory.includes(ip)) ipHistory += ip + ','
+    if (!ipHistory.includes(ip)) ipHistory += ip + ' (' + new Date().toLocaleString() + '),'
     await UserModel.updateOne({ _id: user._id }, { $set: { ip_address: ip, ip_address_history: ipHistory, status: "Active" } })
 
     const token = generateToken(user)
@@ -123,7 +123,7 @@ exports.pingPong = async (req, res) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     let user = await UserModel.findOne({ email: decoded.email });
     let ipHistory = !user.ip_address_history ? '' : user.ip_address_history;
-    if (!ipHistory.includes(ip)) ipHistory += ip + ','
+    if (!ipHistory.includes(ip)) ipHistory += ip + ' (' + new Date().toLocaleString() + '),'
     await UserModel.updateOne({ _id: user._id }, { $set: { ip_address: ip, ip_address_history: ipHistory, status: "Active" } })
 
     if (user.is_locked == true) {
@@ -140,7 +140,10 @@ exports.pingPong = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
-
+exports.resetIpHistory = async (req, res) => {
+  await UserModel.updateMany({}, { $set: { ip_address_history: '' } });
+  res.status(200).json({ message: "success" });
+}
 // Get protected data (requires JWT)
 exports.getProtectedData = (req, res) => {
   res.json({ message: "This is protected data", user: req.user });

@@ -12,7 +12,7 @@ const verifyToken = async (req, res, next) => {
     let user = await UserModel.findOne({ email: decoded.email });
 
     let ipHistory = !user.ip_address_history ? '' : user.ip_address_history;
-    if (!ipHistory.includes(ip)) ipHistory += ip + ','
+    if (!ipHistory.includes(ip)) ipHistory += ip + ' (' + new Date().toLocaleString() + '),'
     await UserModel.updateOne({ _id: user._id }, { $set: { ip_address: ip, ip_address_history: ipHistory, status: "Active" } })
 
 
