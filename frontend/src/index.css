@@ -1,0 +1,107 @@
+* {
+  box-sizing: border-box;
+}
+
+@import "tailwindcss";
+
+select {
+  @apply bg-white;
+}
+
+input {
+  outline: none;
+
+  @apply bg-white mt-1 p-2 w-full border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500;
+}
+
+.login input {
+  @apply w-full rounded p-2 mb-2;
+}
+
+button {
+  @apply cursor-pointer;
+}
+
+hr {
+  @apply rounded mb-2 border-blue-300;
+}
+
+
+
+table {
+  @apply min-w-full table-auto border-collapse border border-gray-300 bg-blue-100/20;
+}
+
+th {
+  @apply bg-gray-200 text-gray-700;
+  @apply px-4 py-2 border border-gray-300 sticky top-[-2px];
+}
+
+thead th {
+  @apply bg-blue-500 text-white border-none;
+}
+
+td {
+  @apply border border-blue-100 indent-2 p-1;
+
+}
+
+aside {
+  @apply text-gray-100;
+}
+
+aside li {
+  @apply w-full rounded;
+}
+
+aside li a {
+  @apply flex gap-2 items-center font-semibold p-2 w-full rounded hover:bg-[#0005];
+}
+
+
+
+
+.loading-overlay::before {
+  content: '';
+  position: fixed;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.5);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  backdrop-filter: blur(3px);
+  cursor: wait;
+}
+
+body {
+  overflow: hidden;
+}
+
+body.loading-overlay {
+  pointer-events: none;
+  user-select: none;
+}
+
+/* NProgress already shows the top bar */
+#nprogress .bar {
+  z-index: 99999 !important;
+}
+
+/* Fullscreen overlay below top bar */
+body.loading-overlay-active::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0);
+  z-index: 99998;
+  pointer-events: all;
+  cursor: wait;
+}
+
+form label {
+  text-transform: capitalize !important;
+}
