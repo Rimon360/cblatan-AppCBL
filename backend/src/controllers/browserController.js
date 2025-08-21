@@ -1,0 +1,111 @@
+const BrowserProfileModel = require("../models/browserProfileModel");
+const { uniqueString } = require("../functions");
+const fs = require("fs");
+
+module.exports.createBrowserProfile = async (req, res) => {
+    let extensionUniqueName = null;
+    if (req.file) {
+        extensionUniqueName = req?.file?.filename; // Assuming the file upload is handled by multer and file_path is available  
+    }
+    const { profileName, proxy } = req.body;
+
+    const src = 'baseProfile.zip';
+    const profileUniqueName = uniqueString() + '.zip';
+    const moveto = 'browserProfilesData/' + profileUniqueName;
+
+    fs.copyFile(src, moveto, (err) => {
+        if (err) throw err;
+    })
+
+    const profile = await BrowserProfileModel.create({
+        profileName,
+        profileUniqueName,
+        extensionUniqueName,
+        proxy
+    });
+    if (profile) {
+        res.status(200).json({
+            message: "Profile created successfully",
+            profile,
+        });
+        return
+    }
+    res.status(503).json({
+        message: "Server error, unable to create browser profile",
+        error: true,
+    });
+};
+module.exports.updateBrowserProfile = async (req, res) => {
+    let { id } = req.body;
+    const oldProfile = await BrowserProfileModel.findOne({ _id: id })
+    if (!oldProfile) {
+        return res.status(200).json({ message: "Old Profile not found", error: true });
+    }
+
+    let extensionUniqueName = oldProfile.extensionUniqueName;
+    if (req.file) {
+        if (oldProfile.extensionUniqueName) {
+            const oldExPath = 'extensionsData/' + oldProfile.extensionUniqueName;
+            fs.unlink(oldExPath);
+        } 
+        extensionUniqueName = req?.file?.filename; // Assuming the file upload is handled by multer and file_path is available  
+    }
+    const { profileName, proxy } = req.body;
+    const profile = await BrowserProfileModel.updateOne(
+        { _id: id },
+        {
+            $set: {
+                profileName,
+                extensionUniqueName,
+                proxy
+            }
+        });
+    if (profile) {
+        res.status(200).json({
+            message: "Profile updated successfully"
+        });
+        return
+    }
+    res.status(503).json({
+        message: "Server error, unable to create browser profile",
+        error: true,
+    });
+};
+
+module.exports.getBrowserProfile = async (req, res) => {
+    const profiles = await BrowserProfileModel.find({}, { __v: 0 }).sort({ createdAt: -1 });
+    if (profiles) {
+        res.status(200).json({
+            profiles,
+        });
+        return;
+    }
+    res.status(503).json({
+        message: "Server error, unable to get profile data",
+        error: true,
+    });
+}
+module.exports.deleteBrowserProfile = async (req, res) => {
+    const { id } = req.body;
+    const profile = await BrowserProfileModel.findOne({ _id: id });
+    const browserProfileDir = 'browserProfilesData/' + profile.profileUniqueName;
+    const extensionDir = 'extensionsData/' + profile.extensionUniqueName;
+    fs.unlink(browserProfileDir, (err) => {
+        if (err) throw err;
+    })
+    if (profile.extensionUniqueName) {
+        fs.unlink(extensionDir, (err) => {
+            if (err) throw err;
+        })
+    }
+
+    const profiles = await BrowserProfileModel.deleteOne({ _id: id });
+    if (profiles) {
+        res.status(200).json({ message: "Profile deleted successfully" });
+        return;
+    }
+    res.status(503).json({
+        message: "Server error, unable to delete profile",
+        error: true,
+    });
+}

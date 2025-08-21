@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const userRoutes = require("./routes/userRoutes");
+const browserRoute = require("./routes/browserRoute");
 const whiteList = require('./routes/whiteList');
 const shopRoutes = require("./routes/shopRoutes");
 const productRoutes = require("./routes/productRoutes");
@@ -43,9 +44,9 @@ app.get("/api/verify-token", verifyToken, (req, res) => {
   res.json({ message: "success", user: req.user });
 });
 app.use('/api/shops', shopRoutes)
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+app.use('/uploads', express.static(path.join(__dirname, '../uploads'))); 
 app.use('/api/whitelist', whiteList)
-
+app.use('/api/browser', browserRoute)
 app.use((req, res) => {
   console.log('404 for:', req.originalUrl);
   res.status(404).json({ message: "Technical Error!. Please try again later!", d: req.protocol + "://" + req.get("host") + req.originalUrl });

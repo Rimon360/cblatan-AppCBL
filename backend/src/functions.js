@@ -35,4 +35,9 @@ function checkValidity(startDateStr, validityDays) {
     let seconds = Math.ceil(diffTime / (1000));
     return { days, seconds, hours };
 }
-module.exports = { encrypt, decrypt, checkValidity };
+function uniqueString() {
+    return Date.now().toString(36) + Math.random().toString(36).slice(2);
+} 
+  
+module.exports = { encrypt, decrypt, checkValidity, uniqueString };
+
