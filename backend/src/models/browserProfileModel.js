@@ -4,7 +4,7 @@ const mongoese = require("mongoose");
 const BrowserProfileSchema = new mongoese.Schema({
     profileName: { type: String },
     profileUniqueName: { type: String },
-    profileVersion: { type: String, default: "1.0" },
+    profileVersion: { type: Number, default: Date.now() },
     proxy: {
         type: String
     },
@@ -12,6 +12,7 @@ const BrowserProfileSchema = new mongoese.Schema({
         type: String,
         default: null
     },
+    startups: { type: String, default: '' },
     createdAt: {
         type: Date,
         default: Date.now

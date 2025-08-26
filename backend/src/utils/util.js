@@ -1,6 +1,10 @@
 require("dotenv").config();
 const fs = require("fs");
+const fsx = require('fs-extra');
 const nodemailer = require("nodemailer");
+const archiver = require("archiver");
+const path = require('path');
+
 
 let seq = (min = 10000000, max = 99999999) => Math.floor(Math.random() * (max - min + 1)) + min;
 
@@ -45,8 +49,28 @@ const sendEmail = async (subject, text, attachmentPath) => {
 
   await transporter.sendMail(mailOptions);
 };
+
+async function moveFolder(src, dest) {
+  await fsx.copy(src, dest, { overwrite: true });
+  await fsx.remove(src);
+}
+
+async function zipFolder(folder, dest) {
+  return new Promise((resolve, reject) => {
+    const output = fs.createWriteStream(dest);
+    const archive = archiver("zip", { zlib: { level: 9 } });
+    output.on("close", () => resolve());
+    archive.on("error", (err) => reject(err));
+    archive.pipe(output);
+    const folderName = path.basename(folder);
+    archive.directory(folder, folderName);
+    archive.finalize();
+  });
+}
+
 exports.getPeruTime = () => new Date().toLocaleString('en-US', { timeZone: 'America/Lima' });
 module.exports.sendEmail = sendEmail;
 module.exports.prependToFile = prependToFile;
+module.exports.zipFolder = zipFolder;
 module.exports.seq = seq;
-console.log(new Date().toISOString());
+module.exports.moveFolder = moveFolder; 

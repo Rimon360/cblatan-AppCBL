@@ -7,7 +7,7 @@ module.exports.createBrowserProfile = async (req, res) => {
     if (req.file) {
         extensionUniqueName = req?.file?.filename; // Assuming the file upload is handled by multer and file_path is available  
     }
-    const { profileName, proxy } = req.body;
+    const { profileName, proxy, startups } = req.body;
 
     const src = 'baseProfile.zip';
     const profileUniqueName = uniqueString() + '.zip';
@@ -21,7 +21,8 @@ module.exports.createBrowserProfile = async (req, res) => {
         profileName,
         profileUniqueName,
         extensionUniqueName,
-        proxy
+        proxy,
+        startups
     });
     if (profile) {
         res.status(200).json({
@@ -47,17 +48,18 @@ module.exports.updateBrowserProfile = async (req, res) => {
         if (oldProfile.extensionUniqueName) {
             const oldExPath = 'extensionsData/' + oldProfile.extensionUniqueName;
             fs.unlink(oldExPath);
-        } 
+        }
         extensionUniqueName = req?.file?.filename; // Assuming the file upload is handled by multer and file_path is available  
     }
-    const { profileName, proxy } = req.body;
+    const { profileName, proxy, startups } = req.body;
     const profile = await BrowserProfileModel.updateOne(
         { _id: id },
         {
             $set: {
                 profileName,
                 extensionUniqueName,
-                proxy
+                proxy,
+                startups
             }
         });
     if (profile) {
@@ -90,13 +92,10 @@ module.exports.deleteBrowserProfile = async (req, res) => {
     const profile = await BrowserProfileModel.findOne({ _id: id });
     const browserProfileDir = 'browserProfilesData/' + profile.profileUniqueName;
     const extensionDir = 'extensionsData/' + profile.extensionUniqueName;
-    fs.unlink(browserProfileDir, (err) => {
-        if (err) throw err;
-    })
+    fs.unlink(browserProfileDir, (err) => { })
+    fs.unlink('syncPath/' + profile.profileUniqueName, (err) => { })
     if (profile.extensionUniqueName) {
-        fs.unlink(extensionDir, (err) => {
-            if (err) throw err;
-        })
+        fs.unlink(extensionDir, (err) => { })
     }
 
     const profiles = await BrowserProfileModel.deleteOne({ _id: id });
