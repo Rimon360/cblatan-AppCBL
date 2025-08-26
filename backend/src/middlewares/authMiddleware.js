@@ -44,7 +44,7 @@ const adminMiddleware = (req, res, next) => {
 };
 
 const memberMiddleware = async (req, res, next) => {
-  const authHeader = req.headers.authorization; 
+  const authHeader = req.headers.authorization;
   const token = authHeader?.split(" ")[1];
 
   if (!token) return res.status(401).json({ message: "Access Denied" });
@@ -52,7 +52,10 @@ const memberMiddleware = async (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await UserModel.findOne({ email: decoded.email, _id: decoded._id });
-
+    if (!user) {
+      res.status(403).json({ message: "User not exists" });
+      return
+    }
     let first_ip = user.first_ip;
     // Use case: Restricting or logging new IPs for non-admin users only.
     if (first_ip && !first_ip.split(',').includes(ip) && user.role !== 'admin') {

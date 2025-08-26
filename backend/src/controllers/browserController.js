@@ -75,6 +75,8 @@ module.exports.updateBrowserProfile = async (req, res) => {
 };
 
 module.exports.getBrowserProfile = async (req, res) => {
+    console.log('hji');
+    
     const profiles = await BrowserProfileModel.find({}, { __v: 0 }).sort({ createdAt: -1 });
     if (profiles) {
         res.status(200).json({
