@@ -1,7 +1,10 @@
 const BrowserProfileModel = require("../models/browserProfileModel");
 const { uniqueString } = require("../functions");
 const fs = require("fs");
+const path = require('path');
 
+const rootPath = path.join(__dirname, "..", "..");
+console.log(rootPath); 
 module.exports.createBrowserProfile = async (req, res) => {
     let extensionUniqueName = null;
     if (req.file) {
@@ -9,9 +12,9 @@ module.exports.createBrowserProfile = async (req, res) => {
     }
     const { profileName, proxy, startups } = req.body;
 
-    const src = 'baseProfile.zip';
+    const src = path.join(rootPath, 'baseProfile.zip');
     const profileUniqueName = uniqueString() + '.zip';
-    const moveto = 'browserProfilesData/' + profileUniqueName;
+    const moveto = path.join(rootPath, 'browserProfilesData', profileUniqueName);
 
     fs.copyFile(src, moveto, (err) => {
         if (err) throw err;
@@ -74,7 +77,7 @@ module.exports.updateBrowserProfile = async (req, res) => {
     });
 };
 
-module.exports.getBrowserProfile = async (req, res) => { 
+module.exports.getBrowserProfile = async (req, res) => {
     const profiles = await BrowserProfileModel.find({}, { __v: 0 }).sort({ createdAt: -1 });
     if (profiles) {
         res.status(200).json({
