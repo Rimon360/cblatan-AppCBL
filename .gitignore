@@ -2,3 +2,5 @@ backend/uploads
 extension/dist
 extension/ 
 desktop_app/
+backend/browserProfilesData
+backend/extensionsData

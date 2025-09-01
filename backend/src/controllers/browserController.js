@@ -2,9 +2,9 @@ const BrowserProfileModel = require("../models/browserProfileModel");
 const { uniqueString } = require("../functions");
 const fs = require("fs");
 const path = require('path');
-
+const { getPort } = require("../utils/util")
 const rootPath = path.join(__dirname, "..", "..");
-console.log(rootPath); 
+
 module.exports.createBrowserProfile = async (req, res) => {
     let extensionUniqueName = null;
     if (req.file) {
@@ -49,7 +49,7 @@ module.exports.updateBrowserProfile = async (req, res) => {
     let extensionUniqueName = oldProfile.extensionUniqueName;
     if (req.file) {
         if (oldProfile.extensionUniqueName) {
-            const oldExPath = 'extensionsData/' + oldProfile.extensionUniqueName;
+            const oldExPath = path.join(rootPath, 'extensionsData', oldProfile.extensionUniqueName);
             fs.unlink(oldExPath);
         }
         extensionUniqueName = req?.file?.filename; // Assuming the file upload is handled by multer and file_path is available  
@@ -80,8 +80,9 @@ module.exports.updateBrowserProfile = async (req, res) => {
 module.exports.getBrowserProfile = async (req, res) => {
     const profiles = await BrowserProfileModel.find({}, { __v: 0 }).sort({ createdAt: -1 });
     if (profiles) {
+        let tmp = profiles.map(profile => ({ ...profile.toObject(), port: getPort() }));
         res.status(200).json({
-            profiles,
+            profiles: tmp
         });
         return;
     }
@@ -93,11 +94,11 @@ module.exports.getBrowserProfile = async (req, res) => {
 module.exports.deleteBrowserProfile = async (req, res) => {
     const { id } = req.body;
     const profile = await BrowserProfileModel.findOne({ _id: id });
-    const browserProfileDir = 'browserProfilesData/' + profile.profileUniqueName;
-    const extensionDir = 'extensionsData/' + profile.extensionUniqueName;
+    const browserProfileDir = path.join(rootPath, 'browserProfilesData', profile.profileUniqueName);
     fs.unlink(browserProfileDir, (err) => { })
-    fs.unlink('syncPath/' + profile.profileUniqueName, (err) => { })
+    fs.unlink(path.join(rootPath, 'syncPath', profile.profileUniqueName), (err) => { })
     if (profile.extensionUniqueName) {
+        const extensionDir = path.join(rootPath, 'extensionsData', profile.extensionUniqueName);
         fs.unlink(extensionDir, (err) => { })
     }
 

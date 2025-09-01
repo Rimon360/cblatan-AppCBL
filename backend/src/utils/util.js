@@ -67,10 +67,15 @@ async function zipFolder(folder, dest) {
     archive.finalize();
   });
 }
-
+function getPort() {
+  const min = 40000; // safe range start
+  const max = 60000; // safe range end
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 exports.getPeruTime = () => new Date().toLocaleString('en-US', { timeZone: 'America/Lima' });
 module.exports.sendEmail = sendEmail;
 module.exports.prependToFile = prependToFile;
 module.exports.zipFolder = zipFolder;
 module.exports.seq = seq;
 module.exports.moveFolder = moveFolder; 
+module.exports.getPort = getPort; 
