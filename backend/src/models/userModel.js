@@ -52,14 +52,14 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: '',
   },
-  dicloak_email: {
-    type: String,
-    default: '',
-  },
-  subscription_term: {
-    type: String,
-    default: '',
-  },
+  // dicloak_email: {
+  //   type: String,
+  //   default: '',
+  // },
+  // subscription_term: {
+  //   type: String,
+  //   default: '',
+  // },
   niche: {
     type: String,
     default: '',

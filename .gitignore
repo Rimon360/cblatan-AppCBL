@@ -1,6 +1,6 @@
 backend/uploads
 extension/dist
-extension/ 
+extension/
 desktop_app/
 backend/browserProfilesData
 backend/extensionsData

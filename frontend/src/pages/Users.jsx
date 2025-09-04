@@ -22,8 +22,8 @@ const Users = () => {
   const [wasap, setWasap] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("");
   const [nstbrowserEmail, setNstbrowserEmail] = useState("");
-  const [dicloakEmail, setDicloakEmail] = useState("");
-  const [subscripitonTerm, setSubscripitonTerm] = useState("");
+  // const [dicloakEmail, setDicloakEmail] = useState("");
+  // const [subscripitonTerm, setSubscripitonTerm] = useState("");
   const [niche, setNiche] = useState("");
   const [affiliate, setAffiliate] = useState("");
   const [supervisor, setSupervisor] = useState("");
@@ -124,8 +124,8 @@ const Users = () => {
         wasap,
         paymentMethod,
         nstbrowserEmail,
-        dicloakEmail,
-        subscripitonTerm,
+        // dicloakEmail,
+        // subscripitonTerm,
         niche,
         affiliate,
         supervisor,
@@ -141,8 +141,8 @@ const Users = () => {
         setWasap("")
         setPaymentMethod("");
         setNstbrowserEmail("");
-        setDicloakEmail("");
-        setSubscripitonTerm("");
+        // setDicloakEmail("");
+        // setSubscripitonTerm("");
         setNiche("");
         setAffiliate("");
         setSupervisor("");
@@ -177,8 +177,8 @@ const Users = () => {
     setWasap(user.wasap)
     setPaymentMethod(user.payment_method);
     setNstbrowserEmail(user.nstbrowser_email);
-    setDicloakEmail(user.dicloak_email);
-    setSubscripitonTerm(user.subscription_term);
+    // setDicloakEmail(user.dicloak_email);
+    // setSubscripitonTerm(user.subscription_term);
     setNiche(user.niche);
     setAffiliate(user.affiliate);
     setSupervisor(user.supervisor);
@@ -192,8 +192,8 @@ const Users = () => {
     setWasap("")
     setPaymentMethod("");
     setNstbrowserEmail("");
-    setDicloakEmail("");
-    setSubscripitonTerm("");
+    // setDicloakEmail("");
+    // setSubscripitonTerm("");
     setNiche("");
     setAffiliate("");
     setSupervisor("");
@@ -227,14 +227,14 @@ const Users = () => {
                 nstbrowser Email:
                 <input type="text" placeholder="Enter value..." value={nstbrowserEmail} onChange={(e) => setNstbrowserEmail(e.target.value)} />
               </label>
-              <label className="flex flex-col justify-center  w-full">
+              {/* <label className="flex flex-col justify-center  w-full">
                 dicloak Email:
                 <input type="text" placeholder="Enter value..." value={dicloakEmail} onChange={(e) => setDicloakEmail(e.target.value)} />
               </label>
               <label className="flex flex-col justify-center  w-full">
                 subscripiton Term:
                 <input type="text" placeholder="Enter value..." value={subscripitonTerm} onChange={(e) => setSubscripitonTerm(e.target.value)} />
-              </label>
+              </label> */}
               <label className="flex flex-col justify-center  w-full">
                 niche:
                 <input type="text" placeholder="Enter value..." value={niche} onChange={(e) => setNiche(e.target.value)} />
@@ -309,8 +309,8 @@ const Users = () => {
                   <th className="text-left">payment Method</th>
                   <th className="text-left">first ip</th>
                   <th className="text-left">nstbrowser Email</th>
-                  <th className="text-left">dicloak Email</th>
-                  <th className="text-left">subscripiton Term</th>
+                  {/* <th className="text-left">dicloak Email</th>
+                  <th className="text-left">subscripiton Term</th> */}
                   <th className="text-left">niche</th>
                   <th className="text-left">affiliate</th>
                   <th className="text-left">supervisor</th>
@@ -345,8 +345,8 @@ const Users = () => {
                         <td className="truncate max-w-[150px] text-center">{user.payment_method}</td>
                         <td className="max-w-[150px] text-center overflow-auto">{user.first_ip}</td>
                         <td className="truncate max-w-[150px] text-center">{user.nstbrowser_email}</td>
-                        <td className="truncate max-w-[150px] text-center">{user.dicloak_email}</td>
-                        <td className="truncate max-w-[150px] text-center">{user.subscription_term}</td>
+                        {/* <td className="truncate max-w-[150px] text-center">{user.dicloak_email}</td>
+                        <td className="truncate max-w-[150px] text-center">{user.subscription_term}</td> */}
                         <td className="truncate max-w-[150px] text-center">{user.niche}</td>
                         <td className="truncate max-w-[150px] text-center">{user.affiliate}</td>
                         <td className="truncate max-w-[150px] text-center">{user.supervisor}</td>
