@@ -86,7 +86,7 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ["admin", "member"],
+    enum: ["admin", "member","appcbl_soft"],
     default: "member",
   },
   seq: { type: Number, default: 0 },
