@@ -1,6 +1,6 @@
 const crypto = require("crypto");
 
-const secret = process.env.CRYPTO_KEY|| 'undefined';
+const secret = process.env.CRYPTO_KEY;
 const key = crypto.createHash("sha256").update(secret).digest(); // 32-byte key
 const iv = Buffer.alloc(16, 0); // constant IV (not secure for real-world use)
 
@@ -37,7 +37,7 @@ function checkValidity(startDateStr, validityDays) {
 }
 function uniqueString() {
     return Date.now().toString(36) + Math.random().toString(36).slice(2);
-} 
-  
+}
+
 module.exports = { encrypt, decrypt, checkValidity, uniqueString };
 
