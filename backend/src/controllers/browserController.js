@@ -78,12 +78,10 @@ module.exports.updateBrowserProfile = async (req, res) => {
 };
 
 module.exports.getBrowserProfile = async (req, res) => {
-    console.log(req.user);
-    
+ 
     const { user } = req;
-    const role = user.role;
-
-    if (role !== 'appcbl_soft' || role !== 'admin') {
+    const role = user.role; 
+    if (!['admin', 'appcbl_soft'].includes(role)) {
         res.status(200).json({
             message: "¡Aún no tienes permiso para utilizar este software!",
             error: true,
