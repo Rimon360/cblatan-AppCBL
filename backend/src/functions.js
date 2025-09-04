@@ -1,6 +1,6 @@
 const crypto = require("crypto");
 
-const secret = process.env.CRYPTO_KEY||"f0f4115ea1b4dea7aa8b9d47c9d18db2c9a7e0b0865747084013fecd45e9339f3fef9cc22f83170dd940eeb00e3e5557";
+const secret = process.env.CRYPTO_KEY|| 'undefined';
 const key = crypto.createHash("sha256").update(secret).digest(); // 32-byte key
 const iv = Buffer.alloc(16, 0); // constant IV (not secure for real-world use)
 
