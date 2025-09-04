@@ -41,7 +41,7 @@ router.get("/download", memberMiddleware, async (req, res) => {
     const { user } = req;
     const role = user.role;
     if (role !== 'appcbl_soft' || role !== 'admin') {
-        res.status(503).json({
+        res.status(200).json({
             message: "¡Aún no tienes permiso para utilizar este software!",
             error: true,
         });
