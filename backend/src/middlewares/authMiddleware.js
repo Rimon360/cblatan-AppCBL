@@ -71,11 +71,11 @@ const memberMiddleware = async (req, res, next) => {
     if (user && user?.is_locked == true) {
       return res.status(503).json({ error: true, message: "Sorry, your account has been locked by admin!" });
     }
-    if (user && decoded && decoded.role === "member" || decoded.role === "admin"|| decoded.role === 'appcbl_soft') {
+    if (user && decoded && ['member', 'admin', 'appcbl_soft'].includes(decoded.role)) {
       req.user = decoded;
       next();
     } else {
-      res.status(403).json({ message: "Only admin or member can access this route" });
+      res.status(403).json({ message: "Role not permitted" });
     }
   } catch (err) {
     res.status(403).json({ message: err.message || "Invalid Token" });
@@ -94,7 +94,7 @@ const ipTrackMiddleware = async (req, res, next) => {
       req.user = decoded;
       next();
     }
-    if (decoded && decoded.role === "member") {
+    if (decoded && decoded.role === "member" || decoded.role ===  'appcbl_soft') {
       const user = await UserModel.findOne({ email: decoded.email, _id: decoded._id })
       if (user && user.ip_address && user.ip_address != 'null' && user.ip_address == ip || user.ip_address == null) {
         if (user.ip_address == null) {
@@ -110,7 +110,7 @@ const ipTrackMiddleware = async (req, res, next) => {
       }
       res.status(200).json({ error: true, message: "Sorry, the account is already in use!" });
     } else {
-      res.status(403).json({ error: true, message: "Only admin or member can access this route" });
+      res.status(403).json({ error: true, message: "Role not permitted" });
     }
   } catch {
     res.status(403).json({ error: true, message: "Invalid Token" });
