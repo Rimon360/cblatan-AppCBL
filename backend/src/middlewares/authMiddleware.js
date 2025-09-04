@@ -71,7 +71,7 @@ const memberMiddleware = async (req, res, next) => {
     if (user && user?.is_locked == true) {
       return res.status(503).json({ error: true, message: "Sorry, your account has been locked by admin!" });
     }
-    if (user && decoded && decoded.role === "member" || decoded.role === "admin") {
+    if (user && decoded && decoded.role === "member" || decoded.role === "admin"|| decoded.role === 'appcbl_soft') {
       req.user = decoded;
       next();
     } else {

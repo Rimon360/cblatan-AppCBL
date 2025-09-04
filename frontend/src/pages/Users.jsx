@@ -38,7 +38,7 @@ const Users = () => {
 
   const [usageLimit, setUsageLimit] = useState(1);
   const [password, setPassword] = useState("");
-  const [userrole, setRole] = useState("member");
+  const [userrole, setRole] = useState("appcbl_soft");
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -271,6 +271,7 @@ const Users = () => {
               <label className="flex flex-col justify-center  w-full">
                 Role:
                 <select className="px-4 w-full py-2 bg-gray-300 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" value={userrole} onChange={(e) => setRole(e.target.value)}>
+                  <option value="appcbl_soft">Acceso al software</option>
                   <option value="admin">Admin</option>
                   <option value="member">Member</option>
                 </select>

@@ -38,6 +38,15 @@ const syncProfileUpload = multer({ storage: syncProfileStorage });
 router.post("/create", adminMiddleware, extensionUpload.single('file'), createBrowserProfile);
 router.get("/get", memberMiddleware, getBrowserProfile);
 router.get("/download", memberMiddleware, async (req, res) => {
+    const { user } = req;
+    const role = user.role;
+    if (role !== 'appcbl_soft' || role !== 'admin') {
+        res.status(503).json({
+            message: "¡Aún no tienes permiso para utilizar este software!",
+            error: true,
+        });
+        return;
+    }
     const filePath = req.query.filepath + '.zip';
     const filename = req.query.filepath.split('/').at(-1);
 
