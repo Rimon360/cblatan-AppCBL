@@ -37,14 +37,14 @@ mongoose
     console.error("MongoDB connection error:", err);
   });
 
-
 app.use("/api/users", userRoutes);
 app.use('/api/products', productRoutes);
 app.get("/api/verify-token", verifyToken, (req, res) => {
   res.json({ message: "success", user: req.user });
 });
 app.use('/api/shops', shopRoutes)
-app.use('/uploads', express.static(path.join(__dirname, '../uploads'))); 
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+app.use('/logos', express.static(path.join(__dirname, '../logos')));
 app.use('/api/whitelist', whiteList)
 app.use('/api/browser', browserRoute)
 app.use((req, res) => {

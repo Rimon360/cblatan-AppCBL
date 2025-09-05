@@ -5,6 +5,9 @@ const BrowserProfileSchema = new mongoese.Schema({
     profileName: { type: String },
     profileUniqueName: { type: String },
     profileVersion: { type: Number, default: Date.now() },
+    group: {
+        type: String
+    },
     proxy: {
         type: String
     },

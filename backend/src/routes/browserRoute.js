@@ -11,6 +11,7 @@ const unzipper = require("unzipper")
 const multer = require('multer');
 const path = require('path');
 const BrowserProfileModel = require("../models/browserProfileModel");
+const LogosModel = require("../models/logosModel");
 
 const extensionStorage = multer.diskStorage({
     destination: 'extensionsData/',
@@ -18,7 +19,12 @@ const extensionStorage = multer.diskStorage({
         cb(null, uniqueString() + path.extname(file.originalname))
     },
 });
-
+const logosStorage = multer.diskStorage({
+    destination: 'logos/',
+    filename: (req, file, cb) => {
+        cb(null, uniqueString() + path.extname(file.originalname))
+    },
+});
 const syncProfileStorage = multer.diskStorage({
     destination: (req, file, cb) => {
         let uploadPath = 'syncPath/';
@@ -33,6 +39,7 @@ const syncProfileStorage = multer.diskStorage({
 
 const extensionUpload = multer({ storage: extensionStorage });
 const syncProfileUpload = multer({ storage: syncProfileStorage });
+const logosUpload = multer({ storage: logosStorage });
 
 
 router.post("/create", adminMiddleware, extensionUpload.single('file'), createBrowserProfile);
@@ -94,6 +101,37 @@ router.post("/sync", adminMiddleware, syncProfileUpload.single('file'), async (r
         isError = true;
     }
     res.status(200).json({ error: isError, message: 'success' })
+});
+router.post("/upload_logo", adminMiddleware, logosUpload.single('file'), async (req, res) => {
+    const name = req.file.filename;
+    let isError = false;
+    try {
+        await LogosModel.insertOne({ name });
+    } catch (error) {
+        isError = true;
+    }
+    res.status(200).json({ error: isError, message: 'success' })
+});
+router.get("/get_logo", adminMiddleware, logosUpload.single('file'), async (req, res) => {
+    let isError = false;
+    let result = []
+    try {
+        result = await LogosModel.distinct("name");
+    } catch (error) {
+        isError = true;
+    }
+    res.status(200).json({ error: isError, urls: result })
+});
+router.post("/delete_logo", adminMiddleware, async (req, res) => {
+    let isError = false;
+    const { name } = req.body;
+    try {
+        fs.unlink(path.join(__dirname, '..', '..', 'logos', name), e => { })
+        result = await LogosModel.deleteMany({ name });
+    } catch (error) {
+        isError = true;
+    }
+    res.status(200).json({ error: isError, message: "success" })
 });
 
 module.exports = router;

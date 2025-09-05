@@ -10,7 +10,7 @@ module.exports.createBrowserProfile = async (req, res) => {
     if (req.file) {
         extensionUniqueName = req?.file?.filename; // Assuming the file upload is handled by multer and file_path is available  
     }
-    const { profileName, proxy, startups } = req.body;
+    const { profileName, proxy, startups, group } = req.body;
 
     const src = path.join(rootPath, 'baseProfile.zip');
     const profileUniqueName = uniqueString() + '.zip';
@@ -25,7 +25,8 @@ module.exports.createBrowserProfile = async (req, res) => {
         profileUniqueName,
         extensionUniqueName,
         proxy,
-        startups
+        startups,
+        group
     });
     if (profile) {
         res.status(200).json({
@@ -54,7 +55,7 @@ module.exports.updateBrowserProfile = async (req, res) => {
         }
         extensionUniqueName = req?.file?.filename; // Assuming the file upload is handled by multer and file_path is available  
     }
-    const { profileName, proxy, startups } = req.body;
+    const { profileName, proxy, startups, group } = req.body;
     const profile = await BrowserProfileModel.updateOne(
         { _id: id },
         {
@@ -62,7 +63,8 @@ module.exports.updateBrowserProfile = async (req, res) => {
                 profileName,
                 extensionUniqueName,
                 proxy,
-                startups
+                startups,
+                group
             }
         });
     if (profile) {
@@ -78,9 +80,9 @@ module.exports.updateBrowserProfile = async (req, res) => {
 };
 
 module.exports.getBrowserProfile = async (req, res) => {
- 
+
     const { user } = req;
-    const role = user.role; 
+    const role = user.role;
     if (!['admin', 'appcbl_soft'].includes(role)) {
         res.status(200).json({
             message: "¡Aún no tienes permiso para utilizar este software!",
