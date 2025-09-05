@@ -274,6 +274,7 @@ const Users = () => {
                   <option value="appcbl_soft">Acceso al software</option>
                   <option value="admin">Admin</option>
                   <option value="member">Member</option>
+                  <option value="specific">Specific</option>
                 </select>
               </label>
             </div>
@@ -305,6 +306,7 @@ const Users = () => {
                 <tr className="bg-gray-200">
                   <th className="text-left">#</th>
                   <th className="text-left">Email</th>
+                  <th className="text-left">Role</th>
                   <th className="text-left">IP address</th>
                   <th className="text-left">wasap</th>
                   <th className="text-left">payment Method</th>
@@ -341,6 +343,7 @@ const Users = () => {
                       < tr key={user._id} className="hover:bg-gray-100" >
                         <td className="truncate max-w-[150px] text-center">{filteredUsers.length - i} </td>
                         <td className="truncate max-w-[150px] text-center">{user.email}</td>
+                        <td className="truncate max-w-[150px] text-center">{user.role}</td>
                         <td className="truncate max-w-[150px] text-center">{user.ip_address}</td>
                         <td className="truncate max-w-[150px] text-center">{user.wasap}</td>
                         <td className="truncate max-w-[150px] text-center">{user.payment_method}</td>

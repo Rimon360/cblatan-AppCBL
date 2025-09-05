@@ -112,7 +112,7 @@ router.post("/upload_logo", adminMiddleware, logosUpload.single('file'), async (
     }
     res.status(200).json({ error: isError, message: 'success' })
 });
-router.get("/get_logo", adminMiddleware, logosUpload.single('file'), async (req, res) => {
+router.get("/get_logo", memberMiddleware, async (req, res) => {
     let isError = false;
     let result = []
     try {
