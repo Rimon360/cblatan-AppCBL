@@ -3,6 +3,7 @@ import { Routes, Route, useNavigate } from "react-router-dom";
 import NotFound from "./NotFound.jsx";
 import Users from "./Users.jsx";
 import Shops from "./Shops.jsx";
+import LogoCrud from "./Logo_crud.jsx";
 import { CiUser } from "react-icons/ci";
 import { FiLogOut } from "react-icons/fi";
 import { FaRegUser } from "react-icons/fa";
@@ -15,7 +16,7 @@ import Whitelist from "./Whitelist.jsx";
 import { FiActivity } from "react-icons/fi";
 import { MdOutlinePassword } from "react-icons/md";
 import { FaGripHorizontal } from "react-icons/fa";
-
+import { CiImageOn } from "react-icons/ci";
 
 function Dashboard() {
   const nav = useNavigate();
@@ -63,6 +64,11 @@ function Dashboard() {
                 <FiActivity /> Activity
               </NavLink>
             </li>
+            <li>
+              <NavLink to={"/dashboard/logos"} className={({ isActive }) => (isActive ? "text-white bg-gray-900" : "")}>
+                <CiImageOn /> Logos
+              </NavLink>
+            </li>
           </ul>
           <button onClick={logout} className="w-full flex items-center gap-2 mt-4 py-2 px-4 bg-gray-500 text-white font-semibold rounded-lg hover:bg-red-500">
             Logout <FiLogOut />
@@ -74,6 +80,7 @@ function Dashboard() {
       <section className="right-section h-screen overflow-auto flex-1 p-4 bg-gray-50">
         <Routes>
           <Route path="/" element={<Users />} />
+          <Route path="/logos" element={<LogoCrud />} />
           <Route path="/users" element={<Users />} />
           <Route path="/managepassword" element={<Shops />} />
           <Route path="/whitelist" element={<Whitelist />} />

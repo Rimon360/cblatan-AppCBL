@@ -11,7 +11,7 @@ function AppRoutes() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Login />} />
+        <Route path="/" element={<Login />} /> 
         <Route path="/users_with_shop/:shop_id" element={<User_list />} />
         <Route path="/admin" element={<Login />} />
         <Route path="/userlogin/:user_id/:username" element={<UserLogin />} />

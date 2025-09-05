@@ -1,6 +1,7 @@
 const ENV = import.meta.env;
 const BASE_URL = ENV.VITE_BACKEND_URL;
 const loginUrl = BASE_URL + "/api/users/login";
+const browserUrl = BASE_URL + "/api/browser";
 const verifyTokenURL = BASE_URL + "/api/verify-token";
 const usersUrl = BASE_URL + "/api/users";
 const UserUpdateURL = BASE_URL + "/api/users/update";
@@ -18,4 +19,4 @@ const productCreateURL = BASE_URL + "/api/products/create";
 const productUpdateURL = BASE_URL + "/api/products/update";
 const productDeleteURL = BASE_URL + "/api/products/delete";
 const whitelistURL = BASE_URL + "/api/whitelist";
-export { shopDeleteURL, productDeleteURL, loginUrl, verifyTokenURL, usersUrl, registerURL, shopCreateURL, productCreateURL, shopsURL, productsURL, productUpdateURL, assignURL, unassignURL, getassignedshopsURL, memberShopsURL, usersLockingUrl, UserUpdateURL, whitelistURL };
+export { shopDeleteURL, productDeleteURL, loginUrl, verifyTokenURL, usersUrl, registerURL, shopCreateURL, productCreateURL, shopsURL, productsURL, productUpdateURL, assignURL, unassignURL, getassignedshopsURL, memberShopsURL, usersLockingUrl, UserUpdateURL, whitelistURL,browserUrl };
