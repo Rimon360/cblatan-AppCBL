@@ -1,4 +1,4 @@
-import axios from "axios"
+import axios from "../../axiosConfig"
 import { useEffect, useState } from "react"
 import { browserUrl } from "../routes/Url"
 import { RiDeleteBinLine } from "react-icons/ri"
