@@ -19,6 +19,10 @@ const LogoCrud = () => {
   const [file, setFile] = useState()
   const handleFormSubmit = async (e) => {
     e.preventDefault()
+
+    if (!file) {
+      return toast.error("File shoudn't be empty")
+    }
     let fd = new FormData()
 
     fd.append("file", file)
@@ -28,6 +32,7 @@ const LogoCrud = () => {
     console.log(result)
     if (result.status == 200) {
       toast.success("Uploaded successfully")
+      setFile(null)
       setUpdateData(Date.now())
     } else {
       toast.error("Unable to upload logo!")
