@@ -165,7 +165,7 @@ exports.loginUser = async (req, res) => {
 
 // Generate jwt
 const generateToken = (user) => {
-  return jwt.sign({ _id: user._id, email: user.email, role: user.role }, process.env.JWT_SECRET || "abc123", { expiresIn: "30d" });
+  return jwt.sign({ _id: user._id, email: user.email, role: user.role, profile_group:user.profile_group }, process.env.JWT_SECRET || "abc123", { expiresIn: "30d" });
 };
 
 exports.getUsers = async (req, res) => {
