@@ -70,8 +70,8 @@ const memberMiddleware = async (req, res, next) => {
 
     if (user && user?.is_locked == true) {
       return res.status(503).json({ error: true, message: "Sorry, your account has been locked by admin!" });
-    }
-    if (user && decoded && ['member', 'admin', 'appcbl_soft', 'specific'].includes(decoded.role)) {
+    } 
+    if (user && decoded && ['member', 'admin', 'appcbl_soft', 'specific', 'all_profile'].includes(decoded.role)) {
       req.user = decoded;
       next();
     } else {
@@ -94,7 +94,7 @@ const ipTrackMiddleware = async (req, res, next) => {
       req.user = decoded;
       next();
     }
-    if (decoded && ['member', 'specific', 'appcbl_soft'].includes(decoded.role)) {
+    if (decoded && ['member', 'specific', 'appcbl_soft','all_profile'].includes(decoded.role)) {
       const user = await UserModel.findOne({ email: decoded.email, _id: decoded._id })
       if (user && user.ip_address && user.ip_address != 'null' && user.ip_address == ip || user.ip_address == null) {
         if (user.ip_address == null) {

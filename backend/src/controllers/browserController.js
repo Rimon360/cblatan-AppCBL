@@ -84,14 +84,14 @@ module.exports.getBrowserProfile = async (req, res) => {
     const { user } = req;
     const role = user.role;
     let queryObj = { group: role };
-    if (!['admin', 'appcbl_soft', 'specific', 'member'].includes(role)) {
+    if (!['admin', 'appcbl_soft', 'specific', 'member', 'all_profile'].includes(role)) {
         res.status(200).json({
             message: "¡Aún no tienes permiso para utilizar este software!",
             error: true,
         });
         return;
     }
-    if (role === 'admin') queryObj = {};
+    if (role === 'admin'|| role == 'all_profile') queryObj = {};
     const profiles = await BrowserProfileModel.find(queryObj, { __v: 0 }).sort({ createdAt: -1 });
     if (profiles) {
         let tmp = profiles.map(profile => ({ ...profile.toObject(), port: getPort() }));

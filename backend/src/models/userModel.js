@@ -84,9 +84,12 @@ const userSchema = new mongoose.Schema({
     type: Number,
     default: 31,
   },
+  profile_group: {
+    type: String
+  },
   role: {
     type: String,
-    enum: ["admin", "member","appcbl_soft",'specific'],
+    enum: ["admin", "member", "appcbl_soft", 'specific'],
     default: "member",
   },
   seq: { type: Number, default: 0 },

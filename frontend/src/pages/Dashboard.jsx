@@ -1,35 +1,36 @@
-import { NavLink } from "react-router-dom";
-import { Routes, Route, useNavigate } from "react-router-dom";
-import NotFound from "./NotFound.jsx";
-import Users from "./Users.jsx";
-import Shops from "./Shops.jsx";
-import LogoCrud from "./Logo_crud.jsx";
-import { CiUser } from "react-icons/ci";
-import { FiLogOut } from "react-icons/fi";
-import { FaRegUser } from "react-icons/fa";
-import { CiShop } from "react-icons/ci";
-import Assign_shop from "./Assign_shop.jsx";
-import { useGlobal } from "../context/GlobalStete.jsx";
-import { MdOutlineAdminPanelSettings } from "react-icons/md";
-import Activity from "./Activity.jsx";
-import Whitelist from "./Whitelist.jsx";
-import { FiActivity } from "react-icons/fi";
-import { MdOutlinePassword } from "react-icons/md";
-import { FaGripHorizontal } from "react-icons/fa";
-import { CiImageOn } from "react-icons/ci";
+import { NavLink } from "react-router-dom"
+import { Routes, Route, useNavigate } from "react-router-dom"
+import NotFound from "./NotFound.jsx"
+import Users from "./Users.jsx"
+import Shops from "./Shops.jsx"
+import LogoCrud from "./Logo_crud.jsx"
+import Ads from "./Ads.jsx"
+import ProfileGroup from "./Profile_group.jsx"
+import { FiLogOut } from "react-icons/fi"
+import { FaRegUser } from "react-icons/fa"
+import Assign_shop from "./Assign_shop.jsx"
+import { useGlobal } from "../context/GlobalStete.jsx"
+import Activity from "./Activity.jsx"
+import Whitelist from "./Whitelist.jsx"
+import { FiActivity } from "react-icons/fi"
+import { MdOutlinePassword } from "react-icons/md"
+import { FaGripHorizontal } from "react-icons/fa"
+import { CiImageOn } from "react-icons/ci"
+import { FaLayerGroup } from "react-icons/fa"
+import { CiBullhorn } from "react-icons/ci"
 
 function Dashboard() {
-  const nav = useNavigate();
-  const { current_user } = useGlobal();
-  const role = current_user.role;
+  const nav = useNavigate()
+  const { current_user } = useGlobal()
+  const role = current_user.role
   const logout = () => {
-    localStorage.removeItem("token");
+    localStorage.removeItem("token")
     if (role == "admin") {
-      nav("/admin");
+      nav("/admin")
     } else {
-      nav("/");
+      nav("/")
     }
-  };
+  }
 
   return (
     <section className="flex h-screen">
@@ -69,6 +70,16 @@ function Dashboard() {
                 <CiImageOn /> Logos
               </NavLink>
             </li>
+            <li>
+              <NavLink to={"/dashboard/profilegroup"} className={({ isActive }) => (isActive ? "text-white bg-gray-900" : "")}>
+                <FaLayerGroup /> Profile Group
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to={"/dashboard/ads"} className={({ isActive }) => (isActive ? "text-white bg-gray-900" : "")}>
+                <CiBullhorn /> Ads
+              </NavLink>
+            </li>
           </ul>
           <button onClick={logout} className="w-full flex items-center gap-2 mt-4 py-2 px-4 bg-gray-500 text-white font-semibold rounded-lg hover:bg-red-500">
             Logout <FiLogOut />
@@ -81,6 +92,8 @@ function Dashboard() {
         <Routes>
           <Route path="/" element={<Users />} />
           <Route path="/logos" element={<LogoCrud />} />
+          <Route path="/ads" element={<Ads />} />
+          <Route path="/profilegroup" element={<ProfileGroup />} />
           <Route path="/users" element={<Users />} />
           <Route path="/managepassword" element={<Shops />} />
           <Route path="/whitelist" element={<Whitelist />} />
@@ -91,7 +104,7 @@ function Dashboard() {
         </Routes>
       </section>
     </section>
-  );
+  )
 }
 
-export default Dashboard;
+export default Dashboard

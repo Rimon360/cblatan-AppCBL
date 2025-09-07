@@ -45,11 +45,12 @@ app.get("/api/verify-token", verifyToken, (req, res) => {
 app.use('/api/shops', shopRoutes)
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 app.use('/logos', express.static(path.join(__dirname, '../logos')));
+app.use('/ads', express.static(path.join(__dirname, '../ads')));
 app.use('/api/whitelist', whiteList)
 app.use('/api/browser', browserRoute)
 app.use((req, res) => {
   console.log('404 for:', req.originalUrl);
-  res.status(404).json({ message: "Technical Error!. Please try again later!", d: req.protocol + "://" + req.get("host") + req.originalUrl });
+  res.status(404).json({error:true, message: "Technical Error!. Please try again later!", d: req.protocol + "://" + req.get("host") + req.originalUrl });
 });
 
 // module.exports = app;

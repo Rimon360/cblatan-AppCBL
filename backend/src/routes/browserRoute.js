@@ -1,7 +1,7 @@
 const fs = require("fs");
 const express = require("express");
 const router = express.Router();
-const { uniqueString } = require("../functions");
+const { uniqueString, getRandomInRange } = require("../functions");
 const { createBrowserProfile, getBrowserProfile, deleteBrowserProfile, updateBrowserProfile } = require("../controllers/browserController");
 const { authMiddleware, adminMiddleware, memberMiddleware } = require("../middlewares/authMiddleware");
 const { moveFolder, zipFolder } = require('../utils/util')
@@ -12,6 +12,8 @@ const multer = require('multer');
 const path = require('path');
 const BrowserProfileModel = require("../models/browserProfileModel");
 const LogosModel = require("../models/logosModel");
+const ProfileGroupModel = require("../models/browserProfileGroup");
+const AdsModel = require("../models/browserAdsModel");
 
 const extensionStorage = multer.diskStorage({
     destination: 'extensionsData/',
@@ -21,6 +23,12 @@ const extensionStorage = multer.diskStorage({
 });
 const logosStorage = multer.diskStorage({
     destination: 'logos/',
+    filename: (req, file, cb) => {
+        cb(null, uniqueString() + path.extname(file.originalname))
+    },
+});
+const adsStorage = multer.diskStorage({
+    destination: 'ads/',
     filename: (req, file, cb) => {
         cb(null, uniqueString() + path.extname(file.originalname))
     },
@@ -40,6 +48,7 @@ const syncProfileStorage = multer.diskStorage({
 const extensionUpload = multer({ storage: extensionStorage });
 const syncProfileUpload = multer({ storage: syncProfileStorage });
 const logosUpload = multer({ storage: logosStorage });
+const adsUpload = multer({ storage: adsStorage });
 
 
 router.post("/create", adminMiddleware, extensionUpload.single('file'), createBrowserProfile);
@@ -47,7 +56,7 @@ router.get("/get", memberMiddleware, getBrowserProfile);
 router.get("/download", memberMiddleware, async (req, res) => {
     const { user } = req;
     const role = user.role;
-    if (!['admin', 'appcbl_soft','specific','member'].includes(role)) {
+    if (!['admin', 'appcbl_soft', 'specific', 'member', 'all_profile'].includes(role)) {
         res.status(200).json({
             message: "¡Aún no tienes permiso para utilizar este software!",
             error: true,
@@ -133,5 +142,68 @@ router.post("/delete_logo", adminMiddleware, async (req, res) => {
     }
     res.status(200).json({ error: isError, message: "success" })
 });
+router.get("/group/get", adminMiddleware, async (req, res) => {
+    let isError = false;
+    try {
+        result = await ProfileGroupModel.find({}, { name: 1 }).sort({ name: 1 });
+    } catch (error) {
+        isError = true;
+    }
+    res.status(200).json({ error: isError, message: "success", group: result })
+});
+router.post("/group/add", adminMiddleware, async (req, res) => {
+    let isError = false;
+    const { name } = req.body;
+
+    try {
+        result = await ProfileGroupModel.insertOne({ name });
+    } catch (error) {
+        isError = true;
+    }
+    res.status(200).json({ error: isError, message: "success" })
+});
+router.post("/group/delete", adminMiddleware, async (req, res) => {
+    let isError = false;
+    const { _id } = req.body;
+    try {
+        await ProfileGroupModel.deleteMany({ _id });
+    } catch (error) {
+        isError = true;
+    }
+    res.status(200).json({ error: isError, message: "success" })
+});
+router.post("/ads/upload", adminMiddleware, adsUpload.single('file'), async (req, res) => {
+    const name = req.file.filename;
+    let isError = false;
+    try {
+        await AdsModel.insertOne({ name });
+    } catch (error) {
+        isError = true;
+    }
+    res.status(200).json({ error: isError, message: 'success' })
+});
+router.get("/ads/get", memberMiddleware, async (req, res) => {
+    let isError = false;
+    let url = '', result = []
+    try {
+        result = await AdsModel.distinct('name');
+        url = result[getRandomInRange(0, result.length - 1)];
+    } catch (error) {
+        isError = true;
+    }
+    res.status(200).json({ error: isError, message: "success", url, ads: result })
+});
+router.post("/ads/delete", adminMiddleware, async (req, res) => {
+    let isError = false;
+    const { name } = req.body;
+    try {
+        fs.unlink(path.join(__dirname, '..', '..', 'ads', name), e => { })
+        await AdsModel.deleteMany({ name });
+    } catch (error) {
+        isError = true;
+    }
+    res.status(200).json({ error: isError, message: "success" })
+});
+
 
 module.exports = router;

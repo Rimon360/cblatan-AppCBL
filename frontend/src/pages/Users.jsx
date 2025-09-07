@@ -1,77 +1,75 @@
-import { useEffect, useState } from "react";
-import { RiDeleteBin6Line } from "react-icons/ri";
-import { TiUserAdd } from "react-icons/ti";
-import axios from '../../axiosConfig';
-import { Navigate, Link } from "react-router-dom";
-import { registerURL, usersUrl, UserUpdateURL } from "../routes/Url";
-import { checkValidity } from "../functions";
-import toast from "react-hot-toast";
-import Swal from "sweetalert2";
-import { FaExternalLinkAlt } from "react-icons/fa";
-import { useGlobal } from "../context/GlobalStete";
-import { format } from 'date-fns';
-import { CiEdit } from "react-icons/ci";
-import { RxCross2, RxUpdate } from "react-icons/rx";
-
+import { useEffect, useState } from "react"
+import { RiDeleteBin6Line } from "react-icons/ri"
+import { TiUserAdd } from "react-icons/ti"
+import axios from "../../axiosConfig"
+import { Navigate, Link } from "react-router-dom"
+import { registerURL, usersUrl, UserUpdateURL, profileGroupDataURL } from "../routes/Url"
+import { checkValidity } from "../functions"
+import toast from "react-hot-toast"
+import Swal from "sweetalert2"
+import { FaExternalLinkAlt } from "react-icons/fa"
+import { useGlobal } from "../context/GlobalStete"
+import { format } from "date-fns"
+import { CiEdit } from "react-icons/ci"
+import { RxCross2, RxUpdate } from "react-icons/rx"
 
 const Users = () => {
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState("")
 
-
-  // new entries started 
-  const [wasap, setWasap] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("");
-  const [nstbrowserEmail, setNstbrowserEmail] = useState("");
+  // new entries started
+  const [wasap, setWasap] = useState("")
+  const [paymentMethod, setPaymentMethod] = useState("")
+  const [nstbrowserEmail, setNstbrowserEmail] = useState("")
   // const [dicloakEmail, setDicloakEmail] = useState("");
   // const [subscripitonTerm, setSubscripitonTerm] = useState("");
-  const [niche, setNiche] = useState("");
-  const [affiliate, setAffiliate] = useState("");
-  const [supervisor, setSupervisor] = useState("");
-  const [observation, setObservation] = useState("");
-  const date = new Date();
-  const [subStartDate, setSubStartDate] = useState(date.toISOString().split('T')[0]);
-  const [subValidity, setSubValidity] = useState(31);
+  const [niche, setNiche] = useState("")
+  const [affiliate, setAffiliate] = useState("")
+  const [supervisor, setSupervisor] = useState("")
+  const [observation, setObservation] = useState("")
+  const date = new Date()
+  const [subStartDate, setSubStartDate] = useState(date.toISOString().split("T")[0])
+  const [subValidity, setSubValidity] = useState(31)
 
   // new entries based on user requirements end
 
-
-
-  const [usageLimit, setUsageLimit] = useState(1);
-  const [password, setPassword] = useState("");
-  const [userrole, setRole] = useState("appcbl_soft");
-  const [users, setUsers] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [showModal, setShowModal] = useState(false);
-  const [selectedId, setSelectedId] = useState(null);
-  const [filteredUsers, setFilteredUsers] = useState([]);
-  const { current_user } = useGlobal();
-  const token = localStorage.getItem("token");
-  const role = current_user.role;
+  const [usageLimit, setUsageLimit] = useState(1)
+  const [password, setPassword] = useState("")
+  const [userrole, setRole] = useState("appcbl_soft")
+  const [users, setUsers] = useState([])
+  const [searchTerm, setSearchTerm] = useState("")
+  const [showModal, setShowModal] = useState(false)
+  const [selectedId, setSelectedId] = useState(null)
+  const [profileGroup, setProfileGroup] = useState("")
+  const [filteredUsers, setFilteredUsers] = useState([])
+  const { current_user } = useGlobal()
+  const token = localStorage.getItem("token")
+  const role = current_user.role
   if (role !== "admin") {
-    return <h1 className="text-center text-red-500 mt-20">
-      You are not authorized to access this page
-      <br />
-      return to <Link to={"/"} className="text-blue-500">Home</Link>
-    </h1>;
+    return (
+      <h1 className="text-center text-red-500 mt-20">
+        You are not authorized to access this page
+        <br />
+        return to{" "}
+        <Link to={"/"} className="text-blue-500">
+          Home
+        </Link>
+      </h1>
+    )
     // return <Navigate to={"/"} />;
   }
-  const [loadData, setLoadData] = useState(Date.now());
+  const [loadData, setLoadData] = useState(Date.now())
   useEffect(() => {
     axios
-      .get(usersUrl + '/false', { headers: { Authorization: `Bearer ${token}` } })
+      .get(usersUrl + "/false", { headers: { Authorization: `Bearer ${token}` } })
       .then((response) => {
-        setUsers(response.data);
-        setFilteredUsers(users.filter((user) =>
-          user?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          user?.ip_address?.toLowerCase().includes(searchTerm.toLowerCase())
-        ));
-
+        setUsers(response.data)
+        setFilteredUsers(users.filter((user) => user?.email?.toLowerCase().includes(searchTerm.toLowerCase()) || user?.ip_address?.toLowerCase().includes(searchTerm.toLowerCase())))
       })
       .catch((error) => {
-        toast.error(error.response.data?.message);
-        console.error("Error fetching users:", error);
-      });
-  }, [loadData]);
+        toast.error(error.response.data?.message)
+        console.error("Error fetching users:", error)
+      })
+  }, [loadData])
 
   const openModal = (id, name) => {
     Swal.fire({
@@ -81,41 +79,41 @@ const Users = () => {
       cancelButtonText: "No",
     }).then((result) => {
       if (result.isConfirmed) {
-        confirmDelete(id);
+        confirmDelete(id)
       }
-    });
-  };
+    })
+  }
 
   const confirmDelete = async (id) => {
     try {
       const res = await fetch(`${usersUrl}/${id}`, {
         method: "DELETE",
-      });
-      const data = await res.json();
+      })
+      const data = await res.json()
       if (data) {
-        setUsers(users.filter((u) => u._id !== id));
+        setUsers(users.filter((u) => u._id !== id))
       } else {
-        toast.error("Failed to delete the uses");
+        toast.error("Failed to delete the uses")
       }
     } catch (err) {
-      toast.error("Delete error", err);
-      console.error("Delete error:", err);
+      toast.error("Delete error", err)
+      console.error("Delete error:", err)
     }
-  };
+  }
 
   const handleSubmit = (e) => {
-    e.preventDefault();
+    e.preventDefault()
 
     if (email.trim() === "") {
-      toast.error("Email should not be empty");
-      return;
+      toast.error("Email should not be empty")
+      return
     }
     if (!isUpdate && password.length < 3) {
-      toast.error("Password length should be >= 4");
-      return;
+      toast.error("Password length should be >= 4")
+      return
     }
-    let url = registerURL;
-    if (isUpdate) url = UserUpdateURL;
+    let url = registerURL
+    if (isUpdate) url = UserUpdateURL
     axios
       .post(url, {
         id: isUpdate,
@@ -126,6 +124,7 @@ const Users = () => {
         nstbrowserEmail,
         // dicloakEmail,
         // subscripitonTerm,
+        profileGroup,
         niche,
         affiliate,
         supervisor,
@@ -137,83 +136,106 @@ const Users = () => {
       })
       .then((response) => {
         // --
-        setIsUpdate(false);
+        setIsUpdate(false)
         setWasap("")
-        setPaymentMethod("");
-        setNstbrowserEmail("");
+        setPaymentMethod("")
+        setNstbrowserEmail("")
         // setDicloakEmail("");
         // setSubscripitonTerm("");
-        setNiche("");
-        setAffiliate("");
-        setSupervisor("");
-        setObservation("");
-        setSubValidity(30);
+        setNiche("")
+        setAffiliate("")
+        setSupervisor("")
+        setObservation("")
+        setSubValidity(30)
+        setProfileGroup("")
 
         // --
-        setEmail("");
-        setUsageLimit(1);
-        setPassword("");
-        setLoadData(Date.now());
+        setEmail("")
+        setUsageLimit(1)
+        setPassword("")
+        setLoadData(Date.now())
       })
       .catch((error) => {
-        toast.error(error.response.data?.message);
-        console.error("Error creating user:", error);
-      });
-  };
+        toast.error(error.response.data?.message)
+        console.error("Error creating user:", error)
+      })
+  }
 
   useEffect(() => {
-    setFilteredUsers(users.filter((user) => user?.email?.toLowerCase().includes(searchTerm.toLowerCase().trim()) ||
-      user?.seq?.toString().includes(searchTerm.toLowerCase().trim()) ||
-      user?.ip_address?.toLowerCase().includes(searchTerm.toLowerCase().trim()) ||
-      user?.ip_address_history?.toLowerCase().includes(searchTerm.toLowerCase().trim())
-    ));
-  }, [users, searchTerm]);
+    setFilteredUsers(
+      users.filter(
+        (user) =>
+          user?.email?.toLowerCase().includes(searchTerm.toLowerCase().trim()) ||
+          user?.seq?.toString().includes(searchTerm.toLowerCase().trim()) ||
+          user?.ip_address?.toLowerCase().includes(searchTerm.toLowerCase().trim()) ||
+          user?.ip_address_history?.toLowerCase().includes(searchTerm.toLowerCase().trim())
+      )
+    )
+  }, [users, searchTerm])
 
-  const [isUpdate, setIsUpdate] = useState(false);
+  const [isUpdate, setIsUpdate] = useState(false)
 
   const handleUserEdit = (user) => {
-    setIsUpdate(user._id);
-    setEmail(user.email);
+    setIsUpdate(user._id)
+    setEmail(user.email)
     setWasap(user.wasap)
-    setPaymentMethod(user.payment_method);
-    setNstbrowserEmail(user.nstbrowser_email);
+    setPaymentMethod(user.payment_method)
+    setNstbrowserEmail(user.nstbrowser_email)
     // setDicloakEmail(user.dicloak_email);
     // setSubscripitonTerm(user.subscription_term);
-    setNiche(user.niche);
-    setAffiliate(user.affiliate);
-    setSupervisor(user.supervisor);
-    setObservation(user.observation);
-    setSubValidity(user.sub_validity);
+    setNiche(user.niche)
+    setAffiliate(user.affiliate)
+    setSupervisor(user.supervisor)
+    setObservation(user.observation)
+    setSubValidity(user.sub_validity)
     setSubStartDate(user.sub_start_date)
+    setProfileGroup(user.profile_group || "")
   }
 
   const handleCancelUpdate = () => {
-    setIsUpdate(false);
+    setIsUpdate(false)
     setWasap("")
-    setPaymentMethod("");
-    setNstbrowserEmail("");
+    setPaymentMethod("")
+    setNstbrowserEmail("")
     // setDicloakEmail("");
     // setSubscripitonTerm("");
-    setNiche("");
-    setAffiliate("");
-    setSupervisor("");
-    setObservation("");
-    setSubValidity(30);
+    setNiche("")
+    setAffiliate("")
+    setSupervisor("")
+    setObservation("")
+    setSubValidity(30)
+    setProfileGroup("")
     // --
-    setEmail("");
-    setUsageLimit(1);
-    setPassword("");
+    setEmail("")
+    setUsageLimit(1)
+    setPassword("")
   }
+
+  const [profileGroupData, setGroupData] = useState([])
+
+  useEffect(() => {
+    axios
+      .get(profileGroupDataURL, { headers: { Authorization: "Bearer " + token } })
+      .then((result) => {
+        result = result.data
+        if (!result.error) { 
+          setGroupData(result.group)
+        } else {
+          toast.error(result.message || "Unable to get profile group")
+        }
+      })
+      .catch((e) => toast.error(e.message || "Unable to get profile group"))
+  }, [])
 
   return (
     <>
       <section className="users p-6">
         <form onSubmit={handleSubmit} className="useraction-container mb-6 bg-white p-2 rounded-xl">
           <div className="flex flex-col gap-2 capitalize text-sm">
-            <div className="flex gap-2" >
+            <div className="flex gap-2">
               <label className="flex flex-col justify-center  w-full">
                 e-mail/username:
-                <input type="text" required placeholder="Enter user/email address" value={email} onChange={(e) => setEmail(e.target.value.replace(' ', '_').toLowerCase())} />
+                <input type="text" required placeholder="Enter user/email address" value={email} onChange={(e) => setEmail(e.target.value.replace(" ", "_").toLowerCase())} />
               </label>
               <label className="flex flex-col justify-center  w-full">
                 wasap:
@@ -240,7 +262,7 @@ const Users = () => {
                 <input type="text" placeholder="Enter value..." value={niche} onChange={(e) => setNiche(e.target.value)} />
               </label>
             </div>
-            <div className="flex gap-2" >
+            <div className="flex gap-2">
               <label className="flex flex-col justify-center  w-full">
                 affiliate:
                 <input type="text" placeholder="Enter value..." value={affiliate} onChange={(e) => setAffiliate(e.target.value)} />
@@ -262,7 +284,14 @@ const Users = () => {
                 <input type="number" placeholder="Enter value..." value={subValidity} onChange={(e) => setSubValidity(e.target.value)} />
               </label>
 
-              {!isUpdate ? (<label className="flex flex-col justify-center  w-full">Password:<input required type="text" placeholder="Confirm password" value={password} onChange={(e) => setPassword(e.target.value)} /></label>) : ''}
+              {!isUpdate ? (
+                <label className="flex flex-col justify-center  w-full">
+                  Password:
+                  <input required type="text" placeholder="Confirm password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                </label>
+              ) : (
+                ""
+              )}
               {/* <label className="flex flex-col justify-center  w-full">
               Usags Limit:
               <input type="number" required placeholder="Enter user limit" value={usageLimit} onChange={(e) => setUsageLimit(e.target.value)} />
@@ -270,36 +299,67 @@ const Users = () => {
 
               <label className="flex flex-col justify-center  w-full">
                 Role:
-                <select className="px-4 w-full py-2 bg-gray-300 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" value={userrole} onChange={(e) => setRole(e.target.value)}>
+                <select
+                  className="px-4 w-full py-2 bg-gray-300 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  value={userrole}
+                  onChange={(e) => setRole(e.target.value)}
+                >
                   <option value="appcbl_soft">Acceso al software</option>
                   <option value="admin">Admin</option>
                   <option value="member">Member</option>
                   <option value="specific">Specific</option>
+                  <option value="all_profile">Todos los perfiles</option>
+                </select>
+              </label>
+              <label className="flex flex-col justify-center  w-full">
+                Profile Group:
+                <select className="p-2 !bg-blue-300 rounded-md cursor-pointer" value={profileGroup} onInput={(e) => setProfileGroup(e.target.value)} name="" id="">
+                  <option value="" disabled>
+                    Select Group
+                  </option>
+                  {profileGroupData.length > 0 ? profileGroupData.map((group) => <option value={group.name}>{group.name}</option>) : ""}
                 </select>
               </label>
             </div>
           </div>
-          {isUpdate ? (<div className="flex justify-between w-fit gap-2">
-
-            <button onClick={handleCancelUpdate} type="submit" className="flex items-center gap-2 create-user mt-4 py-2 px-4 bg-red-500 text-white rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500">
-              Cancel
-              <RxCross2 />
+          {isUpdate ? (
+            <div className="flex justify-between w-fit gap-2">
+              <button
+                onClick={handleCancelUpdate}
+                type="submit"
+                className="flex items-center gap-2 create-user mt-4 py-2 px-4 bg-red-500 text-white rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
+              >
+                Cancel
+                <RxCross2 />
+              </button>
+              <button
+                type="submit"
+                className="flex items-center gap-2 create-user mt-4 py-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                Update
+                <RxUpdate />
+              </button>
+            </div>
+          ) : (
+            <button
+              type="submit"
+              className="flex items-center gap-2 create-user mt-4 py-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              Create user
+              <TiUserAdd />
             </button>
-            <button type="submit" className="flex items-center gap-2 create-user mt-4 py-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
-              Update
-              <RxUpdate />
-            </button>
-          </div>
-          ) : (<button type="submit" className="flex items-center gap-2 create-user mt-4 py-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
-            Create user
-            <TiUserAdd />
-          </button>)}
-
+          )}
         </form>
         <hr />
 
         <div className="users-container mt-6 bg-white p-2 rounded-xl">
-          <input type="search" placeholder="Search user" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="p-2 sticky top-0 mb-4 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <input
+            type="search"
+            placeholder="Search user"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="p-2 sticky top-0 mb-4 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
           <div className="  overflow-auto">
             <table className="w-full h-full overflow-auto mt-4 text-left border-collapse  capitalize text-[11px]">
               <thead>
@@ -307,6 +367,7 @@ const Users = () => {
                   <th className="text-left">#</th>
                   <th className="text-left">Email</th>
                   <th className="text-left">Role</th>
+                  <th className="text-left">Profile Group</th>
                   <th className="text-left">IP address</th>
                   <th className="text-left">wasap</th>
                   <th className="text-left">payment Method</th>
@@ -330,20 +391,20 @@ const Users = () => {
               <tbody>
                 {filteredUsers.length > 0 ? (
                   filteredUsers.map((user, i) => {
-                    let tmpDate = new Date(user.sub_start_date);
-                    let formatedDate = format(tmpDate.toString(), "d/M/y", { timeZone: 'America/Lima' });
+                    let tmpDate = new Date(user.sub_start_date)
+                    let formatedDate = format(tmpDate.toString(), "d/M/y", { timeZone: "America/Lima" })
 
-                    let results = checkValidity(formatedDate, user.sub_validity);
-                    let isAlmostFinished = false;
-                    if (results && results < 4) isAlmostFinished = true;
+                    let results = checkValidity(formatedDate, user.sub_validity)
+                    let isAlmostFinished = false
+                    if (results && results < 4) isAlmostFinished = true
 
-
-                    let isExpired = results == false ? 'Expired' : results;
+                    let isExpired = results == false ? "Expired" : results
                     return (
-                      < tr key={user._id} className="hover:bg-gray-100" >
+                      <tr key={user._id} className="hover:bg-gray-100">
                         <td className="truncate max-w-[150px] text-center">{filteredUsers.length - i} </td>
                         <td className="truncate max-w-[150px] text-center">{user.email}</td>
                         <td className="truncate max-w-[150px] text-center">{user.role}</td>
+                        <td className="truncate max-w-[150px] text-center">{user.profile_group}</td>
                         <td className="truncate max-w-[150px] text-center">{user.ip_address}</td>
                         <td className="truncate max-w-[150px] text-center">{user.wasap}</td>
                         <td className="truncate max-w-[150px] text-center">{user.payment_method}</td>
@@ -357,12 +418,15 @@ const Users = () => {
                         <td className="truncate max-w-[150px] text-center">{user.observation}</td>
                         <td className="truncate max-w-[150px] text-center">{formatedDate}</td>
                         <td className="truncate max-w-[150px] text-center">{user.sub_validity}</td>
-                        <td className={`text-center font-bold text-md  ${isAlmostFinished ? "text-red-500 font-bold" : ""} ${results == false ? 'text-red-500' : ""} `}>{isExpired}</td>
-                        <td className="text-center">{new Date(user.createdAt).toLocaleString('en-US', { timeZone: 'America/Lima' })}</td>
+                        <td className={`text-center font-bold text-md  ${isAlmostFinished ? "text-red-500 font-bold" : ""} ${results == false ? "text-red-500" : ""} `}>{isExpired}</td>
+                        <td className="text-center">{new Date(user.createdAt).toLocaleString("en-US", { timeZone: "America/Lima" })}</td>
 
                         <td>
                           <div className="flex items-center justify-center">
-                            <button onClick={e => handleUserEdit(user)} className="hover:bg-blue-300/50 text-xl text-blue-400 h-[20px] items-center w-full flex justify-center rounded-md hover:text-blue-500" >
+                            <button
+                              onClick={(e) => handleUserEdit(user)}
+                              className="hover:bg-blue-300/50 text-xl text-blue-400 h-[20px] items-center w-full flex justify-center rounded-md hover:text-blue-500"
+                            >
                               <CiEdit />
                             </button>
                           </div>
@@ -374,19 +438,17 @@ const Users = () => {
                             </Link>
                           </div>
                         </td>
-                        <td  >
+                        <td>
                           <div className=" flex items-center justify-center">
-                            {
-                              user.role === "adminss" ? 'N/A' : (
-                                <button onClick={() => openModal(user._id, user.email)} className="px-2 py-1 text-blue-400 rounded hover:bg-blue-200">
-                                  <RiDeleteBin6Line />
-                                </button>
-                              )
-                            }
+                            {user.role === "adminss" ? (
+                              "N/A"
+                            ) : (
+                              <button onClick={() => openModal(user._id, user.email)} className="px-2 py-1 text-blue-400 rounded hover:bg-blue-200">
+                                <RiDeleteBin6Line />
+                              </button>
+                            )}
                           </div>
-
                         </td>
-
                       </tr>
                     )
                   })
@@ -401,9 +463,9 @@ const Users = () => {
             </table>
           </div>
         </div>
-      </section >
+      </section>
     </>
-  );
-};
+  )
+}
 
-export default Users;
+export default Users
