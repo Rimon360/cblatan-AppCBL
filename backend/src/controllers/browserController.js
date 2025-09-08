@@ -51,7 +51,7 @@ module.exports.updateBrowserProfile = async (req, res) => {
     if (req.file) {
         if (oldProfile.extensionUniqueName) {
             const oldExPath = path.join(rootPath, 'extensionsData', oldProfile.extensionUniqueName);
-            fs.unlink(oldExPath);
+            fs.unlink(oldExPath, ()=>{});
         }
         extensionUniqueName = req?.file?.filename; // Assuming the file upload is handled by multer and file_path is available  
     }
