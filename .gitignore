@@ -4,3 +4,6 @@ extension/
 desktop_app/
 backend/browserProfilesData
 backend/extensionsData
+backend/ads
+backend/logos
+backend/syncPath

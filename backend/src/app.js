@@ -3,6 +3,7 @@ const express = require("express");
 const userRoutes = require("./routes/userRoutes");
 const browserRoute = require("./routes/browserRoute");
 const whiteList = require('./routes/whiteList');
+const blacklistRoute = require('./routes/blacklistRoute');
 const shopRoutes = require("./routes/shopRoutes");
 const productRoutes = require("./routes/productRoutes");
 const mongoose = require("mongoose");
@@ -48,6 +49,7 @@ app.use('/logos', express.static(path.join(__dirname, '../logos')));
 app.use('/ads', express.static(path.join(__dirname, '../ads')));
 app.use('/api/whitelist', whiteList)
 app.use('/api/browser', browserRoute)
+app.use('/api/blacklist', blacklistRoute)
 app.use((req, res) => {
   console.log('404 for:', req.originalUrl);
   res.status(404).json({error:true, message: "Technical Error!. Please try again later!", d: req.protocol + "://" + req.get("host") + req.originalUrl });

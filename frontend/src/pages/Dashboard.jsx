@@ -5,6 +5,7 @@ import Users from "./Users.jsx"
 import Shops from "./Shops.jsx"
 import LogoCrud from "./Logo_crud.jsx"
 import Ads from "./Ads.jsx"
+import BlacklistUrl from "./BlacklistUrl.jsx"
 import ProfileGroup from "./Profile_group.jsx"
 import { FiLogOut } from "react-icons/fi"
 import { FaRegUser } from "react-icons/fa"
@@ -18,6 +19,7 @@ import { FaGripHorizontal } from "react-icons/fa"
 import { CiImageOn } from "react-icons/ci"
 import { FaLayerGroup } from "react-icons/fa"
 import { CiBullhorn } from "react-icons/ci"
+import { MdBlock } from "react-icons/md"
 
 function Dashboard() {
   const nav = useNavigate()
@@ -80,6 +82,11 @@ function Dashboard() {
                 <CiBullhorn /> Ads
               </NavLink>
             </li>
+            <li>
+              <NavLink to={"/dashboard/blacklistUrl"} className={({ isActive }) => (isActive ? "text-white bg-gray-900" : "")}>
+                <MdBlock /> BlacklistUrl
+              </NavLink>
+            </li>
           </ul>
           <button onClick={logout} className="w-full flex items-center gap-2 mt-4 py-2 px-4 bg-gray-500 text-white font-semibold rounded-lg hover:bg-red-500">
             Logout <FiLogOut />
@@ -92,6 +99,7 @@ function Dashboard() {
         <Routes>
           <Route path="/" element={<Users />} />
           <Route path="/logos" element={<LogoCrud />} />
+          <Route path="/blacklistUrl" element={<BlacklistUrl />} />
           <Route path="/ads" element={<Ads />} />
           <Route path="/profilegroup" element={<ProfileGroup />} />
           <Route path="/users" element={<Users />} />
