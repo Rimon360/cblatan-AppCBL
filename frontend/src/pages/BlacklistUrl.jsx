@@ -5,28 +5,25 @@ import { RiDeleteBinLine } from "react-icons/ri"
 import toast from "react-hot-toast"
 
 const BlacklistUrl = () => {
-
- 
   const token = localStorage.getItem("token")
   const [blacklistUrl, setBlacklistUrlUrl] = useState("")
 
   useEffect(() => {
     ;(async () => {
-      let result = await axios.get(blacklistUrlPath + "/get", { headers: { Authorization: "Bearer " + token } })
-     
-      
-      if(result.data) setBlacklistUrlUrl(result.data.blacklistUrl)
+      let result = await axios.get(blacklistUrlPath + "/get")
+
+      if (result.data) setBlacklistUrlUrl(result.data.blacklistUrl)
     })()
   }, [])
 
-  let timeout = useRef();
+  let timeout = useRef()
   const handleFormSubmit = async (e) => {
     clearTimeout(timeout.current)
     timeout.current = setTimeout(async () => {
-        toast.success("Updating...") 
-      let result = await axios.post(blacklistUrlPath + "/add", { blacklistUrl: btoa(e.target.value) }, { headers: { Authorization: "Bearer " + token } }).catch((e) => toast.error(e.message)) 
+      toast.success("Updating...")
+      let result = await axios.post(blacklistUrlPath + "/add", { blacklistUrl: btoa(e.target.value) }, { headers: { Authorization: "Bearer " + token } }).catch((e) => toast.error(e.message))
       if (result.status == 200) {
-        toast.success("updated successfully") 
+        toast.success("updated successfully")
       } else {
         toast.error("Unable to update!")
       }
