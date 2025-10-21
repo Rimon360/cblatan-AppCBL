@@ -11,7 +11,7 @@ cron.schedule("0 22 * * *", () => {
   axios
     .post(resetUrl)
     .then((response) => {
-      console.log(response.data.message);
+      // console.log(response.data.message);
 
     })
     .catch((error) => {

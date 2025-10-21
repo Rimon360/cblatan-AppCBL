@@ -304,11 +304,11 @@ const Users = () => {
                   value={userrole}
                   onChange={(e) => setRole(e.target.value)}
                 >
-                  <option value="appcbl_soft">Acceso al software</option>
-                  <option value="admin">Admin</option>
-                  <option value="member">Member</option>
-                  <option value="specific">Specific</option>
-                  <option value="all_profile">Todos los perfiles</option>
+                  <option value="mZw/EdNpH/RyHRg7UjfDTg==:u0vvoHU6wxhS39+VrCExow==">Acceso al software</option>
+                  <option value="XGqYIGIjFr0EOCThHwB1qg==:oKjsYJoIlUD3T3Iff6ty2g==">Admin</option>
+                  <option value="i64V1k5uSiNAT9mlf6uw+Q==:tSXIZwCmgdx4uGtMar/5Mg==">Member</option>
+                  <option value="bOGgWCp/WIwihlVRPZ48lQ==:Gl92lkJCn+XQXjCMPHpKlQ==">Specific</option>
+                  <option value="V8MQ7mhIuerDloDJoeMoww==:AP5hJdMN1xQHECS6M+Ep+w==">Todos los perfiles</option>
                 </select>
               </label>
               <label className="flex flex-col justify-center  w-full">
