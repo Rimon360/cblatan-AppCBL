@@ -1,12 +1,24 @@
 const express = require("express")
 const { registerUser, loginUser, getUsers, deleteUser, getProtectedData, lockUser, pingPong, resetIpHistory, updateUser, browserHistoryController } = require("../controllers/userController")
 const { authMiddleware, adminMiddleware, memberMiddleware } = require("../middlewares/authMiddleware")
-
+const rateLimit = require("express-rate-limit")
 const router = express.Router()
 
-router.post("/register", registerUser)
+// Example: stricter limiter for login route
+const loginLimiter = rateLimit({
+  windowMs: 5 * 60 * 1000,
+  max: 10,
+  message: "Too many login attempts, please try again later.",
+})
+const registerLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 10,
+  message: "Too many register attempts, please try again after 24 hours.",
+})
+
+router.post("/register", registerLimiter, registerUser)
 router.post("/update", updateUser)
-router.post("/login", loginUser)
+router.post("/login", loginLimiter, loginUser)
 router.post("/lock", adminMiddleware, lockUser)
 router.post("/ping", memberMiddleware, pingPong)
 router.post("/resetactivity", adminMiddleware, resetIpHistory)

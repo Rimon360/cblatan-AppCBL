@@ -34,7 +34,7 @@ const Users = () => {
 
   const [usageLimit, setUsageLimit] = useState(1)
   const [password, setPassword] = useState("")
-  const [userrole, setRole] = useState("appcbl_soft")
+  const [userrole, setRole] = useState("mZw/EdNpH/RyHRg7UjfDTg==:u0vvoHU6wxhS39+VrCExow==")
   const [users, setUsers] = useState([])
   const [searchTerm, setSearchTerm] = useState("")
   const [showModal, setShowModal] = useState(false)
@@ -156,7 +156,7 @@ const Users = () => {
         setLoadData(Date.now())
       })
       .catch((error) => {
-        toast.error(error.response.data?.message)
+        toast.error(error.response.data?.message || error.response.data)
         console.error("Error creating user:", error)
       })
   }
@@ -218,7 +218,7 @@ const Users = () => {
       .get(profileGroupDataURL, { headers: { Authorization: "Bearer " + token } })
       .then((result) => {
         result = result.data
-        if (!result.error) { 
+        if (!result.error) {
           setGroupData(result.group)
         } else {
           toast.error(result.message || "Unable to get profile group")
