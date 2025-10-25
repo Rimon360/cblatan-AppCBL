@@ -95,6 +95,8 @@ async function sendOtpEmail(toEmail) {
     await sgMail.send(msg)
     return otp
   } catch (error) {
+    console.log(error);
+    
     return false
   }
 }
