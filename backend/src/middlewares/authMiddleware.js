@@ -26,7 +26,6 @@ const validateFields = (req, res, next) => {
 const adminMiddleware = async (req, res, next) => {
   const authHeader = req.headers.authorization
   const token = authHeader?.split(" ")[1]
-  const ip = req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress
 
   if (!token) return res.status(401).json({ message: "Access Denied" })
 
@@ -36,9 +35,6 @@ const adminMiddleware = async (req, res, next) => {
     if (!user) {
       res.status(403).json({ message: "La usuario no existe" })
       return
-    }
-    if (user && !user?.verified_ip?.includes(ip)) {
-      return res.status(200).json({ user: { verified: false, email: user.email } })
     }
 
     let isEmailVerified = user.email_verified
@@ -68,9 +64,6 @@ const memberMiddleware = async (req, res, next) => {
     if (!user) {
       res.status(403).json({ message: "La usuario no existe" })
       return
-    }
-    if (user && !user?.verified_ip?.includes(ip)) {
-      return res.status(200).json({ user: { verified: false, email: user.email } })
     }
 
     let isEmailVerified = user.email_verified
@@ -136,11 +129,27 @@ const ipTrackMiddleware = async (req, res, next) => {
     res.status(403).json({ error: true, message: "Invalid Token" })
   }
 }
-
+const verifyMiddleware = async (req, res, next) => {
+  const authHeader = req.headers.authorization
+  const token = authHeader?.split(" ")[1]
+  if (!token) return res.status(401).json({ message: "Access Denied" })
+  const ip = req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress
+  const decoded = jwt.verify(token, process.env.JWT_SECRET)
+  const user = await UserModel.findOne({ email: decoded.email, _id: decoded._id })
+  let isEmailVerified = user.email_verified
+  if (!isEmailVerified) {
+    return res.status(200).json({ user: { error: true, email: user.email, token, message: "Correo electrónico no verificado", email_verified: false } })
+  } else if (user && !user?.verified_ip?.includes(ip)) {
+    return res.status(200).json({ user: { verified: false, email: user.email } })
+  } else {
+    next()
+  }
+}
 module.exports = {
   authMiddleware,
   adminMiddleware,
   memberMiddleware,
   ipTrackMiddleware,
   validateFields,
+  verifyMiddleware,
 }
