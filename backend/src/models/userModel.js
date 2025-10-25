@@ -1,28 +1,36 @@
-const mongoose = require("mongoose");
-const getPeruTime = require("../utils/util").getPeruTime;
-const date = new Date();
+const mongoose = require("mongoose")
+const getPeruTime = require("../utils/util").getPeruTime
+const date = new Date()
 const userSchema = new mongoose.Schema({
   email: {
     type: String,
-    required: true
+    required: true,
   },
+  email_verified: { type: Boolean, default: false },
+  otp: { type: String, default: null },
+  otp_received_time: { type: Number, default: 0 },
+  otp_failed_count: { type: Number, default: 0 },
   ip_address: {
-    type: String
+    type: String,
+  },
+  verified_ip: {
+    type: String,
+    default: "",
   },
   ip_address_history: {
-    type: String
+    type: String,
   },
   is_locked: {
     type: Boolean,
-    default: false
+    default: false,
   },
   status: {
     type: String,
-    default: "Inactive"
+    default: "Inactive",
   },
   last_ping_timestamp: {
     type: Number,
-    default: 0
+    default: 0,
   },
   usags_limit: {
     type: Number,
@@ -38,66 +46,58 @@ const userSchema = new mongoose.Schema({
   },
   wasap: {
     type: String,
-    default: '',
+    default: "",
   },
   payment_method: {
     type: String,
-    default: '',
+    default: "",
   },
   first_ip: {
     type: String,
-    default: '',
+    default: "",
   },
   nstbrowser_email: {
     type: String,
-    default: '',
+    default: "",
   },
-  // dicloak_email: {
-  //   type: String,
-  //   default: '',
-  // },
-  // subscription_term: {
-  //   type: String,
-  //   default: '',
-  // },
   niche: {
     type: String,
-    default: '',
+    default: "",
   },
   affiliate: {
     type: String,
-    default: '',
+    default: "",
   },
   supervisor: {
     type: String,
-    default: '',
+    default: "",
   },
   observation: {
     type: String,
-    default: '',
+    default: "",
   },
   sub_start_date: {
     type: String,
-    default: date.toISOString().split('T')[0],
+    default: date.toISOString().split("T")[0],
   },
   sub_validity: {
     type: Number,
     default: 31,
   },
   profile_group: {
-    type: String
+    type: String,
   },
   role: {
     type: String,
-    enum: ["admin", "member", "appcbl_soft", 'specific'],
+    enum: ["admin", "member", "appcbl_soft", "specific"],
     default: "member",
   },
   seq: { type: Number, default: 0 },
   createdAt: {
     type: Number,
     default: Date.now,
-  }
-});
+  },
+})
 
-const UserModel = mongoose.model("users", userSchema);
-module.exports = UserModel;
+const UserModel = mongoose.model("users", userSchema)
+module.exports = UserModel

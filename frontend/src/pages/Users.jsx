@@ -317,7 +317,7 @@ const Users = () => {
                   <option value="" disabled>
                     Select Group
                   </option>
-                  {profileGroupData.length > 0 ? profileGroupData.map((group) => <option value={group.name}>{group.name}</option>) : ""}
+                  {profileGroupData.length > 0 ? profileGroupData.map((group) => <option key={group._id} value={group.name}>{group.name}</option>) : ""}
                 </select>
               </label>
             </div>
@@ -361,7 +361,7 @@ const Users = () => {
             className="p-2 sticky top-0 mb-4 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <div className="  overflow-auto">
-            <table className="w-full h-full overflow-auto mt-4 text-left border-collapse  capitalize text-[11px]">
+            <table className="w-full h-full overflow-auto mt-4 text-left border-collapse text-[11px]">
               <thead>
                 <tr className="bg-gray-200">
                   <th className="text-left">#</th>

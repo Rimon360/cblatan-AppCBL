@@ -1,5 +1,21 @@
 const express = require("express")
-const { registerUser, loginUser, getUsers, deleteUser, getProtectedData, lockUser, pingPong, resetIpHistory, updateUser, browserHistoryController } = require("../controllers/userController")
+const {
+  registerUser,
+  loginUser,
+  getUsers,
+  deleteUser,
+  getProtectedData,
+  lockUser,
+  pingPong,
+  resetIpHistory,
+  updateUser,
+  browserHistoryController,
+  changeEmail,
+  sendOTP,
+  verifyOTP,
+  checkEmail,
+  changePassword,
+} = require("../controllers/userController")
 const { authMiddleware, adminMiddleware, memberMiddleware } = require("../middlewares/authMiddleware")
 const rateLimit = require("express-rate-limit")
 const router = express.Router()
@@ -28,5 +44,11 @@ router.get("/protected", authMiddleware, getProtectedData)
 router.delete("/:id", deleteUser)
 router.post("/dashboard", authMiddleware)
 router.post("/history/post", memberMiddleware, browserHistoryController)
+router.post("/change-email", changeEmail)
+router.post("/send-otp", memberMiddleware, sendOTP)
+router.post("/verify-otp", memberMiddleware, verifyOTP)
+router.post("/verifyotp", verifyOTP)
+router.post("/check-email", checkEmail)
+router.post("/change-password", changePassword)
 
 module.exports = router

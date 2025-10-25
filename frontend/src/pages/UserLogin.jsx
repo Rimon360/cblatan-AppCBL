@@ -28,7 +28,7 @@ function UserLogin() {
         localStorage.setItem("token", response.data.token);
         navigate("/dashboard/shops"); // Redirect to the dashboard with the user ID
       } else {
-        toast.error("Invalid credentials");
+        toast.error("Credenciales inválidas");
       }
     } catch (err) {
       toast.error(err.response?.data?.message || "Something error happened");
