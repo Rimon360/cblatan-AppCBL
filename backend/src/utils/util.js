@@ -5,6 +5,10 @@ const nodemailer = require("nodemailer")
 const archiver = require("archiver")
 const path = require("path")
 const sgMail = require("@sendgrid/mail")
+
+console.log(process.env.SENDGRID_API_KEY);
+
+
 sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 
 
@@ -74,6 +78,7 @@ function getPort(min = 40000, max = 60000) {
 }
 
 async function sendOtpEmail(toEmail) {
+  console.log(process.env.SENDGRID_API_KEY);
   let otp = getPort(111111, 999999)
   const msg = {
     to: toEmail,
