@@ -37,10 +37,10 @@ const adminMiddleware = async (req, res, next) => {
       return
     }
 
-    let isEmailVerified = user.email_verified
-    if (!isEmailVerified) {
-      return res.status(200).json({ user: { error: true, email: user.email, token, message: "Correo electrónico no verificado", email_verified: false } })
-    }
+    // let isEmailVerified = user.email_verified
+    // if (!isEmailVerified) {
+    //   return res.status(200).json({ user: { error: true, email: user.email, token, message: "Correo electrónico no verificado", email_verified: false } })
+    // }
     if (decoded && decoded.role === "admin") {
       req.user = decoded
       next()
@@ -66,10 +66,10 @@ const memberMiddleware = async (req, res, next) => {
       return
     }
 
-    let isEmailVerified = user.email_verified
-    if (!isEmailVerified) {
-      return res.status(200).json({ user: { error: true, email: user.email, token, message: "Correo electrónico no verificado", email_verified: false } })
-    }
+    // let isEmailVerified = user.email_verified
+    // if (!isEmailVerified) {
+    //   return res.status(200).json({ user: { error: true, email: user.email, token, message: "Correo electrónico no verificado", email_verified: false } })
+    // }
     let first_ip = user.first_ip
     // Use case: Restricting or logging new IPs for non-admin users only.
     if (first_ip && !first_ip.split(",").includes(ip) && user.role !== "admin") {
