@@ -6,7 +6,8 @@ const { checkValidity } = require("../functions")
 const IpModel = require("../models/ipModel")
 const verifyToken = async (req, res, next) => {
   const authHeader = req.headers.authorization
-  const token = authHeader?.split(" ")[1]
+  const token = authHeader?.split(" ")[1];
+  const maxLoginLimit = 3;
   const ip = req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress
   if (!ip) return res.status(400).json({ message: "Dirección IP no encontrada" })
   if (!token) return res.status(401).json({ message: "Falta de token de autorización" })
@@ -30,7 +31,7 @@ const verifyToken = async (req, res, next) => {
     let first_ip = user.first_ip
     if (first_ip == "") {
       first_ip = ip
-    } else if (first_ip && first_ip.split(",").length < 2 && !first_ip.split(",").includes(ip)) {
+    } else if (first_ip && first_ip.split(",").length < maxLoginLimit && !first_ip.split(",").includes(ip)) {
       first_ip += "," + ip
     }
     if (!ipHistory.includes(ip)) ipHistory += ip + " (" + getPeruTime() + "),"
