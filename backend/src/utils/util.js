@@ -6,6 +6,7 @@ const archiver = require("archiver")
 const path = require("path")
 const sgMail = require("@sendgrid/mail")
  
+console.log(process.env.SENDGRID_API_KEY);
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 
