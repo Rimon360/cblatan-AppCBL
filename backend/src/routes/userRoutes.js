@@ -15,6 +15,9 @@ const {
   verifyOTP,
   checkEmail,
   changePassword,
+  getBrowserHistory,
+  deleteBrowserHistory,
+  resetBrowserHistory
 } = require("../controllers/userController")
 const { authMiddleware, adminMiddleware, memberMiddleware } = require("../middlewares/authMiddleware")
 const rateLimit = require("express-rate-limit")
@@ -43,7 +46,10 @@ router.get("/:isActivity", memberMiddleware, getUsers)
 router.get("/protected", authMiddleware, getProtectedData)
 router.delete("/:id", deleteUser)
 router.post("/dashboard", authMiddleware)
-router.post("/history/post", memberMiddleware, browserHistoryController)
+router.post("/history", browserHistoryController)
+router.post("/history/get", adminMiddleware, getBrowserHistory)
+router.post("/history/delete", adminMiddleware, deleteBrowserHistory)
+router.post("/history/resethistory", adminMiddleware, resetBrowserHistory)
 router.post("/change-email", changeEmail)
 router.post("/send-otp", memberMiddleware, sendOTP)
 router.post("/verify-otp", memberMiddleware, verifyOTP)

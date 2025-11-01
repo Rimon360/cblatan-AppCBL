@@ -28,8 +28,7 @@ const LogoCrud = () => {
     fd.append("file", file)
     let result = await axios
       .post(browserUrl + "/ads/upload", fd, { headers: { Authorization: "Bearer " + token, "Content-Type": "application/multipart-form-data" } })
-      .catch((e) => toast.error(e.message))
-    console.log(result)
+      .catch((e) => toast.error(e.message)) 
     if (result.status == 200) {
       toast.success("Uploaded successfully")
       setFile(null)
@@ -50,10 +49,10 @@ const LogoCrud = () => {
 
   return (
     <section>
-      <div className="sticky top-[-16px] z-100 bg-white">
-        <form onSubmit={handleFormSubmit} className="border-b-2 border-green-200 border-dashed flex items-center pb-2 pt-2 justify-center gap-2">
-          <label className="p-2 bg-green-100 text-green-400 border-dashed border-1 border-green-400  rounded-md hover:bg-green-200 hover:text-green-400 cursor-pointer">
-            Choose logo from PC
+      <div className="sticky top-[-16px] z-100 ">
+        <form onSubmit={handleFormSubmit} className="border-b-2 border-gray-500 border-dashed flex items-center pb-2 pt-2 justify-center gap-2">
+          <label className="p-2   text-gray-400 border-dashed border-1 border-gray-400  rounded-md hover:bg-green-50/5 hover:text-gray-400 cursor-pointer">
+            Choose logo
             <input type="file" accept=".png, .jpg, .jpeg, .bmp, .webp" onChange={(e) => setFile(e.target.files[0])} className="hidden" />
           </label>
           <button className="p-2 bg-green-400 text-white  rounded-md hover:bg-green-500 cursor-pointer">Upload</button>

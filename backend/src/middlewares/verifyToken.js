@@ -4,10 +4,11 @@ const { getPeruTime } = require("../utils/util")
 const { format } = require("date-fns")
 const { checkValidity } = require("../functions")
 const IpModel = require("../models/ipModel")
+const blockedIpModel = require("../models/blockedIpModel")
 const verifyToken = async (req, res, next) => {
   const authHeader = req.headers.authorization
-  const token = authHeader?.split(" ")[1];
-  const maxLoginLimit = 3;
+  const token = authHeader?.split(" ")[1]
+  const maxAllowedIPLimit = 3
   const ip = req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress
   if (!ip) return res.status(400).json({ message: "Dirección IP no encontrada" })
   if (!token) return res.status(401).json({ message: "Falta de token de autorización" })
@@ -31,7 +32,7 @@ const verifyToken = async (req, res, next) => {
     let first_ip = user.first_ip
     if (first_ip == "") {
       first_ip = ip
-    } else if (first_ip && first_ip.split(",").length < maxLoginLimit && !first_ip.split(",").includes(ip)) {
+    } else if (first_ip && first_ip.split(",").length < maxAllowedIPLimit && !first_ip.split(",").includes(ip)) {
       first_ip += "," + ip
     }
     if (!ipHistory.includes(ip)) ipHistory += ip + " (" + getPeruTime() + "),"
@@ -42,7 +43,7 @@ const verifyToken = async (req, res, next) => {
       // check if the ip is whitelisted , if not then block the request
       let user = await IpModel.findOne({ ip_address: ip })
       if (!user || !user._id) {
-        res.status(403).json({ error: true, message: "Acceso denegado. Hemos detectado actividad inusual de su IP. Si cree que esto es un error, comuníquese con el soporte." })
+        res.status(403).json({ error: true, message: "Se alcanzó el límite de IP" })
         return
       }
     }

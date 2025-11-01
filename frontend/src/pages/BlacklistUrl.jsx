@@ -35,7 +35,7 @@ const BlacklistUrl = () => {
       <h1 className="text-4xl text-blue-400">Enumere las URL bloqueadas a continuación</h1>
       <br />
       <textarea
-        className="w-full min-h-[400px] bg-gray-200 rounded-xl p-4"
+        className="w-full min-h-[400px] bg-gray-950/40 rounded-xl p-4"
         placeholder="Blacklisted urls..."
         value={blacklistUrl || ""}
         onInput={(e) => setBlacklistUrlUrl(e.target.value)}

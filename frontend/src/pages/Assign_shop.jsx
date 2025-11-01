@@ -162,7 +162,7 @@ const Assign_shop = () => {
       });
     } else {
       const data = { shop_id: shops.map(shop => shop._id), user_id: userId, isBulk: true }
-      console.log(data);
+      
 
       axios
         .post(assignURL, data, { headers: { Authorization: "Bearer " + token } })
@@ -192,7 +192,7 @@ const Assign_shop = () => {
           <ul className="max-h-300 overflow-auto shadow rounded  p-2">
             {filteredShops && filteredShops.length > 0 ? (
               filteredShops.map((shop, i) => (
-                <li key={shop._id} className={`flex justify-between items-center p-[4px]  border-dotted rounded-lg ${selectedShopId == shop._id ? "text-green-300 hover:text-green-400" : "text-black-400 "}`}>
+                <li key={shop._id} className={`flex justify-between bg-gray-950/40 hover:bg-gray-900/50 mb-1 pl-4 items-center p-[4px]  border-dotted rounded-lg ${selectedShopId == shop._id ? "text-green-300 hover:text-green-400" : "text-black-400 "}`}>
                   <p className="font-semibold  ">
                     ({i + 1}) - {shop.shop_name}
                   </p>

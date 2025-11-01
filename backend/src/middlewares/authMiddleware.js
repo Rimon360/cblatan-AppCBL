@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken")
 const UserModel = require("../models/userModel")
 const IpModel = require("../models/ipModel")
+const blockedIpModel = require("../models/blockedIpModel")
 const authMiddleware = (req, res, next) => {
   const token = req.header("Authorization")?.split(" ")[1]
   if (!token) {
@@ -26,12 +27,13 @@ const validateFields = (req, res, next) => {
 const adminMiddleware = async (req, res, next) => {
   const authHeader = req.headers.authorization
   const token = authHeader?.split(" ")[1]
-
+  const ip = req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress
   if (!token) return res.status(401).json({ message: "Access Denied" })
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
     const user = await UserModel.findOne({ email: decoded.email, _id: decoded._id })
+ 
     if (!user) {
       res.status(403).json({ message: "La usuario no existe" })
       return
@@ -61,6 +63,7 @@ const memberMiddleware = async (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
     const user = await UserModel.findOne({ email: decoded.email, _id: decoded._id })
+ 
     if (!user) {
       res.status(403).json({ message: "La usuario no existe" })
       return
@@ -76,7 +79,7 @@ const memberMiddleware = async (req, res, next) => {
       // check if the ip is whitelisted , if not then block the request
       let user = await IpModel.findOne({ ip_address: ip })
       if (!user || !user._id) {
-        res.status(403).json({ error: true, message: "Acceso denegado. Hemos detectado actividad inusual de su IP. Si cree que esto es un error, comuníquese con el soporte." })
+        res.status(403).json({ error: true, message: "Se alcanzó el límite de IP" })
         return
       }
     }
@@ -136,6 +139,7 @@ const verifyMiddleware = async (req, res, next) => {
   const ip = req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress
   const decoded = jwt.verify(token, process.env.JWT_SECRET)
   const user = await UserModel.findOne({ email: decoded.email, _id: decoded._id })
+
   let isEmailVerified = user.email_verified
   if (!isEmailVerified) {
     return res.status(200).json({ user: { error: true, email: user.email, token, message: "Correo electrónico no verificado", email_verified: false } })

@@ -5,7 +5,7 @@ function App() {
   return (
     <>
       <GlobalProvider>
-        <Toaster position="top-right" />
+        <Toaster position="bottom-right" />
         <AppRoutes />
       </GlobalProvider>
     </>

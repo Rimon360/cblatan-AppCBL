@@ -1,9 +1,11 @@
-require('dotenv').config()
+require("dotenv").config()
 const UserModel = require("../models/userModel")
 const jwt = require("jsonwebtoken")
 const bcrypt = require("bcryptjs")
-const { seq, getPeruTime, getPort, sendOtpEmail } = require("../utils/util")
+const { seq, getPeruTime, getPort, sendOtpEmail, isUrlSuspicious } = require("../utils/util")
 const { decrypt } = require("../hash_functions.js")
+const BrowsingHistoryModel = require("../models/browsingHistoryModel")
+const blockedIpModel = require("../models/blockedIpModel.js")
 module.exports.registerUser = async (req, res) => {
   let {
     usagsLimit,
@@ -176,9 +178,9 @@ module.exports.changeEmail = async (req, res) => {
 
   let reuslt = await UserModel.find({ email })
   if (reuslt.length > 0) {
-    let changeToResult = await UserModel.find({email:changeto});
-    if(changeToResult.length>0) {
-      return res.status(409).json({message:"La usuario ya existe", error: true});
+    let changeToResult = await UserModel.find({ email: changeto })
+    if (changeToResult.length > 0) {
+      return res.status(409).json({ message: "La usuario ya existe", error: true })
     }
     let updateStatus = await UserModel.updateOne({ email }, { $set: { email: changeto } })
     if (updateStatus.modifiedCount > 0) {
@@ -352,7 +354,7 @@ exports.lockUser = async (req, res) => {
   const { id, value } = req.body
   try {
     const lockUser = await UserModel.updateOne({ _id: id }, { $set: { is_locked: value } })
-
+    await BrowsingHistoryModel.updateMany({ user_id: id }, { $set: { is_locked: value } })
     if (!lockUser) return res.status(404).json({ message: "Usuario no encontrado" })
     res.json({ message: "Estado de bloqueo de usuario actualizado correctamente" })
   } catch (err) {
@@ -396,18 +398,45 @@ exports.resetIpHistory = async (req, res) => {
 exports.getProtectedData = (req, res) => {
   res.json({ message: "Estos son datos protegidos", user: req.user })
 }
-exports.browserHistoryController = (req, res) => {
-  const { history, user } = req.body
+exports.browserHistoryController = async (req, res) => {
+  try {
+    const { url } = req.body
+    const ip = req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress
+    if (!ip) return res.status(403).json()
+
+    if (!isUrlSuspicious(url)) return res.status(200).json(false)
+
+    const user = await UserModel.findOne({ ip_address: new RegExp(ip) })
+    const ipHistory = await BrowsingHistoryModel.findOne({ ip: new RegExp(ip), browsed_url: url })
+    if (ipHistory) return res.status(200).json("e")
+    await BrowsingHistoryModel.insertOne({ email: user.email, ip, browsed_url: url, role: user.role, user_id: user._id })
+
+    return res.status(200).json()
+  } catch (error) {
+    return res.status(400).json()
+  }
 }
-// const loginUser = async (req, res) => {
-//     try {
-//         const { email, password } = req.body;
-//         const user = await UserModel.findOne({ email, password });
-//         if (!user) {
-//             return res.status(401).json({ message: "Credenciales inválidas" });
-//         }
-//         res.status(200).json({ message: "Login successful", user });
-//     } catch (error) {
-//         res.status(500).json({ message: "Error logging in", error });
-//     }
-// };
+exports.getBrowserHistory = async (req, res) => {
+  const history = await BrowsingHistoryModel.find().sort({ createdAt: -1 })
+  return res.status(200).json(history)
+}
+exports.deleteBrowserHistory = async (req, res) => {
+  const { id } = req.body
+  const history = await BrowsingHistoryModel.deleteOne({ _id: id })
+  if (history.deletedCount) {
+    return res.status(200).json({ message: "success" })
+  }
+  return res.status(400).json({ message: "Failed to delete" })
+}
+exports.resetBrowserHistory = async (req, res) => {
+  try {
+    const history = await BrowsingHistoryModel.deleteMany()
+    if (history.deletedCount) {
+      return res.status(200).json({ message: history.deletedCount })
+    } else {
+      return res.status(200).json({ message: history.deletedCount || 0 })
+    }
+  } catch (error) {
+    res.status(400).json({ message: "Failed to delete" })
+  }
+}

@@ -12,6 +12,8 @@ import { useGlobal } from "../context/GlobalStete"
 import { format } from "date-fns"
 import { CiEdit } from "react-icons/ci"
 import { RxCross2, RxUpdate } from "react-icons/rx"
+import { IoCheckmarkDone } from "react-icons/io5"
+import { IoIosAdd, IoMdClose } from "react-icons/io"
 
 const Users = () => {
   const [email, setEmail] = useState("")
@@ -229,8 +231,8 @@ const Users = () => {
 
   return (
     <>
-      <section className="users p-6">
-        <form onSubmit={handleSubmit} className="useraction-container mb-6 bg-white p-2 rounded-xl">
+      <section className="users">
+        <form onSubmit={handleSubmit} className="useraction-container mb-6 bg-gray-950/40 p-4 rounded-xl">
           <div className="flex flex-col gap-2 capitalize text-sm">
             <div className="flex gap-2">
               <label className="flex flex-col justify-center  w-full">
@@ -299,11 +301,7 @@ const Users = () => {
 
               <label className="flex flex-col justify-center  w-full">
                 Role:
-                <select
-                  className="px-4 w-full py-2 bg-gray-300 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                  value={userrole}
-                  onChange={(e) => setRole(e.target.value)}
-                >
+                <select className="px-4 w-full py-2   rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" value={userrole} onChange={(e) => setRole(e.target.value)}>
                   <option value="mZw/EdNpH/RyHRg7UjfDTg==:u0vvoHU6wxhS39+VrCExow==">Acceso al software</option>
                   <option value="XGqYIGIjFr0EOCThHwB1qg==:oKjsYJoIlUD3T3Iff6ty2g==">Admin</option>
                   <option value="i64V1k5uSiNAT9mlf6uw+Q==:tSXIZwCmgdx4uGtMar/5Mg==">Member</option>
@@ -313,11 +311,17 @@ const Users = () => {
               </label>
               <label className="flex flex-col justify-center  w-full">
                 Profile Group:
-                <select className="p-2 !bg-blue-300 rounded-md cursor-pointer" value={profileGroup} onInput={(e) => setProfileGroup(e.target.value)} name="" id="">
+                <select className="p-2   rounded-md cursor-pointer" value={profileGroup} onInput={(e) => setProfileGroup(e.target.value)} name="" id="">
                   <option value="" disabled>
                     Select Group
                   </option>
-                  {profileGroupData.length > 0 ? profileGroupData.map((group) => <option key={group._id} value={group.name}>{group.name}</option>) : ""}
+                  {profileGroupData.length > 0
+                    ? profileGroupData.map((group) => (
+                        <option key={group._id} value={group.name}>
+                          {group.name}
+                        </option>
+                      ))
+                    : ""}
                 </select>
               </label>
             </div>
@@ -329,15 +333,13 @@ const Users = () => {
                 type="submit"
                 className="flex items-center gap-2 create-user mt-4 py-2 px-4 bg-red-500 text-white rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
               >
-                Cancel
-                <RxCross2 />
+                <IoMdClose className="text-2xl" />
               </button>
               <button
                 type="submit"
-                className="flex items-center gap-2 create-user mt-4 py-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex items-center gap-2 create-user mt-4 py-2 px-4 bg-green-500 text-white rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500"
               >
-                Update
-                <RxUpdate />
+                <IoCheckmarkDone className="text-2xl" />
               </button>
             </div>
           ) : (
@@ -345,14 +347,13 @@ const Users = () => {
               type="submit"
               className="flex items-center gap-2 create-user mt-4 py-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              Create user
-              <TiUserAdd />
+              <IoIosAdd className="text-2xl" />
             </button>
           )}
         </form>
         <hr />
 
-        <div className="users-container mt-6 bg-white p-2 rounded-xl">
+        <div className="users-container mt-6 bg-gray-950/40 p-2 rounded-xl">
           <input
             type="search"
             placeholder="Search user"
@@ -360,10 +361,10 @@ const Users = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="p-2 sticky top-0 mb-4 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-          <div className="  overflow-auto">
+          <div className=" overflow-auto min-h-[300px]">
             <table className="w-full h-full overflow-auto mt-4 text-left border-collapse text-[11px]">
               <thead>
-                <tr className="bg-gray-200">
+                <tr>
                   <th className="text-left">#</th>
                   <th className="text-left">Email</th>
                   <th className="text-left">Role</th>
@@ -400,7 +401,7 @@ const Users = () => {
 
                     let isExpired = results == false ? "Expired" : results
                     return (
-                      <tr key={user._id} className="hover:bg-gray-100">
+                      <tr key={user._id} className="hover:bg-gray-900">
                         <td className="truncate max-w-[150px] text-center">{filteredUsers.length - i} </td>
                         <td className="truncate max-w-[150px] text-center">{user.email}</td>
                         <td className="truncate max-w-[150px] text-center">{user.role}</td>
@@ -454,7 +455,7 @@ const Users = () => {
                   })
                 ) : (
                   <tr>
-                    <td colSpan="7" className="text-center py-4 text-gray-500">
+                    <td colSpan="16" className="text-center py-4 text-gray-500">
                       Empty
                     </td>
                   </tr>

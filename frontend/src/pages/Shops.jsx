@@ -1,4 +1,4 @@
-import { IoMdAdd } from "react-icons/io"
+import { IoMdAdd, IoMdClose, IoMdDoneAll } from "react-icons/io"
 import { RiDeleteBin6Line } from "react-icons/ri"
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
@@ -12,6 +12,7 @@ import { getDomain } from "../functions"
 import { CiEdit } from "react-icons/ci"
 import { FaUpload } from "react-icons/fa"
 import { decrypt } from "../functions"
+import { MdOutlineCancel } from "react-icons/md"
 const Shops = () => {
   const [selectedTitleId, setSelectedTitleId] = useState(null)
   const [selectedSubtitleId, setSelectedSubtitleId] = useState(null)
@@ -94,8 +95,7 @@ const Shops = () => {
           toast.success("No Product Found!")
         }
       })
-      .catch((e) => {
-        console.log(e)
+      .catch((e) => { 
         toast.error(e.message)
       })
   }
@@ -363,8 +363,7 @@ const Shops = () => {
   }
 
   const handleProductSubtitleUpdate = (e) => {
-    e.preventDefault()
-    console.log({ subtitle: subtitleValue, id: selectedSubtitleId })
+    e.preventDefault() 
 
     axios
       .post(
@@ -445,7 +444,7 @@ const Shops = () => {
 
   return (
     <>
-      <section className="shop-section p-6">
+      <section className="shop-section ">
         {isAdmin ? (
           <>
             <div>
@@ -463,7 +462,7 @@ const Shops = () => {
                           handleTitleClick(shop._id, shop)
                         }}
                         key={shop._id}
-                        className={` cursor-pointer hover:border-dotted hover:border flex flex-col justify-between p-[4px]  bg-white m-0.5 rounded   ${
+                        className={` cursor-pointer hover:border-dotted hover:border-blue-500 hover:border flex flex-col justify-between p-[4px]  bg-gray-950/40 m-0.5 rounded   ${
                           selectedTitleId == shop._id ? "text-blue-500 border border-blue-500/50" : "text-black-400  "
                         }`}
                       >
@@ -481,7 +480,7 @@ const Shops = () => {
                           </div>
                         </div>
                         <div className={selectedTitleId == shop._id ? "visible" : "hidden"}>
-                          <ul className="p-2 ml-4 text-sm max-h-[300px] overflow-auto text-blue-500/80 bg-gray-100/50   mr-2 rounded-md">
+                          <ul className="p-2 ml-4 text-sm max-h-[300px] overflow-auto text-blue-500/80 bg-blue-950   mr-2 rounded-md">
                             {subtitleData[shop._id]?.length > 0
                               ? subtitleData[shop._id].map((data) => (
                                   <li
@@ -510,7 +509,7 @@ const Shops = () => {
                                       e.stopPropagation()
                                       handleSubtitleClick(data._id, data)
                                     }}
-                                    className="hover:bg-gray-200 pl-2 rounded-sm flex justify-between cursor-pointer"
+                                    className="hover:bg-blue-900 pl-2 rounded-sm flex justify-between cursor-pointer"
                                   >
                                     <p>{data.subtitle}</p>
                                     <button
@@ -569,8 +568,8 @@ const Shops = () => {
                 </div>
               </form>
               <hr />
-              <form onSubmit={handleProductCreate} className="  bg-gray-100 p-4 rounded-2xl  ">
-                <div className="flex gap-2 bg-gray-100  rounded-2xl items-center">
+              <form onSubmit={handleProductCreate} className="  bg-gray-950/40 p-4 rounded-2xl  ">
+                <div className="flex gap-2 justify-center rounded-2xl items-center">
                   <label>
                     Name:
                     <input
@@ -633,7 +632,7 @@ const Shops = () => {
                   )}
                 </div>
 
-                <div className="w-fit">
+                <div className="w-full flex justify-center">
                   {editAbleData.id ? (
                     <div className="flex gap-2">
                       <button
@@ -646,16 +645,15 @@ const Shops = () => {
                           setCourseName("")
                         }}
                         className="flex items-center gap-2 create-user   py-2 px-4 bg-red-400 text-white rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400"
-                      >
-                        Cancel
-                        <IoMdAdd className="ml-[-6px] text-2xl" />
+                      > 
+                        <IoMdClose className=" text-2xl" />
                       </button>
 
                       <button
                         type="submit"
                         className="flex items-center gap-2 create-user   py-2 px-4 bg-green-500 text-white rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500"
-                      >
-                        Update Credential
+                      > 
+                        <IoMdDoneAll className=" text-2xl" />
                       </button>
                     </div>
                   ) : (
@@ -665,8 +663,7 @@ const Shops = () => {
                         type="submit"
                         className="flex items-center gap-2 create-user   py-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       >
-                        Create Credential
-                        <IoMdAdd className="ml-[-6px] text-2xl" />
+                        <IoMdAdd className=" text-2xl" />
                       </button>
                     </>
                   )}

@@ -5,11 +5,8 @@ const nodemailer = require("nodemailer")
 const archiver = require("archiver")
 const path = require("path")
 const sgMail = require("@sendgrid/mail")
- 
-console.log(process.env.SENDGRID_API_KEY);
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY)
-
 
 let seq = (min = 10000000, max = 99999999) => Math.floor(Math.random() * (max - min + 1)) + min
 
@@ -76,7 +73,7 @@ function getPort(min = 40000, max = 60000) {
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
-async function sendOtpEmail(toEmail) { 
+async function sendOtpEmail(toEmail) {
   let otp = getPort(111111, 999999)
   const msg = {
     to: toEmail,
@@ -97,11 +94,37 @@ async function sendOtpEmail(toEmail) {
   try {
     await sgMail.send(msg)
     return otp
-  } catch (error) {
-    console.log(error);
-    
+  } catch (error) { 
     return false
   }
+}
+
+function isUrlSuspicious(url) {
+  const suspiciousString = [
+      "reset-password",
+      "account",
+      "setting",
+      "account-password",
+      "mail/Trash",
+      "mail/recovery",
+      "security",
+      "systemOrigin=club-new",
+      "categories",
+      "systemOrigin=hub",
+      "documents",
+      "personal-information",
+      "purchase",
+      "configuracion",
+      "profile",
+      "forgot",
+      "forget",
+  ]
+  for (const s of suspiciousString) {
+    if (url && url.includes(s)) {
+      return true
+    }
+  }
+  return false
 }
 
 exports.getPeruTime = () => new Date().toLocaleString("en-US", { timeZone: "America/Lima" })
@@ -112,3 +135,4 @@ module.exports.seq = seq
 module.exports.moveFolder = moveFolder
 module.exports.getPort = getPort
 module.exports.sendOtpEmail = sendOtpEmail
+module.exports.isUrlSuspicious = isUrlSuspicious

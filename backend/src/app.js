@@ -3,6 +3,7 @@ const express = require("express")
 const userRoutes = require("./routes/userRoutes")
 const browserRoute = require("./routes/browserRoute")
 const whiteList = require("./routes/whiteList")
+const ipBlacklist = require("./routes/ipBlacklist")
 const blacklistRoute = require("./routes/blacklistRoute")
 const shopRoutes = require("./routes/shopRoutes")
 const productRoutes = require("./routes/productRoutes")
@@ -21,12 +22,12 @@ app.use(express.json())
 app.set("trust proxy", "loopback")
 
 const rateLimit = require("express-rate-limit")
+const blockedIpModel = require("./models/blockedIpModel")
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 min
   max: 1000, // limit each IP
 })
-
 
 app.use(limiter)
 
@@ -39,6 +40,16 @@ mongoose
     console.error("MongoDB connection error:", err)
   })
 
+app.use("/api", async (req, res, next) => {
+  const ip = req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress
+  if (!ip) return res.status(400).json({ message: "Dirección IP no encontrada" })
+  const blockedIps = await blockedIpModel.find({ ip_address: ip })
+  if (blockedIps.length > 0) {
+    return res.status(503).json({ message: "Su cuenta ha sido bloqueada por actividades sospechosas." })
+  }
+  next()
+})
+
 app.use("/api/users", userRoutes)
 app.use("/api/products", productRoutes)
 app.get("/api/verify-token", verifyToken, (req, res) => {
@@ -49,6 +60,7 @@ app.use("/uploads", express.static(path.join(__dirname, "../uploads")))
 app.use("/logos", express.static(path.join(__dirname, "../logos")))
 app.use("/ads", express.static(path.join(__dirname, "../ads")))
 app.use("/api/whitelist", whiteList)
+app.use("/api/ipblacklist", ipBlacklist)
 app.use("/api/browser", browserRoute)
 app.use("/api/blacklist", blacklistRoute)
 app.use((req, res) => {

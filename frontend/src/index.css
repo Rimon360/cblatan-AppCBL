@@ -1,17 +1,17 @@
 * {
   box-sizing: border-box;
+
 }
 
 @import "tailwindcss";
 
 select {
-  @apply bg-white;
+  @apply bg-gray-900;
 }
 
 input {
   outline: none;
-
-  @apply bg-white mt-1 p-2 w-full border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500;
+  @apply !text-gray-200 bg-gray-950/40 text-white mt-1 p-2 w-full border border-gray-900 rounded-lg focus:ring-1 focus:ring-blue-500;
 }
 
 .login input {
@@ -19,7 +19,15 @@ input {
 }
 
 button {
-  @apply cursor-pointer;
+  @apply cursor-pointer
+}
+
+.swal2-popup {
+  @apply bg-gray-800 text-white;
+}
+
+#_rht_toaster>div>div {
+  @apply !bg-gray-600 !text-white;
 }
 
 hr {
@@ -29,7 +37,7 @@ hr {
 
 
 table {
-  @apply min-w-full table-auto border-collapse border border-gray-300 bg-blue-100/20;
+  @apply min-w-full table-auto border-collapse border border-none bg-gray-950/40 text-white;
 }
 
 th {
@@ -38,16 +46,39 @@ th {
 }
 
 thead th {
-  @apply bg-blue-500 text-white border-none;
+  @apply bg-blue-900 text-white border-none;
 }
 
 td {
-  @apply border border-blue-100 indent-2 p-1;
+  @apply border-b border-blue-500/20 indent-2 p-1;
 
 }
 
 aside {
   @apply text-gray-100;
+  background: linear-gradient(90deg, rgb(2, 12, 22), rgb(15, 41, 66))
+}
+
+.right-section {
+  background: radial-gradient(rgb(9, 45, 73), rgb(3, 24, 46))
+}
+
+::-webkit-scrollbar {
+  -webkit-appearance: none;
+  height: 8px;
+  width: 8px;
+  background: rgb(2, 19, 36);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgb(0, 72, 143);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(0, 100, 201);
+  cursor: move
 }
 
 aside li {
@@ -58,7 +89,9 @@ aside li a {
   @apply flex gap-2 items-center font-semibold p-2 w-full rounded hover:bg-[#0005];
 }
 
-
+table tr:hover {
+  @apply bg-gray-900
+}
 
 
 .loading-overlay::before {
@@ -101,6 +134,11 @@ body.loading-overlay-active::after {
   pointer-events: all;
   cursor: wait;
 }
+
+
+/* form>div {
+  @apply bg-gray-950/40;
+} */
 
 form label {
   text-transform: capitalize !important;

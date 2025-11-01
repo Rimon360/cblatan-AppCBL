@@ -25,8 +25,7 @@ const LogoCrud = () => {
     }
     let result = await axios
       .post(browserUrl + "/group/add", { name: group }, { headers: { Authorization: "Bearer " + token, "Content-Type": "application/json" } })
-      .catch((e) => toast.error(e.message))
-    console.log(result)
+      .catch((e) => toast.error(e.message)) 
     if (result.status == 200) {
       toast.success("Added successfully")
       setGroup("")
@@ -47,8 +46,8 @@ const LogoCrud = () => {
 
   return (
     <section>
-      <div className="sticky top-[-16px] z-100 bg-white">
-        <form onSubmit={handleFormSubmit} className="border-b-2 border-gray-200 border-dashed flex items-center pb-2 pt-2 justify-center gap-2">
+      <div className="sticky top-[-16px] z-100 bg-gray-950/40 rounded-xl">
+        <form onSubmit={handleFormSubmit} className="  flex items-center pb-2 pt-2 justify-center gap-2">
           <label>
             Enter group name [Enter Key]
             <input type="text" placeholder="Enter group name" value={group} onChange={(e) => setGroup(e.target.value)} className="p-2   border-dashed border-1  rounded-md hover:bg-green-200    " />
@@ -60,7 +59,7 @@ const LogoCrud = () => {
         <ul className="flex flex-col gap-1 overflow-auto max-h-[70vh] ">
           {profileGroup.length > 0 ? (
             profileGroup.map((group) => (
-              <li key={group._id} className="flex justify-between p-1 bg-gray-200 rounded-md  hover:bg-gray-300">
+              <li key={group._id} className="flex justify-between p-1 bg-gray-950/40 rounded-md  hover:bg-gray-800">
                 <div className="flex px-2">{group.name}</div>
                 <button onClick={(e) => handleGroupDelete(group._id)} className="px-2 bg-red-300 text-white  rounded-md hover:bg-red-800 cursor-pointer">
                   <RiDeleteBinLine />{" "}

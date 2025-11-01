@@ -21,20 +21,20 @@ const LogoCrud = () => {
     e.preventDefault()
 
     if (!file) {
-      return toast.error("File shoudn't be empty")
+      return toast.error("File shouldn't be empty")
     }
     let fd = new FormData()
 
     fd.append("file", file)
-    let result = await axios
-      .post(browserUrl + "/upload_logo", fd, { headers: { Authorization: "Bearer " + token, "Content-Type": "application/multipart-form-data" } })
-      .catch((e) => toast.error(e.message))
-    console.log(result)
-    if (result.status == 200) {
-      toast.success("Uploaded successfully")
-      setFile(null)
-      setUpdateData(Date.now())
-    } else {
+    try {
+      let result = await axios.post(browserUrl + "/upload_logo", fd, { headers: { Authorization: "Bearer " + token, "Content-Type": "application/multipart-form-data" } })
+
+      if (result.status == 200) {
+        toast.success("Uploaded successfully")
+        setFile(null)
+        setUpdateData(Date.now())
+      }
+    } catch (error) { 
       toast.error("Unable to upload logo!")
     }
   }
@@ -50,10 +50,10 @@ const LogoCrud = () => {
 
   return (
     <section>
-      <div className="sticky top-[-16px] z-100 bg-white">
-        <form onSubmit={handleFormSubmit} className="border-b-2 border-green-200 border-dashed flex items-center pb-2 pt-2 justify-center gap-2">
-          <label className="p-2 bg-green-100 text-green-400 border-dashed border-1 border-green-400  rounded-md hover:bg-green-200 hover:text-green-400 cursor-pointer">
-            Choose logo from PC
+      <div className="sticky top-[-16px] z-100  ">
+        <form onSubmit={handleFormSubmit} className="border-b-2 border-gray-500 border-dashed flex items-center pb-2 pt-2 justify-center gap-2">
+          <label className="p-2   text-gray-400 border-dashed border-1 border-gray-400  rounded-md hover:bg-green-50/5 hover:text-gray-400 cursor-pointer">
+            Choose logo
             <input type="file" accept=".png, .jpg, .jpeg, .bmp, .webp" onChange={(e) => setFile(e.target.files[0])} className="hidden" />
           </label>
           <button className="p-2 bg-green-400 text-white  rounded-md hover:bg-green-500 cursor-pointer">Upload</button>
@@ -63,7 +63,7 @@ const LogoCrud = () => {
       <div className="overflow-auto w-full ">
         {logos.length > 0 ? (
           logos.map((url) => (
-            <div key={url} className="flex flex-col pb-2 gap-1 justify-between  bg-gray-200 hover:bg-gray-300 rounded-xl float-left m-2 max-w-[150px] h-[150px]">
+            <div key={url} className="flex flex-col pb-2 gap-1 justify-between  bg-gray-950/40 hover:bg-gray-800 rounded-xl float-left m-2 max-w-[150px] h-[150px]">
               <div className="flex  border-1 border-green-200 border-dashed rounded-xl max-w-[300px] max-h-[200px] items-center justify-center relative overflow-hidden">
                 <img crossOrigin="" className="max-w-[150px]  max-h-[300px]" src={BACKEND_URL + "/logos/" + url} alt="Logo" />
               </div>

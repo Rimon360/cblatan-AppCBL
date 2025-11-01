@@ -1,44 +1,44 @@
 import { useState } from "react"
 import { IoAdd } from "react-icons/io5"
 import { RiDeleteBin6Line } from "react-icons/ri"
-import { whitelistURL } from "../routes/Url"
+import { ipBlacklistURL } from "../routes/Url"
 import axios from "../../axiosConfig"
 import toast from "react-hot-toast"
 import { useEffect } from "react"
 import Swal from "sweetalert2"
-const WhiteList = () => {
+const BlockedIps = () => {
   const [whitelistIp, setWhitelistIP] = useState("")
   const token = localStorage.getItem("token")
-  let [whitelistData, setWhitelistData] = useState([])
+  let [ipBlacklistData, setIpBlacklistData] = useState([])
   const [refresh, setRefresh] = useState(Date.now())
   const [searchQuery, setSearchQuery] = useState("")
   const [reservedWhitelist, setReservedWhitelist] = useState([])
   useEffect(() => {
     ;(async () => {
-      let res = await axios.get(whitelistURL, { headers: { Authorization: "Bearer " + token } })
+      let res = await axios.get(ipBlacklistURL, { headers: { Authorization: "Bearer " + token } })
       if (res.status === 200) {
-        setWhitelistData(res.data.whitelist)
-        setReservedWhitelist(res.data.whitelist)
+        setIpBlacklistData(res.data.ipBlacklist)
+        setReservedWhitelist(res.data.ipBlacklist)
         return
       }
-      toast.error("Failed to get whitelisted data")
+      toast.error("Failed to get blacklisted data")
     })()
   }, [refresh])
   const handleWhiteListSubmission = async (e) => {
     e.preventDefault()
-    let res = await axios.post(whitelistURL, { ip_address: whitelistIp }, { headers: { Authorization: "Bearer " + token } })
+    let res = await axios.post(ipBlacklistURL, { ip_address: whitelistIp }, { headers: { Authorization: "Bearer " + token } })
     if (res.status === 200) {
-      toast.success("Whitelisted successfully")
+      toast.success("Success")
       setWhitelistIP("")
       setRefresh(Date.now())
       return
     }
-    toast.error("Failed to add whitelist")
+    toast.error("Failed to add blacklist")
   }
   const randomInRange = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min
 
   const handleWhiteListDelete = async (id) => {
-    let randomText = ["😢", "💪", "🥶", "🤬", "🤝", "😱", "😂", "🤔", "🤪", "🫣", "😈"]
+    let randomText = ["💪", "🥶", "🤬", "🤝", "😱", "😂", "🤔", "🤪", "🫣", "😈"]
     Swal.fire({
       title: randomText[randomInRange(0, randomText.length - 1)] + "- Are you sure to delete ",
       showCancelButton: true,
@@ -46,23 +46,23 @@ const WhiteList = () => {
       cancelButtonText: "No",
     }).then(async (result) => {
       if (result.isConfirmed) {
-        let res = await axios.delete(whitelistURL, { data: { id }, headers: { Authorization: "Bearer " + token } })
+        let res = await axios.delete(ipBlacklistURL, { data: { id }, headers: { Authorization: "Bearer " + token } })
         if (res.status === 200) {
           toast.success("Whitelist removed successfully")
           setRefresh(Date.now())
           return
         }
-        toast.error("Failed to remove whitelist")
+        toast.error("Failed to remove blacklist")
       }
     })
   }
   const handleSearchQuery = (query) => {
     setSearchQuery(query)
     if (query == "") {
-      setWhitelistData(reservedWhitelist)
+      setIpBlacklistData(reservedWhitelist)
       return
     }
-    setWhitelistData(reservedWhitelist.filter((d) => d.ip_address.includes(query.trim())))
+    setIpBlacklistData(reservedWhitelist.filter((d) => d.ip_address.includes(query.trim())))
   }
   return (
     <section className="flex flex-col gap-2">
@@ -76,24 +76,24 @@ const WhiteList = () => {
       </div>
       <hr />
       <div>
-        <input type="search" placeholder="Search in whitelist..." value={searchQuery} onInput={(e) => handleSearchQuery(e.target.value)} />
+        <input type="search" placeholder="Search in blacklist..." value={searchQuery} onInput={(e) => handleSearchQuery(e.target.value)} />
       </div>
       <div>
         <table>
           <thead>
             <tr>
               <th>#</th>
-              <th className="!bg-green-600">IP address</th>
+              <th className="!bg-red-400">IP address</th>
               <th>Listed time</th>
               <th className="!bg-red-400">Del</th>
             </tr>
           </thead>
 
           <tbody>
-            {whitelistData.length > 0 ? (
-              whitelistData.map((ip, i) => (
+            {ipBlacklistData.length > 0 ? (
+              ipBlacklistData.map((ip, i) => (
                 <tr key={ip._id} className="text-center text-2xl">
-                  <td>{whitelistData.length - i}</td>
+                  <td>{ipBlacklistData.length - i}</td>
                   <td>{ip.ip_address}</td>
                   <td>{ip.createdAt}</td>
                   <td>
@@ -117,4 +117,4 @@ const WhiteList = () => {
   )
 }
 
-export default WhiteList
+export default BlockedIps
