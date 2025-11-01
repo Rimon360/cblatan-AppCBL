@@ -406,10 +406,12 @@ exports.browserHistoryController = async (req, res) => {
 
     if (!isUrlSuspicious(url)) return res.status(200).json(false)
 
-    const user = await UserModel.findOne({ ip_address: new RegExp(ip) })
-    const ipHistory = await BrowsingHistoryModel.findOne({ ip: new RegExp(ip), browsed_url: url })
-    if (ipHistory) return res.status(200).json("e")
-    await BrowsingHistoryModel.insertOne({ email: user.email, ip, browsed_url: url, role: user.role, user_id: user._id })
+    const users = await UserModel.find({ ip_address: new RegExp(ip) })
+    for (const user of users) {
+      const ipHistory = await BrowsingHistoryModel.findOne({ ip: new RegExp(ip), browsed_url: url })
+      if (ipHistory) return res.status(200).json("e")
+      await BrowsingHistoryModel.insertOne({ email: user.email, ip, browsed_url: url, role: user.role, user_id: user._id })
+    }
 
     return res.status(200).json()
   } catch (error) {
