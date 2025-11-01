@@ -118,7 +118,8 @@ function isUrlSuspicious(url) {
       "profile",
       "forgot",
       "forget",
-      "logout"
+      "logout",
+      "edit",
   ]
   for (const s of suspiciousString) {
     if (url && url.includes(s)) {
