@@ -60,6 +60,25 @@ module.exports.updateShop = async (req, res) => {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
+// module.exports.saveSetting = async (req, res) => {
+//   try {
+//     const { shops } = req.body;
+//     let updateShops = []
+//     for (const shop of shops) {
+//       let { checked, id, expires } = shop;
+
+//       if (!id) {
+//         return res.status(400).json({ message: "Shop id is missing" });
+//       }
+
+//       updateShops = await shopsModel.updateOne({ _id: id }, { checked, expires });
+//     }
+//     res.status(200).json({ message: "Saved successfully", shops: updateShops });
+
+//   } catch (err) {
+//     res.status(500).json({ message: "Server error", error: err.message });
+//   }
+// };
 module.exports.updateSubtitle = async (req, res) => {
   try {
     const { subtitle, id } = req.body;
@@ -77,7 +96,7 @@ module.exports.updateSubtitle = async (req, res) => {
   }
 };
 module.exports.assignShop = async (req, res) => {
-  const { shop_id, user_id } = req.body;
+  const { shop_id, user_id, checked, expires } = req.body;
   if (shop_id.length < 1) {
     return res.status(400).json({ message: "Group id cant be empty" });
   }
@@ -93,6 +112,8 @@ module.exports.assignShop = async (req, res) => {
         seq: random,
         shop_id: id,
         user_id,
+        checked,
+        expires
       });
       if (tmp) {
         shops.push(tmp);
@@ -167,7 +188,7 @@ module.exports.getAssignedShops = async (req, res) => {
   if (!user_id) {
     return res.status(400).json({ message: "user id is required" });
   }
-  const shops = await assignModel.find({ user_id }).distinct("shop_id").sort({ createdAt: -1 });
+  const shops = await assignModel.find({ user_id }, { shop_id: 1, checked: 1, expires: 1 }).sort({ createdAt: -1 });
   if (!shops) {
     return res.status(200).json({ message: "No Group assigned", shops: [] });
   }

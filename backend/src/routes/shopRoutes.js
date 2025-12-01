@@ -10,6 +10,7 @@ router.get("/subtitle/:id", adminMiddleware, getSubtitle);
 router.post("/update", adminMiddleware, updateShop);
 router.post("/subtitle/update", adminMiddleware, updateSubtitle);
 router.post("/assign", adminMiddleware, assignShop);
+// router.post("/settings/save", adminMiddleware, saveSetting);
 router.get("/getassignedshops/:user_id", adminMiddleware, getAssignedShops);
 router.delete("/unassign", adminMiddleware, unassignShop);
 router.delete("/delete", adminMiddleware, deleteShop);

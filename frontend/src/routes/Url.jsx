@@ -12,6 +12,7 @@ const usersHistoryUrl = BASE_URL + "/api/users/history"
 const registerURL = usersUrl + "/register"
 const shopCreateURL = BASE_URL + "/api/shops/create"
 const shopsURL = BASE_URL + "/api/shops"
+const saveShopSettingsURL = BASE_URL + "/api/shops/settings/save"
 const shopDeleteURL = BASE_URL + "/api/shops/delete"
 const memberShopsURL = BASE_URL + "/api/shops/member"
 const assignURL = BASE_URL + "/api/shops/assign"
@@ -47,4 +48,5 @@ export {
   profileGroupDataURL,
   blacklistUrlPath,
   usersHistoryUrl,
+  saveShopSettingsURL,
 }

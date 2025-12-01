@@ -127,7 +127,11 @@ module.exports.getPasswordData = async (req, res) => {
     {
       $replaceRoot: {
         newRoot: {
-          $mergeObjects: ["$products", { subtitle: "$subtitles.subtitle" }],
+          $mergeObjects: ["$products", {
+            subtitle: "$subtitles.subtitle",
+            checked: "$checked",
+            expires: "$expires",
+          }],
         },
       },
     },
@@ -141,6 +145,8 @@ module.exports.getPasswordData = async (req, res) => {
         c: "$course_name",
         m: "$file_path",
         t: "$createdAt",
+        checked: "$checked",
+        expires: "$expires",
       },
     },
     {
@@ -155,12 +161,21 @@ module.exports.getPasswordData = async (req, res) => {
   ])
 
 
-  let tmp = [] 
+  let tmp = []
   for (const p of products) {
-    p.k = decrypt(p.k)
-    tmp.push(p)
-  }
+    if (p.checked) {
+      let expires = p.expires;
+      let timestamp = new Date(expires).getTime();
+      let currentTimeStamp = Date.now();
+      if (timestamp - currentTimeStamp < 0) continue;
+      p.k = decrypt(p.k)
+      tmp.push(p)
+    } else {
+      p.k = decrypt(p.k)
+      tmp.push(p)
+    }
 
+  }
   res.status(200).json({ products: encrypt(JSON.stringify(tmp)) })
   return
 }

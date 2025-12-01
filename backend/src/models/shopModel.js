@@ -35,6 +35,13 @@ const assignedShopSchema = new mongoose.Schema({
     type: String,
     ref: "shops",
   },
+  checked: {
+    type: Boolean,
+    default: false
+  },
+  expires: {
+    type: String
+  },
   user_id: {
     type: String,
     ref: "users",
