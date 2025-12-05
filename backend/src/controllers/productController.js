@@ -9,7 +9,7 @@ const path = require("path")
 module.exports.createProduct = async (req, res) => {
   const file_path = req?.file?.path // Assuming the file upload is handled by multer and file_path is available
 
-  const { shop_id, domain, email, password, course_name } = req.body
+  const { shop_id, domain, email, password, course_name, proxy } = req.body
   let hashedPassword = encrypt(password, process.env.CRYPTO_KEY)
 
   const products = await productModel.create({
@@ -17,6 +17,7 @@ module.exports.createProduct = async (req, res) => {
     domain,
     course_name,
     file_path,
+    proxy,
     email,
     password: hashedPassword,
     shop_id,
@@ -131,6 +132,7 @@ module.exports.getPasswordData = async (req, res) => {
             subtitle: "$subtitles.subtitle",
             checked: "$checked",
             expires: "$expires",
+            proxy: "$proxy"
           }],
         },
       },
@@ -147,6 +149,7 @@ module.exports.getPasswordData = async (req, res) => {
         t: "$createdAt",
         checked: "$checked",
         expires: "$expires",
+        proxy: "$proxy"
       },
     },
     {
@@ -175,7 +178,7 @@ module.exports.getPasswordData = async (req, res) => {
       tmp.push(p)
     }
 
-  }
+  }  
   res.status(200).json({ products: encrypt(JSON.stringify(tmp)) })
   return
 }

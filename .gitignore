@@ -1,6 +1,7 @@
 backend/uploads
 extension/dist
-extension/
+extension/node_modules
+extension/doc.md
 desktop_app/
 backend/browserProfilesData
 backend/extensionsData
@@ -8,3 +9,27 @@ backend/ads
 backend/logos
 backend/syncPath
 t.js
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

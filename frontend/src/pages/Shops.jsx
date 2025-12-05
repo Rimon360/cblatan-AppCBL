@@ -21,6 +21,7 @@ const Shops = () => {
   const [productName, setProductName] = useState("")
   const [email, setEmail] = useState([])
   const [domain, setDomain] = useState("")
+  const [proxy, setProxy] = useState("")
   const [courseName, setCourseName] = useState("")
   const [password, setPassword] = useState("")
   const { current_user } = useGlobal()
@@ -95,7 +96,7 @@ const Shops = () => {
           toast.success("No Product Found!")
         }
       })
-      .catch((e) => { 
+      .catch((e) => {
         toast.error(e.message)
       })
   }
@@ -117,6 +118,7 @@ const Shops = () => {
         navigate("/")
       })
   }, [isUpdated])
+
   const [isSubtitleUpdated, setIsSubtitleUpdated] = useState(Date.now())
   useEffect(() => {
     if (!selectedTitleId) return
@@ -164,6 +166,7 @@ const Shops = () => {
       formData.append("shop_id", selectedSubtitleId)
       formData.append("email", email)
       formData.append("domain", domain)
+      formData.append("proxy", proxy)
       formData.append("password", password)
       formData.append("course_name", courseName)
       formData.append("file", file)
@@ -178,6 +181,7 @@ const Shops = () => {
           setProducts((prev) => [...prev, res.data.products])
           setEmail("")
           setDomain("")
+          setProxy("")
           setCourseName("")
           setPassword("")
           setFile(null)
@@ -188,12 +192,13 @@ const Shops = () => {
         })
     } else {
       axios
-        .post(productUpdateURL, { course_name: courseName, domain, email, password, id: editAbleData.id }, { headers: { Authorization: "Bearer " + token } })
+        .post(productUpdateURL, { course_name: courseName, domain, email, proxy, password, id: editAbleData.id }, { headers: { Authorization: "Bearer " + token } })
         .then((res) => {
           setProductName("")
           // setProducts((prev) => [...prev, res.data.products]);
           setEmail("")
           setDomain("")
+          setProxy("")
           setCourseName("")
           setPassword("")
           setFile(null)
@@ -214,13 +219,14 @@ const Shops = () => {
     if (editAbleData.id) {
       setEmail(editAbleData.email)
       setDomain(editAbleData.domain)
+      setProxy(editAbleData.proxy)
       setPassword(editAbleData.password)
       setCourseName(editAbleData.course_name)
     }
   }, [editAbleData])
 
-  const handleProductUpdate = (id, course_name, domain, email, password) => {
-    setEditAbleData({ id, course_name, domain, email, password })
+  const handleProductUpdate = (id, course_name, domain, email, password, proxy) => {
+    setEditAbleData({ id, course_name, domain, email, password, proxy })
 
     // if (result.isConfirmed) {
     //   axios
@@ -363,7 +369,7 @@ const Shops = () => {
   }
 
   const handleProductSubtitleUpdate = (e) => {
-    e.preventDefault() 
+    e.preventDefault()
 
     axios
       .post(
@@ -597,6 +603,18 @@ const Shops = () => {
                     />
                   </label>
                   <label>
+                    Proxy:
+                    <input
+                      value={proxy}
+                      onChange={(e) => {
+                        setProxy(e.target.value)
+                      }}
+                      className="mb-2  sticky top-0 bg-white"
+                      type="text"
+                      placeholder="eg: socks5://user:pass@host:port"
+                    />
+                  </label>
+                  <label>
                     Email/username:
                     <input
                       required
@@ -641,18 +659,19 @@ const Shops = () => {
                           setEditAbleData({})
                           setEmail("")
                           setDomain("")
+                          setProxy("")
                           setPassword("")
                           setCourseName("")
                         }}
                         className="flex items-center gap-2 create-user   py-2 px-4 bg-red-400 text-white rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400"
-                      > 
+                      >
                         <IoMdClose className=" text-2xl" />
                       </button>
 
                       <button
                         type="submit"
                         className="flex items-center gap-2 create-user   py-2 px-4 bg-green-500 text-white rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500"
-                      > 
+                      >
                         <IoMdDoneAll className=" text-2xl" />
                       </button>
                     </div>
@@ -730,7 +749,7 @@ const Shops = () => {
                             <div className="flex items-center justify-center">
                               <button
                                 onClick={() => {
-                                  handleProductUpdate(p._id, p.course_name, p.domain, p.email, p.password)
+                                  handleProductUpdate(p._id, p.course_name, p.domain, p.email, p.password, p.proxy)
                                 }}
                                 className="px-2 py-2 text-green-400 rounded hover:bg-green-200"
                               >

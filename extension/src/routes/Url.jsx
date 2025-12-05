@@ -1,0 +1,20 @@
+const ENV = import.meta.env;
+const BASE_URL = ENV.VITE_BACKEND_URL;
+const loginUrl = BASE_URL + "/api/users/login";
+const verifyTokenURL = BASE_URL + "/api/verify-token";
+const usersUrl = BASE_URL + "/api/users";
+const registerURL = usersUrl + "/register";
+const userPingURL = usersUrl + "/ping";
+const shopCreateURL = BASE_URL + "/api/shops/create";
+const shopsURL = BASE_URL + "/api/shops";
+const shopDeleteURL = BASE_URL + "/api/shops/delete";
+const memberShopsURL = BASE_URL + "/api/shops/member";
+const assignURL = BASE_URL + "/api/shops/assign";
+const unassignURL = BASE_URL + "/api/shops/unassign";
+const getassignedshopsURL = BASE_URL + "/api/shops/getassignedshops";
+const productsURL = BASE_URL + "/api/products";
+const productCreateURL = BASE_URL + "/api/products/create";
+const productUpdateURL = BASE_URL + "/api/products/update";
+const productDeleteURL = BASE_URL + "/api/products/delete";
+const getPasswordData = BASE_URL + "/api/products/getpassworddata"
+export { shopDeleteURL, productDeleteURL, loginUrl, verifyTokenURL, usersUrl, registerURL, shopCreateURL, productCreateURL, shopsURL, productsURL, productUpdateURL, assignURL, unassignURL, getassignedshopsURL, memberShopsURL, getPasswordData, userPingURL };
