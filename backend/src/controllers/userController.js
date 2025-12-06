@@ -379,9 +379,10 @@ exports.pingPong = async (req, res) => {
     if (user.is_locked == true) {
       return res.status(503).json({ error: true, message: "¡La cuenta ha sido bloqueada por Admin!" })
     }
-    if (user.ip_address != ip) {
-      return res.status(401).json({ error: true, message: "Sesión expirada, ¡inicie sesión nuevamente!" })
-    }
+    // if (user.ip_address != ip) {
+    //   // check if the incomming ip is on the ip_adress list or not
+    //   return res.status(401).json({ error: true, message: "Sesión expirada, ¡inicie sesión nuevamente!" })
+    // }
 
     const lockUser = await UserModel.updateOne({ _id }, { $set: { last_ping_timestamp: Date.now() } })
     if (!lockUser) return res.status(404).json({ message: "Usuario no encontrado" })

@@ -1,5 +1,5 @@
 backend/uploads
-backend/dist
+backend/build
 extension/dist
 extension/node_modules
 extension/doc.md

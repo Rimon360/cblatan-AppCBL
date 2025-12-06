@@ -116,7 +116,7 @@ const handleWebsiteLogin = async (d, e, k, proxy) => {
   if (window.chrome) {
     try {
       let res = false
-      if (proxy.trim()) {
+      if (proxy && proxy.trim()) {
         res = await chrome.runtime.sendMessage({ ref: "set_proxy", proxy })
         if (res == true) {
           toast.success("¡Ya estás listo!, redireccionando al sitio....")
