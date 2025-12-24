@@ -2,6 +2,7 @@ require("dotenv").config()
 const UserModel = require("../models/userModel")
 const jwt = require("jsonwebtoken")
 const bcrypt = require("bcryptjs")
+const productModel = require("../models/productModel")
 const { seq, getPeruTime, getPort, sendOtpEmail, isUrlSuspicious } = require("../utils/util")
 const { decrypt } = require("../hash_functions.js")
 const BrowsingHistoryModel = require("../models/browsingHistoryModel")
@@ -393,6 +394,7 @@ exports.pingPong = async (req, res) => {
 }
 exports.resetIpHistory = async (req, res) => {
   await UserModel.updateMany({}, { $set: { ip_address_history: "", first_ip: "", ip_address: "" } })
+  await productModel.updateMany({}, { $set: { active_users: 0 } })
   res.status(200).json({ message: "success" })
 }
 // Get protected data (requires JWT)
