@@ -1,6 +1,6 @@
 import axios from "axios"
 import { toast } from "react-hot-toast"
-import { registerURL, loginUrl } from "./routes/Url"
+import { registerURL, loginUrl, productsURL } from "./routes/Url"
 
 let isProduction = 1
 const login = async (user) => {
@@ -111,9 +111,12 @@ const removeToken = async () => {
     localStorage.removeItem("token")
   }
 }
-
-const handleWebsiteLogin = async (d, e, k, proxy) => {
+const windowTrackKey = "windowTrackList"
+const handleWebsiteLogin = async (d, e, k, proxy, pid) => {
   if (window.chrome) {
+    let incognitoList = ["hotmart.com", "www.hotmart.com", "labs.google", "www.labs.google", "gemini.google.com", "www.gemini.google.com", "skool.com", "www.skool.com"]
+    let hasIncognitoPermission = await chrome.extension.isAllowedIncognitoAccess()
+    let extensionId = chrome.runtime.id
     try {
       let res = false
       if (proxy && proxy.trim()) {
@@ -128,15 +131,94 @@ const handleWebsiteLogin = async (d, e, k, proxy) => {
       } else {
         await chrome.runtime.sendMessage({ ref: "reset_proxy" })
       }
-
       await chrome.storage.local.set({ product: { d, e, k, t: Date.now() } })
-      chrome.tabs.create({ url: d })
+
+      if (incognitoList.includes(getDomain(d))) {
+        await closeAllIncognitoTabs(d)
+
+        // if (hasIncognitoPermission) {
+        //   chrome.windows.create({ url: d, incognito: true })
+        // } else {
+        //   let exUrl = `chrome://extensions/?id=${extensionId}`
+        //   chrome.tabs.create({ url: exUrl })
+        //   let count = 0
+        //   let int = setInterval(async () => {
+        //     count++
+        //     if (count >= 30) {
+        //       clearInterval(int)
+        //     }
+        //     if (await chrome.extension.isAllowedIncognitoAccess()) {
+        //       clearInterval(int)
+        //       chrome.windows.create({ url: d, incognito: true })
+        //     }
+        //   }, 1000)
+        // }
+      }
+      // chrome.tabs.create({ url: d })
+      chrome.windows.create({ url: d }, async (win) => {
+        const windowId = win.id
+        await addWindowOnTrackList(windowId, pid)
+      })
+      await addActivityStatus(pid)
     } catch (error) {
       toast.error("ERROR: " + error.message)
     }
   }
   return false
 }
+
+const addWindowOnTrackList = async (winId, pid) => {
+  let oldData = (await chrome.storage.local.get(windowTrackKey))[windowTrackKey] || []
+  oldData.push({ [winId]: pid })
+  await chrome.storage.local.set({ [windowTrackKey]: oldData })
+}
+const addActivityStatus = async (id) => {
+  let token = await getToken()
+  await axios.post(productsURL + "/activitystatus/add", { id }, { headers: { Authorization: "Bearer " + token } })
+}
+const closeAllIncognitoTabs = async (d) => {
+  let tabs = await chrome.tabs.query({})
+  for (const tab of tabs) {
+    if (getDomain(tab.url).includes(getDomain(d))) {
+      await chrome.tabs.remove(tab.id)
+      let domain = getRootDomain(tab.url)
+      deleteCookiesRoot(domain)
+    }
+  }
+  await new Promise((rs) => setTimeout(rs, 200))
+}
+function getRootDomain(url) {
+  const host = new URL(url).hostname
+  const parts = host.split(".")
+
+  // brand TLDs you may extend
+  const brandTLDs = ["google"]
+
+  const tld = parts[parts.length - 1]
+
+  // If brand TLD → return last 2 parts (labs.google → google)
+  if (brandTLDs.includes(tld)) {
+    return parts.slice(-1).join(".")
+  }
+
+  // normal domains
+  if (parts.length <= 2) return host
+  return parts.slice(-2).join(".")
+}
+
+function deleteCookiesRoot(rootDomain) {
+  chrome.cookies.getAll({}, (cookies) => {
+    cookies
+      .filter((c) => c.domain.includes(rootDomain))
+      .forEach((c) => {
+        chrome.cookies.remove({
+          url: (c.secure ? "https://" : "http://") + c.domain + c.path,
+          name: c.name,
+        })
+      })
+  })
+}
+
 const remove = async (key) => {
   if (isProduction) {
     return await chrome.storage.local.remove(key)

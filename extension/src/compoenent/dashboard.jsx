@@ -22,6 +22,7 @@ const Dashboard = () => {
     nav("/login")
   }
 
+  const [refreshActivity, setRefreshActivity] = useState(Date.now())
   useEffect(() => {
     ;(async () => {
       try {
@@ -37,9 +38,10 @@ const Dashboard = () => {
           nav("/login")
           return
         }
-        let res = await axios.get(getPasswordData + "/" + user._id, { headers: { Authorization: `Bearer ` + token } })
+        let res = await fetch(getPasswordData + "/" + user._id, { method: "GET", headers: { Authorization: `Bearer ` + token } })
         if (res.status === 200) {
-          let decryptedData = JSON.parse(await decrypt(res.data.products))
+          res = await res.json()
+          let decryptedData = JSON.parse(await decrypt(res.products))
           setPasswordData(decryptedData)
           setReservedCourses(decryptedData)
         } else if (res.data.error) {
@@ -51,6 +53,12 @@ const Dashboard = () => {
         nav("/login")
       }
     })()
+  }, [refreshActivity])
+
+  useEffect(() => {
+    setInterval(() => {
+      setRefreshActivity(Date.now())
+    }, 15 * 1e3)
   }, [])
 
   const [courseSearchQuery, setCourseSearchQuery] = useState(null)
@@ -150,13 +158,14 @@ const Dashboard = () => {
                         let filepath = import.meta.env.VITE_BACKEND_URL + "/" + p.m
                         return (
                           <div
-                            onClick={() => handleWebsiteLogin(p.d, p.e, p.k, p.proxy)}
+                            onClick={() => handleWebsiteLogin(p.d, p.e, p.k, p.proxy, p.id)}
                             key={i}
-                            className="float-left cursor-pointer bg-gray-950/50 hover:scale-105 backdrop:blur-3xl hover:bg-black rounded-xl w-[300px] text-white overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 !m-4"
+                            className=" relative float-left cursor-pointer bg-gray-950/50 hover:scale-105 backdrop:blur-3xl hover:bg-black rounded-xl w-[300px] text-white overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 !m-4"
                           >
                             <div className="border-gray-600 border-b-1 flex items-center justify-center bg-black">
                               <img loading="lazy" src={filepath} className="w-fit h-[200px]" alt="image" crossOrigin="anonymous" />
                             </div>
+                            <span className="absolute right-2 bottom-2  px-1 text-sm text-red-500 rounded-xl bg-red-400/20">active: {p.active_users || 0}</span>
                           </div>
                         )
                       })}

@@ -21,7 +21,8 @@ const verifyToken = async (req, res, next) => {
 
     if (!user) {
       return res.status(404).json({ message: "User not exists" })
-    }
+    } 
+
     if (user && (!user?.verified_ip?.includes(ip) && !proxeis.includes(ip))) {
       // check if the incomming ip is verified by OTP or not to prevent unusual access 
       return res.status(200).json({ user: { verified: false, email: user.email } })

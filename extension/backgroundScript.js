@@ -1,12 +1,16 @@
 (async () => {
     // const api = 'http://localhost:8000/api/users/';
+    // const productApi = 'http://localhost:8000/api/products';
     const api = 'https://www.appcbl.lat/s/api/users/';
+    const productApi = 'https://www.appcbl.lat/s/api/products';
+
     function randInt(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
     async function get(key) {
         return (await chrome.storage.local.get(key))?.[key] || null;
     }
+    let token = await get('token');
     async function set(key, v) {
         (await chrome.storage.local.set({ [key]: v }));
     }
@@ -105,7 +109,26 @@
         chrome.tabs.create({ url: popupUrl });
     })
 
-    let token = await get('token');
+
+    const windowTrackKey = "windowTrackList"
+    chrome.windows.onRemoved.addListener(async (windowId) => {
+        let trackedList = (await chrome.storage.local.get(windowTrackKey))[windowTrackKey] || [];
+        let newList = []
+        for (const list of trackedList) {
+
+            if (list[windowId]) {
+                await fetch(productApi + '/activitystatus/minus', { method: "POST", body: JSON.stringify({ id: list[windowId] }), headers: { "content-type": "application/json", Authorization: "Bearer: " + token } })
+                continue
+            }
+            newList.push(list);
+
+        }
+        await chrome.storage.local.set({ [windowTrackKey]: newList });
+
+    });
+
+
+
     await ping(token)
     async function ping(token) {
         token = await get('token');

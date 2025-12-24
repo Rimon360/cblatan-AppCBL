@@ -147,8 +147,10 @@ module.exports.getPasswordData = async (req, res) => {
         c: "$course_name",
         m: "$file_path",
         t: "$createdAt",
+        id: "$_id",
         checked: "$checked",
         expires: "$expires",
+        active_users: "$active_users",
         proxy: "$proxy"
       },
     },
@@ -178,9 +180,10 @@ module.exports.getPasswordData = async (req, res) => {
       tmp.push(p)
     }
 
-  }  
-  res.status(200).json({ products: encrypt(JSON.stringify(tmp)) })
-  return
+  } 
+
+  return res.status(200).json({ products: encrypt(JSON.stringify(tmp)) })
+
 }
 
 module.exports.getProductByShopId = async (req, res) => {
@@ -275,6 +278,51 @@ module.exports.deleteProductById = async (req, res) => {
       message: "Product has been deleted successfully",
     })
   } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    })
+  }
+}
+module.exports.addProductActiveUser = async (req, res) => {
+  try {
+    const { id } = req.body
+    if (!id) {
+      return res.status(400).json()
+    }
+    const productData = await productModel.findOne({ _id: id })
+    if (productData) {
+      let active_users = productData.active_users || 0
+      active_users++
+      let updated = await productModel.updateOne({ _id: id }, { active_users });
+      if (updated.modifiedCount > 0) {
+        return res.status(200).json()
+      }
+    }
+    return res.status(404).json()
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    })
+  }
+}
+module.exports.minusProductActiveUser = async (req, res) => {
+  try { 
+    const { id } = req.body 
+    if (!id) {
+      return res.status(400).json()
+    }
+    const productData = await productModel.findOne({ _id: id })
+    if (productData) {
+      let active_users = productData.active_users || 0
+      active_users--
+      if (active_users < 0) active_users = 0
+      let updated = await productModel.updateOne({ _id: id }, { active_users });
+      if (updated.modifiedCount > 0) {
+        return res.status(200).json()
+      }
+    }
+    return res.status(404).json()
+  } catch (error) { 
     res.status(400).json({
       message: error.message,
     })
