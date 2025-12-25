@@ -96,6 +96,12 @@ const Dashboard = () => {
       totalSeconds--
     }, 1000)
   }
+
+  const getPeruTime = (time, timeZone = "America/Lima") => {
+    time = time.replace(", ", "T")
+    const t = new Date(time).toLocaleString("en-US", { timeZone })
+    return `${t}  `
+  }
   return (
     <div className="min-h-screen flex justify-center   bg-radial from-gray-900 to-gray-950 to-90%">
       <div className=" bg-gray-700 max-w-[1336px] rounded-lg min-w-[400px]">
@@ -165,10 +171,8 @@ const Dashboard = () => {
                             <div className="border-gray-600 border-b-1 flex items-center justify-center bg-black">
                               <img loading="lazy" src={filepath} className="w-fit h-[200px]" alt="image" crossOrigin="anonymous" />
                             </div>
-                            <span className="absolute right-2 bottom-2  px-1 text-sm text-white rounded-xl bg-gray-400/20" title={`${p.active_users?.join?.("\n")||''}`} >activa: {p.active_users?.length || 0}
-                            <span>
-                              
-                            </span>
+                            <span className="absolute right-2 bottom-2  px-1 text-sm text-white rounded-xl bg-gray-400/20" title={`${p.active_users?.join?.("\n") || ""}`}>
+                              activa: {p.active_users?.length || 0}
                             </span>
                           </div>
                         )

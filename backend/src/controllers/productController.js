@@ -285,9 +285,9 @@ module.exports.deleteProductById = async (req, res) => {
 }
 module.exports.addProductActiveUser = async (req, res) => {
   try {
-    const { id } = req.body
+    const { id, country } = req.body
     const user = req.user;
-    const currentTime = (new Date()).toISOString().replace('T', ', ');
+    const currentTime = new Date().toLocaleString("en-US", { timeZone:'America/Lima' })
     if (!id) {
       return res.status(400).json()
     }
@@ -298,7 +298,7 @@ module.exports.addProductActiveUser = async (req, res) => {
       if (typeof active_users === 'number') {
         active_users = []
       }
-      active_users.push(`${user.email} : ${currentTime}`)
+      active_users.push(`${user.email} : ${currentTime} : ${country}`)
       let updated = await productModel.updateOne({ _id: id }, { active_users });
       if (updated.modifiedCount > 0) {
         return res.status(200).json()

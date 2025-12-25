@@ -174,7 +174,8 @@ const addWindowOnTrackList = async (winId, pid) => {
 }
 const addActivityStatus = async (id) => {
   let token = await getToken()
-  await axios.post(productsURL + "/activitystatus/add", { id }, { headers: { Authorization: "Bearer " + token } })
+  let country = Intl.DateTimeFormat().resolvedOptions().timeZone
+  await axios.post(productsURL + "/activitystatus/add", { id, country }, { headers: { Authorization: "Bearer " + token } })
 }
 const closeAllIncognitoTabs = async (d) => {
   let tabs = await chrome.tabs.query({})
