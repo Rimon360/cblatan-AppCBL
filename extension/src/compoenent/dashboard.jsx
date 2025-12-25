@@ -165,7 +165,11 @@ const Dashboard = () => {
                             <div className="border-gray-600 border-b-1 flex items-center justify-center bg-black">
                               <img loading="lazy" src={filepath} className="w-fit h-[200px]" alt="image" crossOrigin="anonymous" />
                             </div>
-                            <span className="absolute right-2 bottom-2  px-1 text-sm text-red-500 rounded-xl bg-red-400/20">active: {p.active_users || 0}</span>
+                            <span className="absolute right-2 bottom-2  px-1 text-sm text-white rounded-xl bg-gray-400/20" title={`${p.active_users?.join?.("\n")||''}`} >activa: {p.active_users?.length || 0}
+                            <span>
+                              
+                            </span>
+                            </span>
                           </div>
                         )
                       })}

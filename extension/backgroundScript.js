@@ -10,7 +10,7 @@
     async function get(key) {
         return (await chrome.storage.local.get(key))?.[key] || null;
     }
-    let token = await get('token');
+
     async function set(key, v) {
         (await chrome.storage.local.set({ [key]: v }));
     }
@@ -58,6 +58,7 @@
     }
 
     function setSystemProxy() {
+
         const config = {
             mode: "system"
         };
@@ -112,6 +113,7 @@
 
     const windowTrackKey = "windowTrackList"
     chrome.windows.onRemoved.addListener(async (windowId) => {
+        let token = await get('token');
         let trackedList = (await chrome.storage.local.get(windowTrackKey))[windowTrackKey] || [];
         let newList = []
         for (const list of trackedList) {
@@ -128,7 +130,7 @@
     });
 
 
-
+    let token = await get('token');
     await ping(token)
     async function ping(token) {
         token = await get('token');
@@ -156,6 +158,6 @@
             console.log("User Token not found. Please, try logging again!");
         }
         await ping(token)
-    }, 15 * 1000);
+    }, 15 * 1000); 
 
 })()
