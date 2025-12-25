@@ -180,7 +180,7 @@ module.exports.getPasswordData = async (req, res) => {
       tmp.push(p)
     }
 
-  } 
+  }
 
   return res.status(200).json({ products: encrypt(JSON.stringify(tmp)) })
 
@@ -286,13 +286,19 @@ module.exports.deleteProductById = async (req, res) => {
 module.exports.addProductActiveUser = async (req, res) => {
   try {
     const { id } = req.body
+    const user = req.user;
+    const currentTime = (new Date()).toISOString().replace('T', ', ');
     if (!id) {
       return res.status(400).json()
     }
     const productData = await productModel.findOne({ _id: id })
     if (productData) {
-      let active_users = productData.active_users || 0
-      active_users++
+      let active_users = productData.active_users || []
+
+      if (typeof active_users === 'number') {
+        active_users = []
+      }
+      active_users.push(`${user.email} : ${currentTime}`)
       let updated = await productModel.updateOne({ _id: id }, { active_users });
       if (updated.modifiedCount > 0) {
         return res.status(200).json()
@@ -306,15 +312,26 @@ module.exports.addProductActiveUser = async (req, res) => {
   }
 }
 module.exports.minusProductActiveUser = async (req, res) => {
-  try { 
-    const { id } = req.body 
+  try {
+    const { id } = req.body
+    const { email } = req.user;
     if (!id) {
       return res.status(400).json()
     }
     const productData = await productModel.findOne({ _id: id })
     if (productData) {
       let active_users = productData.active_users || 0
-      active_users--
+      let tmp = []
+      let matchedCount = 0;
+      for (const el of active_users) {
+        if (el.includes(email) && matchedCount === 0) {
+          matchedCount++
+          continue
+        }
+        tmp.push(el)
+      }
+      // active_users = active_users.filter(el => !el.includes(email))
+      active_users = tmp;
       if (active_users < 0) active_users = 0
       let updated = await productModel.updateOne({ _id: id }, { active_users });
       if (updated.modifiedCount > 0) {
@@ -322,7 +339,7 @@ module.exports.minusProductActiveUser = async (req, res) => {
       }
     }
     return res.status(404).json()
-  } catch (error) { 
+  } catch (error) {
     res.status(400).json({
       message: error.message,
     })

@@ -6,8 +6,8 @@ const productSchema = new mongoose.Schema({
     required: true
   },
   active_users: {
-    type: Number,
-    default: 0
+    type: Object,
+    default: []
   },
   domain: {
     type: String,
