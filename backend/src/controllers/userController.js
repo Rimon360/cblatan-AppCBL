@@ -394,7 +394,7 @@ exports.pingPong = async (req, res) => {
 }
 exports.resetIpHistory = async (req, res) => {
   await UserModel.updateMany({}, { $set: { ip_address_history: "", first_ip: "", ip_address: "" } })
-  await productModel.updateMany({}, { $set: { active_users: 0 } })
+  await productModel.updateMany({}, { $set: { active_users: [] } })
   res.status(200).json({ message: "success" })
 }
 // Get protected data (requires JWT)
