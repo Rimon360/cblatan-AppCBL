@@ -14,8 +14,8 @@ const app = express()
 const verifyToken = require("./middlewares/verifyToken")
 const helmet = require("helmet")
 const port = process.env.PORT || 8000
+const routeVersion = process.env.ROUTE_VERSION || 'vvoHU6wxhS39'
 const path = require("path")
-
 app.use(cors()) // Allow all origins, adjust as needed
 app.use(helmet()) // for security headers
 app.use(express.json())
@@ -40,7 +40,7 @@ mongoose
     console.error("MongoDB connection error:", err)
   })
 
-app.use("/api", async (req, res, next) => {
+app.use("/" + routeVersion + "/api", async (req, res, next) => {
   const ip = req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress
   if (!ip) return res.status(400).json({ message: "Dirección IP no encontrada" })
   const blockedIps = await blockedIpModel.find({ ip_address: ip })
@@ -50,19 +50,19 @@ app.use("/api", async (req, res, next) => {
   next()
 })
 
-app.use("/api/users", userRoutes)
-app.use("/api/products", productRoutes)
-app.get("/api/verify-token", verifyToken, (req, res) => {
+app.use("/" + routeVersion + "/api/users", userRoutes)
+app.use("/" + routeVersion + "/api/products", productRoutes)
+app.get("/" + routeVersion + "/api/verify-token", verifyToken, (req, res) => {
   res.json({ message: "success", user: req.user })
 })
-app.use("/api/shops", shopRoutes)
-app.use("/uploads", express.static(path.join(__dirname, "../uploads")))
-app.use("/logos", express.static(path.join(__dirname, "../logos")))
-app.use("/ads", express.static(path.join(__dirname, "../ads")))
-app.use("/api/whitelist", whiteList)
-app.use("/api/ipblacklist", ipBlacklist)
-app.use("/api/browser", browserRoute)
-app.use("/api/blacklist", blacklistRoute)
+app.use("/" + routeVersion + "/api/shops", shopRoutes)
+app.use("/" + routeVersion + "/uploads", express.static(path.join(__dirname, "../uploads")))
+app.use("/" + routeVersion + "/logos", express.static(path.join(__dirname, "../logos")))
+app.use("/" + routeVersion + "/ads", express.static(path.join(__dirname, "../ads")))
+app.use("/" + routeVersion + "/api/whitelist", whiteList)
+app.use("/" + routeVersion + "/api/ipblacklist", ipBlacklist)
+app.use("/" + routeVersion + "/api/browser", browserRoute)
+app.use("/" + routeVersion + "/api/blacklist", blacklistRoute)
 app.use((req, res) => {
   console.log("404 for:", req.originalUrl)
   res.status(404).json({ error: true, message: "Technical Error!. Please try again later!", d: req.protocol + "://" + req.get("host") + req.originalUrl })

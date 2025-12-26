@@ -227,6 +227,21 @@ const remove = async (key) => {
     return localStorage.removeItem(key)
   }
 }
+function disableInspect() {
+  console.log("Disabling inspect element...")
+  const preventInspect = (e) => {
+    e.preventDefault()
+    return false
+  }
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "F12" || (e.ctrlKey && e.shiftKey && ["I", "J", "C"].includes(e.key)) || (e.ctrlKey && e.key === "U")) preventInspect(e)
+  })
+
+  document.addEventListener("contextmenu", preventInspect)
+  setInterval(() => {
+    if (window.outerHeight - window.innerHeight > 200) window.close() // likely devtools open
+  }, 1000)
+}
 async function decrypt(encryptedB64) {
   const keyStr = import.meta.env.VITE_CRYPTO_KEY
   const key = await crypto.subtle.importKey("raw", await crypto.subtle.digest("SHA-256", new TextEncoder().encode(keyStr)), { name: "AES-CTR" }, false, ["decrypt"])
@@ -238,4 +253,4 @@ async function decrypt(encryptedB64) {
 
   return new TextDecoder().decode(decrypted)
 }
-export { logout, login, getDomain, getToken, setToken, removeToken, isValidURL, handleWebsiteLogin, remove, register, decrypt }
+export { logout, login, getDomain, getToken, setToken, removeToken, isValidURL, handleWebsiteLogin, remove, register, decrypt, disableInspect }

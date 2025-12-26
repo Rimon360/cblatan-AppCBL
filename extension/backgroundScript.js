@@ -24,6 +24,10 @@
             }, s * 1000);
         })
     }
+    document.addEventListener('contextmenu', e => {
+        console.log(e);
+        ; e.preventDefault()
+    })
 
     async function setProxy(proxy) {
         // PAC script with embedded credentials (may not work in all cases)
@@ -111,23 +115,23 @@
     })
 
 
-    const windowTrackKey = "windowTrackList"
-    chrome.windows.onRemoved.addListener(async (windowId) => {
-        let token = await get('token');
-        let trackedList = (await chrome.storage.local.get(windowTrackKey))[windowTrackKey] || [];
-        let newList = []
-        for (const list of trackedList) {
+    // const windowTrackKey = "windowTrackList"
+    // chrome.windows.onRemoved.addListener(async (windowId) => {
+    //     let token = await get('token');
+    //     let trackedList = (await chrome.storage.local.get(windowTrackKey))[windowTrackKey] || [];
+    //     let newList = []
+    //     for (const list of trackedList) {
 
-            if (list[windowId]) {
-                await fetch(productApi + '/activitystatus/minus', { method: "POST", body: JSON.stringify({ id: list[windowId] }), headers: { "content-type": "application/json", Authorization: "Bearer: " + token } })
-                continue
-            }
-            newList.push(list);
+    //         if (list[windowId]) {
+    //             await fetch(productApi + '/activitystatus/minus', { method: "POST", body: JSON.stringify({ id: list[windowId] }), headers: { "content-type": "application/json", Authorization: "Bearer: " + token } })
+    //             continue
+    //         }
+    //         newList.push(list);
 
-        }
-        await chrome.storage.local.set({ [windowTrackKey]: newList });
+    //     }
+    //     await chrome.storage.local.set({ [windowTrackKey]: newList });
 
-    });
+    // });
 
 
     let token = await get('token');
@@ -158,6 +162,6 @@
             console.log("User Token not found. Please, try logging again!");
         }
         await ping(token)
-    }, 15 * 1000); 
+    }, 15 * 1000);
 
 })()

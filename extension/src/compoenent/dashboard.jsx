@@ -10,6 +10,7 @@ import { getToken, removeToken, handleWebsiteLogin, decrypt } from "../funcitons
 import { toast } from "react-hot-toast"
 
 const Dashboard = () => {
+  const refreshActivityPeriodInSecond = 30
   const nav = useNavigate()
   const { state, setState } = useGlobal()
   const [kData, setPasswordData] = useState([{}])
@@ -21,7 +22,7 @@ const Dashboard = () => {
     removeToken()
     nav("/login")
   }
-
+  const [courseSearchQuery, setCourseSearchQuery] = useState(null)
   const [refreshActivity, setRefreshActivity] = useState(Date.now())
   useEffect(() => {
     ;(async () => {
@@ -44,13 +45,16 @@ const Dashboard = () => {
           let decryptedData = JSON.parse(await decrypt(res.products))
           setPasswordData(decryptedData)
           setReservedCourses(decryptedData)
+          if (courseSearchQuery) {
+            handleCourseSearch(courseSearchQuery)
+          }
         } else if (res.data.error) {
           toast.error(res.data.message)
         }
       } catch (error) {
         toast.error(error.response?.data.message || error.response?.data || error.message || "La sesión ha expirado. Por favor, vuelve a iniciar sesión.")
-        removeToken()
-        nav("/login")
+        // removeToken()
+        // nav("/login")
       }
     })()
   }, [refreshActivity])
@@ -58,10 +62,8 @@ const Dashboard = () => {
   useEffect(() => {
     setInterval(() => {
       setRefreshActivity(Date.now())
-    }, 15 * 1e3)
+    }, refreshActivityPeriodInSecond * 1e3)
   }, [])
-
-  const [courseSearchQuery, setCourseSearchQuery] = useState(null)
 
   const handleCourseSearch = (query) => {
     setCourseSearchQuery(query)
@@ -166,12 +168,19 @@ const Dashboard = () => {
                           <div
                             onClick={() => handleWebsiteLogin(p.d, p.e, p.k, p.proxy, p.id)}
                             key={i}
-                            className=" relative float-left cursor-pointer bg-gray-950/50 hover:scale-105 backdrop:blur-3xl hover:bg-black rounded-xl w-[300px] text-white overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 !m-4"
+                            className=" relative float-left cursor-pointer bg-gray-950/50 hover:border-blue-500 border-solid border-2 backdrop:blur-3xl hover:bg-black rounded-xl w-[300px] text-white overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 !m-4"
                           >
                             <div className="border-gray-600 border-b-1 flex items-center justify-center bg-black">
                               <img loading="lazy" src={filepath} className="w-fit h-[200px]" alt="image" crossOrigin="anonymous" />
                             </div>
-                            <span className="absolute right-2 bottom-2  px-1 text-sm text-white rounded-xl bg-gray-400/20" title={`${p.active_users?.join?.("\n") || ""}`}>
+                            <span
+                              className="absolute right-2 bottom-2  px-1 text-sm text-white rounded-xl bg-gray-400/20 hover:scale-115"
+                              title={`${p.active_users?.join?.("\n") || ""}`}
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                navigator.clipboard.writeText(p.active_users?.join?.("\n") || "")
+                              }}
+                            >
                               activa: {p.active_users?.length || 0}
                             </span>
                           </div>

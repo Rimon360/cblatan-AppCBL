@@ -3,7 +3,7 @@ import "./App.css"
 import AppRoutes from "./routes/AppRoutes"
 import { Toaster } from "react-hot-toast"
 import { GlobalProvider } from "./context/globalContext"
-
+import { disableInspect } from "./funcitons"
 function App() {
   return (
     <div className="App min-w-[320px] min-h-[400px] ">
@@ -11,6 +11,7 @@ function App() {
         <AppRoutes />
         <Toaster position="bottom-right" reverseOrder={false} />
       </GlobalProvider>
+      {disableInspect()}
     </div>
   )
 }
