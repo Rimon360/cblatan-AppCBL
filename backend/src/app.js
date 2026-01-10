@@ -14,7 +14,7 @@ const app = express()
 const verifyToken = require("./middlewares/verifyToken")
 const helmet = require("helmet")
 const port = process.env.PORT || 8000
-const routeVersion = process.env.ROUTE_VERSION || 'vvoHU6wxhS39'
+const routeVersion = process.env.ROUTE_VERSION || 'vHU6wxhS396wxhS39wxhS39'
 const path = require("path")
 app.use(cors()) // Allow all origins, adjust as needed
 app.use(helmet()) // for security headers

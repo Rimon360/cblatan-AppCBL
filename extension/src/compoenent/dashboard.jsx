@@ -48,11 +48,11 @@ const Dashboard = () => {
           if (courseSearchQuery) {
             handleCourseSearch(courseSearchQuery)
           }
-        } else if (res.data.error) {
-          toast.error(res.data.message)
+        } else if (res?.data?.error) {
+          toast.error(res?.data?.message)
         }
       } catch (error) {
-        toast.error(error.response?.data.message || error.response?.data || error.message || "La sesión ha expirado. Por favor, vuelve a iniciar sesión.")
+        toast.error(error?.response?.data.message || error?.response?.data || error?.message || "La sesión ha expirado. Por favor, vuelve a iniciar sesión.")
         // removeToken()
         // nav("/login")
       }

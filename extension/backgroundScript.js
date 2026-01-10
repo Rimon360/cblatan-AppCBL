@@ -1,8 +1,8 @@
 (async () => {
-    // const api = 'http://localhost:8000/api/users/';
-    // const productApi = 'http://localhost:8000/api/products';
-    const api = 'https://www.appcbl.lat/s/api/users/';
-    const productApi = 'https://www.appcbl.lat/s/api/products';
+    const api = 'http://localhost:8000/vHU6wxhS396wxhS39wxhS39/api/users/';
+    const productApi = 'http://localhost:8000/vHU6wxhS396wxhS39wxhS39/api/products';
+    // const api = 'https://www.appcbl.lat/s/vHU6wxhS396wxhS39wxhS39/api/users/';
+    // const productApi = 'https://www.appcbl.lat/s/vHU6wxhS396wxhS39wxhS39/api/products';
 
     function randInt(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -24,18 +24,14 @@
             }, s * 1000);
         })
     }
-    document.addEventListener('contextmenu', e => {
-        console.log(e);
-        ; e.preventDefault()
-    })
 
     async function setProxy(proxy) {
         // PAC script with embedded credentials (may not work in all cases)
-        let proxyArray = proxy.split("://")
+        // let proxyArray = proxy.split("://") 
         const pacScript = `
     function FindProxyForURL(url, host) {
       // Try SOCKS5 with authentication embedded
-      return "${proxyArray[0].toUpperCase()} ${proxyArray[1]}; DIRECT";
+      return "SOCKS5 127.0.0.1:1080; DIRECT";
     }
   `;
 
@@ -115,23 +111,23 @@
     })
 
 
-    // const windowTrackKey = "windowTrackList"
-    // chrome.windows.onRemoved.addListener(async (windowId) => {
-    //     let token = await get('token');
-    //     let trackedList = (await chrome.storage.local.get(windowTrackKey))[windowTrackKey] || [];
-    //     let newList = []
-    //     for (const list of trackedList) {
+    const windowTrackKey = "windowTrackList"
+    chrome.windows.onRemoved.addListener(async (windowId) => {
+        let token = await get('token');
+        let trackedList = (await chrome.storage.local.get(windowTrackKey))[windowTrackKey] || [];
+        let newList = []
+        for (const list of trackedList) {
 
-    //         if (list[windowId]) {
-    //             await fetch(productApi + '/activitystatus/minus', { method: "POST", body: JSON.stringify({ id: list[windowId] }), headers: { "content-type": "application/json", Authorization: "Bearer: " + token } })
-    //             continue
-    //         }
-    //         newList.push(list);
+            if (list[windowId]) {
+                await fetch(productApi + '/activitystatus/minus', { method: "POST", body: JSON.stringify({ id: list[windowId] }), headers: { "content-type": "application/json", Authorization: "Bearer: " + token } })
+                continue
+            }
+            newList.push(list);
 
-    //     }
-    //     await chrome.storage.local.set({ [windowTrackKey]: newList });
+        }
+        await chrome.storage.local.set({ [windowTrackKey]: newList });
 
-    // });
+    });
 
 
     let token = await get('token');
