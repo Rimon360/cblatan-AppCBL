@@ -1,3 +1,6 @@
+process.on('uncaughtException', err => console.error(err));
+process.on('unhandledRejection', err => console.error(err));
+
 require("dotenv").config()
 const express = require("express")
 const userRoutes = require("./routes/userRoutes")
@@ -5,6 +8,7 @@ const browserRoute = require("./routes/browserRoute")
 const whiteList = require("./routes/whiteList")
 const ipBlacklist = require("./routes/ipBlacklist")
 const blacklistRoute = require("./routes/blacklistRoute")
+const emailRoute = require("./routes/emailRoute")
 const shopRoutes = require("./routes/shopRoutes")
 const productRoutes = require("./routes/productRoutes")
 const mongoose = require("mongoose")
@@ -14,7 +18,7 @@ const app = express()
 const verifyToken = require("./middlewares/verifyToken")
 const helmet = require("helmet")
 const port = process.env.PORT || 8000
-const routeVersion = process.env.ROUTE_VERSION || 'vHU6wxhS396wxhS39wxhS39'
+const routeVersion = process.env.ROUTE_VERSION || "vHU6wxhS396wxhS39wxhS39"
 const path = require("path")
 app.use(cors()) // Allow all origins, adjust as needed
 app.use(helmet()) // for security headers
@@ -26,8 +30,9 @@ const blockedIpModel = require("./models/blockedIpModel")
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 min
-  max: 1000, // limit each IP
+  max: 500, // limit each IP
 })
+app.use(express.json({ limit: "300mb", strict: true }))
 
 app.use(limiter)
 
@@ -63,6 +68,7 @@ app.use("/" + routeVersion + "/api/whitelist", whiteList)
 app.use("/" + routeVersion + "/api/ipblacklist", ipBlacklist)
 app.use("/" + routeVersion + "/api/browser", browserRoute)
 app.use("/" + routeVersion + "/api/blacklist", blacklistRoute)
+app.use("/" + routeVersion + "/api/email", emailRoute)
 app.use((req, res) => {
   console.log("404 for:", req.originalUrl)
   res.status(404).json({ error: true, message: "Technical Error!. Please try again later!", d: req.protocol + "://" + req.get("host") + req.originalUrl })

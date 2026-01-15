@@ -25,6 +25,7 @@ import { CiBullhorn } from "react-icons/ci"
 import { MdBlock } from "react-icons/md"
 import History from "./History.jsx"
 import BlockedIps from "./BlockedIps.jsx"
+import EmailActivity from "./EmailActivity.jsx"
 
 function Dashboard() {
   const nav = useNavigate()
@@ -101,6 +102,11 @@ function Dashboard() {
                 <FiUserX /> Suspecious User
               </NavLink>
             </li>
+            <li>
+              <NavLink to={"/dashboard/email_activity"} className={({ isActive }) => (isActive ? "text-white bg-gray-950" : "")}>
+                <FiUserX /> Email Activity
+              </NavLink>
+            </li>
           </ul>
           <button onClick={logout} className="w-full flex items-center gap-2 mt-4 py-2 px-4 text-red-500 bg-red-900/30 font-semibold rounded-lg hover:bg-red-500/50 hover:text-white">
             Cerrar <FiLogOut />
@@ -124,6 +130,7 @@ function Dashboard() {
           <Route path="/blockedip" element={<BlockedIps />} />
           <Route path="/shops/:shop_id" element={<Shops />} />
           <Route path="/assign-product/:id" element={<Assign_shop />} />
+          <Route path="/email_activity" element={<EmailActivity />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </section>

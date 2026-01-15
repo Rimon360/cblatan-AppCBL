@@ -8,6 +8,7 @@ import { getPasswordData } from "../routes/Url"
 import { IoIosLogOut } from "react-icons/io"
 import { getToken, removeToken, handleWebsiteLogin, decrypt } from "../funcitons"
 import { toast } from "react-hot-toast"
+import AdsComponent from "./adsComponent"
 
 const Dashboard = () => {
   const refreshActivityPeriodInSecond = 30
@@ -106,6 +107,7 @@ const Dashboard = () => {
   }
   return (
     <div className="min-h-screen flex justify-center   bg-radial from-gray-900 to-gray-950 to-90%">
+      {<AdsComponent />}
       <div className=" bg-gray-700 max-w-[1336px] rounded-lg min-w-[400px]">
         {warning ? <p className="text-center p-2 w-full bg-yellow-300 text-black">{warning}</p> : ""}
         {user?.expiration?.hours > 72 ? (
