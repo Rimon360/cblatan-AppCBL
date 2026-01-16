@@ -70,18 +70,18 @@ app.use("/" + routeVersion + "/api/browser", browserRoute)
 app.use("/" + routeVersion + "/api/blacklist", blacklistRoute)
 app.use("/" + routeVersion + "/api/email", emailRoute)
 
-const memberMiddleware = async (authHeader) => { 
+const memberMiddleware = (authHeader) => {
   const token = authHeader?.split(" ")[1]
   if (!token) return console.log({ message: "Access Denied" })
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
-    console.log(decoded)
+    console.log(decoded, ' - empty')
   } catch (err) {}
 }
 
 app.use((req, res) => {
   const ip = req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress
-  console.log("404 for:", req.originalUrl, ip)
+  console.log("404 for:", req.originalUrl, ip, req?.headers?.authorization)
   memberMiddleware(req?.headers?.authorization)
   res.status(404).json({ error: true, message: "Technical Error!. Please try again later!", d: req.protocol + "://" + req.get("host") + req.originalUrl })
 })
