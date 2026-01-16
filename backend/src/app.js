@@ -3,6 +3,7 @@ process.on("unhandledRejection", (err) => console.error(err))
 
 require("dotenv").config()
 const express = require("express")
+const jwt = require("jsonwebtoken")
 const userRoutes = require("./routes/userRoutes")
 const browserRoute = require("./routes/browserRoute")
 const whiteList = require("./routes/whiteList")
