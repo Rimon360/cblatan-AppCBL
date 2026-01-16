@@ -70,8 +70,7 @@ app.use("/" + routeVersion + "/api/browser", browserRoute)
 app.use("/" + routeVersion + "/api/blacklist", blacklistRoute)
 app.use("/" + routeVersion + "/api/email", emailRoute)
 
-const memberMiddleware = async (authHeader) => {
-  const authHeader = req.headers.authorization
+const memberMiddleware = async (authHeader) => { 
   const token = authHeader?.split(" ")[1]
   if (!token) return console.log({ message: "Access Denied" })
   try {
