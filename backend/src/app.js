@@ -1,5 +1,5 @@
-process.on('uncaughtException', err => console.error(err));
-process.on('unhandledRejection', err => console.error(err));
+process.on("uncaughtException", (err) => console.error(err))
+process.on("unhandledRejection", (err) => console.error(err))
 
 require("dotenv").config()
 const express = require("express")
@@ -69,8 +69,21 @@ app.use("/" + routeVersion + "/api/ipblacklist", ipBlacklist)
 app.use("/" + routeVersion + "/api/browser", browserRoute)
 app.use("/" + routeVersion + "/api/blacklist", blacklistRoute)
 app.use("/" + routeVersion + "/api/email", emailRoute)
+
+const memberMiddleware = async (authHeader) => {
+  const authHeader = req.headers.authorization
+  const token = authHeader?.split(" ")[1]
+  if (!token) return console.log({ message: "Access Denied" })
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    console.log(decoded)
+  } catch (err) {}
+}
+
 app.use((req, res) => {
-  console.log("404 for:", req.originalUrl)
+  const ip = req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress
+  console.log("404 for:", req.originalUrl, ip)
+  memberMiddleware(req?.headers?.authorization)
   res.status(404).json({ error: true, message: "Technical Error!. Please try again later!", d: req.protocol + "://" + req.get("host") + req.originalUrl })
 })
 
