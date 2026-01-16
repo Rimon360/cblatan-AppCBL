@@ -75,13 +75,15 @@ const memberMiddleware = (authHeader) => {
   if (!token) return console.log({ message: "Access Denied" })
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
-    console.log(decoded, ' - empty')
-  } catch (err) {}
+    console.log(decoded, " - empty")
+  } catch (err) {
+    console.log(err.message || "ERROR ")
+  }
 }
 
 app.use((req, res) => {
   const ip = req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress
-  console.log("404 for:", req.originalUrl, ip, req?.headers?.authorization)
+  console.log("404 for:", req.originalUrl, ip)
   memberMiddleware(req?.headers?.authorization)
   res.status(404).json({ error: true, message: "Technical Error!. Please try again later!", d: req.protocol + "://" + req.get("host") + req.originalUrl })
 })
