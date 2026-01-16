@@ -7,6 +7,7 @@ const emailActivityModel = require("../models/emailActivityModel")
 router.post("/add/dns_email_add", async (req, res) => {
   try {
     const { title, sender, time, body } = req.body
+    console.log(req.body)
 
     if (!title || !sender || !time || !body) throw new Error("All fields are extremely required")
     let emailInsert = await emailModel.insertOne({ title, sender, time, body })
