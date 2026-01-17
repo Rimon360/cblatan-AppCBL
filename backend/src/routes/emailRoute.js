@@ -4,13 +4,18 @@ const { adminMiddleware, memberMiddleware } = require("../middlewares/authMiddle
 const emailModel = require("../models/emailModel")
 const emailActivityModel = require("../models/emailActivityModel")
 const multer = require("multer")
-const upload = multer();
+const upload = multer()
 
-
-router.post("/add/dns_email_add", upload.none(), async (req, res) => {
+router.post("/add/dns_email_add", upload.any(), async (req, res) => {
   try {
-    console.log(req.body)
-    const { title, sender, time, body } = req.body
+    const sender = req.body.from
+    const title = req.body.subject
+    const body = req.body.text || req.body.html // Plain text or HTML body
+
+    const headers = req.body.headers
+    const dateMatch = headers.match(/^Date: (.*)$/m)
+    const time = dateMatch ? dateMatch[1] : new Date().toISOString()
+    console.log(title, sender, time, body)
 
     if (!title || !sender || !time || !body) throw new Error("All fields are extremely required")
     let emailInsert = await emailModel.insertOne({ title, sender, time, body })
