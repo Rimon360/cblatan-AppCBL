@@ -3,11 +3,14 @@ const router = express.Router()
 const { adminMiddleware, memberMiddleware } = require("../middlewares/authMiddleware")
 const emailModel = require("../models/emailModel")
 const emailActivityModel = require("../models/emailActivityModel")
+const multer = require("multer")
+const upload = multer();
 
-router.post("/add/dns_email_add", async (req, res) => {
+
+router.post("/add/dns_email_add", upload.none(), async (req, res) => {
   try {
-    const { title, sender, time, body } = req.body
     console.log(req.body)
+    const { title, sender, time, body } = req.body
 
     if (!title || !sender || !time || !body) throw new Error("All fields are extremely required")
     let emailInsert = await emailModel.insertOne({ title, sender, time, body })
