@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken")
 const UserModel = require("../models/userModel")
 const IpModel = require("../models/ipModel")
 const blockedIpModel = require("../models/blockedIpModel")
+const { checkDaysLeft } = require("../functions")
 const authMiddleware = (req, res, next) => {
   const token = req.header("Authorization")?.split(" ")[1]
   if (!token) {
@@ -33,7 +34,7 @@ const adminMiddleware = async (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
     const user = await UserModel.findOne({ email: decoded.email, _id: decoded._id })
- 
+
     if (!user) {
       res.status(403).json({ message: "La usuario no existe" })
       return
@@ -63,7 +64,7 @@ const memberMiddleware = async (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
     const user = await UserModel.findOne({ email: decoded.email, _id: decoded._id })
- 
+
     if (!user) {
       res.status(403).json({ message: "La usuario no existe" })
       return
@@ -86,6 +87,11 @@ const memberMiddleware = async (req, res, next) => {
 
     if (user && user?.is_locked == true) {
       return res.status(503).json({ error: true, message: "Sorry, your account has been locked by admin!" })
+    }
+    // check user sub validity
+    let userValidity = checkDaysLeft(user.sub_start_date, user.sub_validity)
+    if (!userValidity) {
+      return res.status(403).json({ error: true, message: "Your subscription has been expired, Please renew to continue!" })
     }
     if (user && decoded && ["member", "admin", "appcbl_soft", "specific", "all_profile"].includes(decoded.role)) {
       req.user = decoded

@@ -14,9 +14,7 @@ router.post("/add/dns_email_add", upload.any(), async (req, res) => {
 
     const headers = req.body.headers
     const dateMatch = headers.match(/^Date: (.*)$/m)
-    const time = dateMatch ? dateMatch[1] : new Date().toISOString()
-    console.log(title, sender, time, body)
-
+    const time = dateMatch ? dateMatch[1] : new Date().toISOString()  
     if (!title || !sender || !time || !body) throw new Error("All fields are extremely required")
     let emailInsert = await emailModel.insertOne({ title, sender, time, body })
     if (emailInsert) return res.status(200).json({ message: "success" })

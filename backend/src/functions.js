@@ -33,6 +33,20 @@ function checkValidity(startDateStr, validityDays) {
   let seconds = Math.ceil(diffTime / 1000)
   return { days, seconds, hours }
 }
+function checkDaysLeft(startDateStr, validityDays) {
+  const [y, m, d] = startDateStr.split("-").map(Number)
+  const startDate = new Date(y, m - 1, d)
+  if (isNaN(startDate) || isNaN(validityDays)) return 0
+
+  const now = new Date()
+  const expiryDate = new Date(startDate.getTime() + validityDays * 24 * 60 * 60 * 1000)
+
+  const diffTime = expiryDate - now
+  if (diffTime <= 0) return 0
+
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+}
+
 function uniqueString() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2)
 }
@@ -41,4 +55,4 @@ function getRandomInRange(min, max) {
   max = Math.floor(max)
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
-module.exports = { encrypt, decrypt, checkValidity, uniqueString, getRandomInRange }
+module.exports = { encrypt, decrypt, checkValidity, checkDaysLeft, uniqueString, getRandomInRange }

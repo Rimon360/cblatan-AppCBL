@@ -40,17 +40,21 @@ const Dashboard = () => {
           nav("/login")
           return
         }
-        let res = await fetch(getPasswordData + "/" + user._id, { method: "GET", headers: { Authorization: `Bearer ` + token } })
-        if (res.status === 200) {
-          res = await res.json()
-          let decryptedData = JSON.parse(await decrypt(res.products))
-          setPasswordData(decryptedData)
-          setReservedCourses(decryptedData)
-          if (courseSearchQuery) {
-            handleCourseSearch(courseSearchQuery)
+        try {
+          let res = await fetch(getPasswordData + "/" + user._id, { method: "GET", headers: { Authorization: `Bearer ` + token } }).catch((err) => toast.error(err.message))
+          if (res.status === 200) {
+            res = await res.json()
+            let decryptedData = JSON.parse(await decrypt(res.products))
+            setPasswordData(decryptedData)
+            setReservedCourses(decryptedData)
+            if (courseSearchQuery) {
+              handleCourseSearch(courseSearchQuery)
+            }
+          } else if (res?.data?.error) {
+            toast.error(res?.data?.message)
           }
-        } else if (res?.data?.error) {
-          toast.error(res?.data?.message)
+        } catch (error) {
+          toast.error(error?.response?.data.message || error?.response?.data || error?.message || "La sesión ha expirado. Por favor, vuelve a iniciar sesión.")
         }
       } catch (error) {
         toast.error(error?.response?.data.message || error?.response?.data || error?.message || "La sesión ha expirado. Por favor, vuelve a iniciar sesión.")
