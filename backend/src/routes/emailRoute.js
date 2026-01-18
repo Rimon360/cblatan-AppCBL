@@ -14,8 +14,7 @@ router.post("/add/dns_email_add", upload.any(), async (req, res) => {
 
     // const headers = req.body.headers
     // const dateMatch = headers.match(/^Date: (.*)$/m)
-    // const time = dateMatch ? dateMatch[1] : new Date().toISOString()
-    console.log(req.body)
+    // const time = dateMatch ? dateMatch[1] : new Date().toISOString() 
 
     const raw = req.body.email // full raw MIME
 
