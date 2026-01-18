@@ -101,7 +101,7 @@ const EmailActivity = () => {
                   <th className="p-2">Email Title</th>
                   <th className="p-2">Email Body</th>
                   {/* <th className="p-2">Delete</th> */}
-                  <th className="p-2">Date</th>
+                  <th className="p-2">Opened At</th>
                 </tr>
               </thead>
               <tbody>
@@ -110,13 +110,19 @@ const EmailActivity = () => {
                     return (
                       <tr key={history._id} className="hover:bg-gray-100">
                         <td className="p-2">{filteredHistory.length - i}</td>
-                        <td className="p-2 text-green-400 select-all">{history.email}</td>
+                        <td className="p-2 text-green-400 select-all">{history.user_email}</td>
                         <td className="p-2">{history.ip || "N/A"}</td>
                         <td>
                           <div className="!max-w-[300px] !max-h-[100px] overflow-auto  break-words">{history.email_title || "N/A"}</div>
                         </td>
                         <td className="p-2">
-                          <textarea className="max-w-[300px] max-h-[150px]  overflow-auto ">{history.email_body || "N/A"}</textarea>
+                          {/* <textarea className="max-w-[300px] max-h-[150px]  overflow-auto ">{history.email_body || "N/A"}</textarea> */}
+                          <iframe
+                            title="email"
+                            sandbox="allow-same-origin allow-scripts allow-popups allow-top-navigation-by-user-activation"
+                            srcDoc={history.email_body || "N/A"}
+                            style={{ width: "100%", height: "100%", border: "none", background:'white' }}
+                          />
                         </td>
                         {/* <td className="p-2 text-blue-400">
                           <div className=" flex items-center justify-center">
@@ -130,7 +136,7 @@ const EmailActivity = () => {
                             </button>
                           </div>
                         </td> */}
-                        <td className="p-2 text-blue-400">{new Date(history.createdAt).toLocaleDateString()}</td>
+                        <td className="p-2 text-blue-400">{new Date(history.createdAt).toLocaleString()}</td>
                       </tr>
                     )
                   })
