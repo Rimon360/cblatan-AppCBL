@@ -145,10 +145,10 @@ const Dashboard = () => {
               <div className="p-4 flex justify-between gap-4  items-center">
                 <h2 className="text-2xl flex items-center font-bold text-gray-300 mb-4">Welcome, {user?.email || "User"}!</h2>
                 <button
-                  onClick={() => handleWebsiteLogin('https://email.appcbl.lat/email', codeHere.e, codeHere.k, codeHere.proxy, codeHere.id)}
+                  onClick={() => handleWebsiteLogin("https://email.appcbl.lat/email", codeHere.e, codeHere.k, codeHere.proxy, codeHere.id)}
                   className="text-white !text-[18px] w-[200px] !bg-black flex justify-center items-center gap-2"
                 >
-                  Code here <MdOpenInNew className="flex justify-center items-center" />
+                  CODIGOS AQUI <MdOpenInNew className="flex justify-center items-center" />
                 </button>
               </div>
               <hr />

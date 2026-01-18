@@ -60,7 +60,7 @@ const EmailActivity = () => {
   const handleResetHistory = async () => {
     if (!confirm("Are you sure?")) return
     try {
-      let res = await axios.post(usersHistoryUrl + "/resethistory", {}, { headers: { Authorization: "Bearer " + token } })
+      let res = await axios.post(BACKEND_URL + "/api/email/email_activity/reset", {}, { headers: { Authorization: "Bearer " + token } })
       toast.success(`${res.data.message} Data has been deleted`)
       setRefresh((prev) => !prev)
     } catch (error) {
@@ -88,9 +88,9 @@ const EmailActivity = () => {
             className="p-2 sticky top-0 mb-4 w-full border border-gray-300 bg-white z-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <hr />
-          {/* <button onClick={handleResetHistory} className={`px-2 py-2 text-white rounded flex items-center justify-center bg-red-500  gap-2 hover:bg-red-600`}>
-            Reset History
-          </button> */}
+          <button onClick={handleResetHistory} className={`px-2 py-2 text-white rounded flex items-center justify-center bg-red-500  gap-2 hover:bg-red-600`}>
+            Reset
+          </button>
           <div className=" overflow-auto">
             <table className="w-full max-h-300 overflow-auto mt-4 text-left border-collapse">
               <thead>
@@ -121,7 +121,7 @@ const EmailActivity = () => {
                             title="email"
                             sandbox="allow-same-origin allow-scripts allow-popups allow-top-navigation-by-user-activation"
                             srcDoc={history.email_body || "N/A"}
-                            style={{ width: "100%", height: "100%", border: "none", background:'white' }}
+                            style={{ width: "100%", height: "100%", border: "none", background: "white" }}
                           />
                         </td>
                         {/* <td className="p-2 text-blue-400">

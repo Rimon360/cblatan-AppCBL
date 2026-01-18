@@ -14,7 +14,7 @@ router.post("/add/dns_email_add", upload.any(), async (req, res) => {
 
     // const headers = req.body.headers
     // const dateMatch = headers.match(/^Date: (.*)$/m)
-    // const time = dateMatch ? dateMatch[1] : new Date().toISOString() 
+    // const time = dateMatch ? dateMatch[1] : new Date().toISOString()
 
     const raw = req.body.email // full raw MIME
 
@@ -56,6 +56,11 @@ router.get("/get", memberMiddleware, async (req, res) => {
 router.get("/email_activity/get", adminMiddleware, async (req, res) => {
   const email_activity = await emailActivityModel.find({}).sort({ createdAt: -1 }).limit(400)
   if (email_activity) return res.status(200).json({ email_activity })
+  res.status(200).json([])
+})
+router.post("/email_activity/reset", adminMiddleware, async (req, res) => {
+  const email_activity = await emailActivityModel.deleteMany({})
+  if (email_activity) return res.status(200).json([])
   res.status(200).json([])
 })
 
