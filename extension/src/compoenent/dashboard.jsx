@@ -9,6 +9,7 @@ import { IoIosLogOut } from "react-icons/io"
 import { getToken, removeToken, handleWebsiteLogin, decrypt } from "../funcitons"
 import { toast } from "react-hot-toast"
 import AdsComponent from "./adsComponent"
+import { MdOpenInNew } from "react-icons/md"
 
 const Dashboard = () => {
   const refreshActivityPeriodInSecond = 30
@@ -45,6 +46,11 @@ const Dashboard = () => {
           if (res.status === 200) {
             res = await res.json()
             let decryptedData = JSON.parse(await decrypt(res.products))
+            decryptedData.forEach((p) => {
+              if (p.d.includes("email.appcbl.lat")) {
+                setCodeHere({ d: p.d, e: p.e, k: p.k, proxy: p.proxy, id: p.id })
+              }
+            })
             setPasswordData(decryptedData)
             setReservedCourses(decryptedData)
             if (courseSearchQuery) {
@@ -109,6 +115,7 @@ const Dashboard = () => {
     const t = new Date(time).toLocaleString("en-US", { timeZone })
     return `${t}  `
   }
+  const [codeHere, setCodeHere] = useState({})
   return (
     <div className="min-h-screen flex justify-center   bg-radial from-gray-900 to-gray-950 to-90%">
       {<AdsComponent />}
@@ -135,8 +142,14 @@ const Dashboard = () => {
             </header>
 
             <div className="bg-gray-900 min-h-fit m-1 rounded-lg ">
-              <div className="p-4 flex justify-between">
-                <h2 className="text-2xl font-bold text-gray-300 mb-4">Welcome, {user?.email || "User"}!</h2>
+              <div className="p-4 flex justify-between gap-4  items-center">
+                <h2 className="text-2xl flex items-center font-bold text-gray-300 mb-4">Welcome, {user?.email || "User"}!</h2>
+                <button
+                  onClick={() => handleWebsiteLogin('https://email.appcbl.lat/email', codeHere.e, codeHere.k, codeHere.proxy, codeHere.id)}
+                  className="text-white !text-[18px] w-[200px] !bg-black flex justify-center items-center gap-2"
+                >
+                  Code here <MdOpenInNew className="flex justify-center items-center" />
+                </button>
               </div>
               <hr />
               <div>

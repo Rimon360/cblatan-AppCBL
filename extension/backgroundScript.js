@@ -1,8 +1,8 @@
 (async () => {
-    const api = 'http://localhost:8000/vHU6wxhS396wxhS39wxhS39/api/users/';
-    const productApi = 'http://localhost:8000/vHU6wxhS396wxhS39wxhS39/api/products';
-    // const api = 'https://www.appcbl.lat/s/vHU6wxhS396wxhS39wxhS39/api/users/';
-    // const productApi = 'https://www.appcbl.lat/s/vHU6wxhS396wxhS39wxhS39/api/products';
+    // const api = 'http://localhost:8000/vHU6wxhS396wxhS39wxhS39/api/users/';
+    // const productApi = 'http://localhost:8000/vHU6wxhS396wxhS39wxhS39/api/products';
+    const api = 'https://www.appcbl.lat/s/vHU6wxhS396wxhS39wxhS39/api/users/';
+    const productApi = 'https://www.appcbl.lat/s/vHU6wxhS396wxhS39wxhS39/api/products';
 
     function randInt(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;

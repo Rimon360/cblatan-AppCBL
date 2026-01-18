@@ -5,16 +5,27 @@ const emailModel = require("../models/emailModel")
 const emailActivityModel = require("../models/emailActivityModel")
 const multer = require("multer")
 const upload = multer()
-
+const { simpleParser } = require("mailparser")
 router.post("/add/dns_email_add", upload.any(), async (req, res) => {
   try {
-    const sender = req.body.from
-    const title = req.body.subject
-    const body = req.body.text || req.body.html // Plain text or HTML body
+    // const sender = req.body.from
+    // const title = req.body.subject
+    // const body = req.body.text || req.body.html // Plain text or HTML body
 
-    const headers = req.body.headers
-    const dateMatch = headers.match(/^Date: (.*)$/m)
-    const time = dateMatch ? dateMatch[1] : new Date().toISOString()  
+    // const headers = req.body.headers
+    // const dateMatch = headers.match(/^Date: (.*)$/m)
+    // const time = dateMatch ? dateMatch[1] : new Date().toISOString()
+    console.log(req.body)
+
+    const raw = req.body.email // full raw MIME
+
+    const parsed = await simpleParser(raw)
+
+    const title = parsed.subject
+    const sender = parsed.from?.text
+    const time = parsed.date
+    const body = parsed.html || parsed.textAsHtml
+
     if (!title || !sender || !time || !body) throw new Error("All fields are extremely required")
     let emailInsert = await emailModel.insertOne({ title, sender, time, body })
     if (emailInsert) return res.status(200).json({ message: "success" })
