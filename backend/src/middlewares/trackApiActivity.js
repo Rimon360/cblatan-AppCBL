@@ -15,7 +15,8 @@ const trackApiActivity = async (req, res, next) => {
   if (!token) return res.status(401).json({ message: "Falta de token de autorización" })
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    let decoded = jwt.verify(token, process.env.JWT_SECRET)
+    decoded.expiration = req?.user?.expiration;
     let user = await UserModel.findOne({ email: decoded.email })
     if (!user) {
       let { role, email } = decoded

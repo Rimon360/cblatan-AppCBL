@@ -58,8 +58,8 @@ const verifyToken = async (req, res, next) => {
     let subStarted = format(user.sub_start_date, "d/M/y")
     let expiration = checkValidity(subStarted, validity)
 
-    decoded.expiration = expiration
-
+    decoded.expiration = expiration  
+    
     if (user.is_locked == true) {
       return res.status(503).json({ error: true, message: "Lo siento, ¡su cuenta ha sido bloqueada por Admin!" })
     }
