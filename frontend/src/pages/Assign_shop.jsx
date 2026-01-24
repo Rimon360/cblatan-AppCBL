@@ -49,7 +49,7 @@ const Assign_shop = () => {
   }
 
   const getShops = async () => {
-    if (current_user.role !== "admin") return
+    if (!["admin", "manager"].includes(current_user.role)) return
     axios
       .get(shopsURL, { headers: { Authorization: "Bearer " + token } })
       .then((res) => {
@@ -63,8 +63,8 @@ const Assign_shop = () => {
             let tmp = tmpShops.map((shop) => {
               const match = assignedShops.find((e) => e.shop_id === shop._id) // Convert shop._id to string if necessary
               const isAssigned = !!match
-              return { ...shop, isAssigned, checked: match?.checked, expires: match?.expires||'' }
-            })  
+              return { ...shop, isAssigned, checked: match?.checked, expires: match?.expires || "" }
+            })
             setShops(tmp)
           })
       })
@@ -131,7 +131,7 @@ const Assign_shop = () => {
       .filter((shop) => {
         if (shop.isAssigned) return shop._id
       })
-      .map((shop) => shop._id) 
+      .map((shop) => shop._id)
 
     setAssingedShops(getAssignedId)
     setIsAssignedAll(getAssignedId.length > 0)
@@ -196,7 +196,7 @@ const Assign_shop = () => {
         <div>
           <input type="search" value={shopSearch} onInput={(e) => handleShopSearch(e.target.value)} placeholder="Search shop" />
         </div>
-        <br />
+        <br /> 
         <div className="flex justify-between">
           <button
             onClick={() => handleAssigningAll(shops)}
@@ -207,13 +207,14 @@ const Assign_shop = () => {
             {isAssignedAll ? "Unassign all group" : "Assign all group"} <BsArrowRight className="inline" />
           </button>
         </div>
+        <p className="mb-2 w-fit text-center text-yellow-300/50 px-2 rounded-md">Nota: La inercia de fecha solo funciona para asignaciones individuales.</p> 
         <div className="shop-container  mb-6">
-          <ul className="max-h-300 overflow-auto shadow rounded  p-2">
+          <ul className="max-h-300 overflow-auto shadow rounded mt-2">
             {filteredShops && filteredShops.length > 0 ? (
               filteredShops.map((shop, i) => (
                 <li
                   key={shop._id}
-                  className={`flex justify-between bg-gray-950/40 hover:bg-gray-900/50 mb-1 pl-4 items-center p-[4px]  border-dotted rounded-lg ${
+                  className={`flex justify-between bg-gray-950/40 hover:bg-gray-900/50 mb-1  items-center px-4  border-dotted rounded-lg ${
                     selectedShopId == shop._id ? "text-green-300 hover:text-green-400" : "text-black-400 "
                   }`}
                 >
@@ -224,7 +225,7 @@ const Assign_shop = () => {
                   <div className="flex gap-2 items-center">
                     <p className="flex justify-between items-center  gap-1">
                       <input type="checkbox" checked={shop?.checked || false} onChange={(e) => handleGroupCheckbox(e, shop)} />
-                      <input   value={shop.expires} type="date" disabled={shop?.checked ? false : true} onChange={(e) => handleGroupExpireDate(e, shop)} />
+                      <input value={shop.expires} type="date" disabled={shop?.checked ? false : true} onChange={(e) => handleGroupExpireDate(e, shop)} />
                     </p>
                     <div className="w-[110px] flex justify-end ">
                       <button

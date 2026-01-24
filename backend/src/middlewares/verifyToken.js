@@ -17,19 +17,21 @@ const verifyToken = async (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
     let user = await UserModel.findOne({ email: decoded.email })
-    let proxeis = await productModel.distinct('proxy');
+    let proxeis = await productModel.distinct("proxy")
+
+    let isAlwaysAllowedUser = ["admin", "manager"].includes(user?.role?.trim())
 
     if (!user) {
       return res.status(404).json({ message: "User not exists" })
-    } 
+    }
 
-    if (user && (!user?.verified_ip?.includes(ip) && !proxeis.includes(ip))) {
-      // check if the incomming ip is verified by OTP or not to prevent unusual access 
+    if (user && !user?.verified_ip?.includes(ip) && !proxeis.includes(ip) && !isAlwaysAllowedUser) {
+      // check if the incomming ip is verified by OTP or not to prevent unusual access
       return res.status(200).json({ user: { verified: false, email: user.email } })
     }
 
     let isEmailVerified = user.email_verified
-    if (!isEmailVerified) {
+    if (!isEmailVerified && !isAlwaysAllowedUser) {
       return res.status(200).json({ user: { error: true, email: user.email, token, message: "Correo electrónico no verificado", email_verified: false } })
     }
     let ipHistory = !user.ip_address_history ? "" : user.ip_address_history

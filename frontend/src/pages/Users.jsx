@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { RiDeleteBin6Line } from "react-icons/ri"
 import { TiUserAdd } from "react-icons/ti"
 import axios from "../../axiosConfig"
-import { Navigate, Link } from "react-router-dom"
+import { useNavigate, Link } from "react-router-dom"
 import { registerURL, usersUrl, UserUpdateURL, profileGroupDataURL } from "../routes/Url"
 import { checkValidity } from "../functions"
 import toast from "react-hot-toast"
@@ -44,9 +44,10 @@ const Users = () => {
   const [profileGroup, setProfileGroup] = useState("")
   const [filteredUsers, setFilteredUsers] = useState([])
   const { current_user } = useGlobal()
+  const navigate = useNavigate()
   const token = localStorage.getItem("token")
   const role = current_user.role
-  if (role !== "admin") {
+  if (!["admin", "manager"].includes(role)) {
     return (
       <h1 className="text-center text-red-500 mt-20">
         You are not authorized to access this page
@@ -135,7 +136,7 @@ const Users = () => {
         subValidity,
         password,
         role: userrole,
-      })
+      },{headers:{"Authorization": "Bearer " + token}})
       .then((response) => {
         // --
         setIsUpdate(false)
@@ -170,8 +171,8 @@ const Users = () => {
           user?.email?.toLowerCase().includes(searchTerm.toLowerCase().trim()) ||
           user?.seq?.toString().includes(searchTerm.toLowerCase().trim()) ||
           user?.ip_address?.toLowerCase().includes(searchTerm.toLowerCase().trim()) ||
-          user?.ip_address_history?.toLowerCase().includes(searchTerm.toLowerCase().trim())
-      )
+          user?.ip_address_history?.toLowerCase().includes(searchTerm.toLowerCase().trim()),
+      ),
     )
   }, [users, searchTerm])
 
@@ -302,11 +303,23 @@ const Users = () => {
               <label className="flex flex-col justify-center  w-full">
                 Role:
                 <select className="px-4 w-full py-2   rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" value={userrole} onChange={(e) => setRole(e.target.value)}>
-                  <option value="mZw/EdNpH/RyHRg7UjfDTg==:u0vvoHU6wxhS39+VrCExow==">Acceso al software</option>
-                  <option value="XGqYIGIjFr0EOCThHwB1qg==:oKjsYJoIlUD3T3Iff6ty2g==">Admin</option>
-                  <option value="i64V1k5uSiNAT9mlf6uw+Q==:tSXIZwCmgdx4uGtMar/5Mg==">Member</option>
-                  <option value="bOGgWCp/WIwihlVRPZ48lQ==:Gl92lkJCn+XQXjCMPHpKlQ==">Specific</option>
-                  <option value="V8MQ7mhIuerDloDJoeMoww==:AP5hJdMN1xQHECS6M+Ep+w==">Todos los perfiles</option>
+                  {role === "admin" ? (
+                    <>
+                      <option value="mZw/EdNpH/RyHRg7UjfDTg==:u0vvoHU6wxhS39+VrCExow==">Acceso al software</option>
+                      <option value="610Td82HCr6fZSZatk7jxA==:pImxWt+zOzBK4qxpL80JvQ==">Manager</option>
+                      <option value="XGqYIGIjFr0EOCThHwB1qg==:oKjsYJoIlUD3T3Iff6ty2g==">Admin</option>
+                      <option value="i64V1k5uSiNAT9mlf6uw+Q==:tSXIZwCmgdx4uGtMar/5Mg==">Member</option>
+                      <option value="bOGgWCp/WIwihlVRPZ48lQ==:Gl92lkJCn+XQXjCMPHpKlQ==">Specific</option>
+                      <option value="V8MQ7mhIuerDloDJoeMoww==:AP5hJdMN1xQHECS6M+Ep+w==">Todos los perfiles</option>
+                    </>
+                  ) : (
+                    <>
+                      <option value="mZw/EdNpH/RyHRg7UjfDTg==:u0vvoHU6wxhS39+VrCExow==">Acceso al software</option>
+                      <option value="i64V1k5uSiNAT9mlf6uw+Q==:tSXIZwCmgdx4uGtMar/5Mg==">Member</option>
+                      <option value="bOGgWCp/WIwihlVRPZ48lQ==:Gl92lkJCn+XQXjCMPHpKlQ==">Specific</option>
+                      <option value="V8MQ7mhIuerDloDJoeMoww==:AP5hJdMN1xQHECS6M+Ep+w==">Todos los perfiles</option>
+                    </>
+                  )}
                 </select>
               </label>
               <label className="flex flex-col justify-center  w-full">
@@ -385,7 +398,7 @@ const Users = () => {
                   <th className="text-left">Days left</th>
                   <th className="text-left">Opening date</th>
                   <th className="text-left">Edit</th>
-                  <th className="text-left">Assign Password</th>
+                  <th className="text-left">Assign Tools</th>
                   <th className="text-left">Del</th>
                 </tr>
               </thead>

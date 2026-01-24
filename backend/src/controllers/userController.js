@@ -7,6 +7,7 @@ const { seq, getPeruTime, getPort, sendOtpEmail, isUrlSuspicious } = require("..
 const { decrypt } = require("../hash_functions.js")
 const BrowsingHistoryModel = require("../models/browsingHistoryModel")
 const blockedIpModel = require("../models/blockedIpModel.js")
+const userApiActivityModel = require("../models/userApiActivityModel.js")
 module.exports.registerUser = async (req, res) => {
   let {
     usagsLimit,
@@ -27,7 +28,13 @@ module.exports.registerUser = async (req, res) => {
     role,
     client,
   } = req.body
-
+  const authHeader = req.headers.authorization
+  let created_by = "own_or_admin"
+  if (authHeader) {
+    const token = authHeader?.split(" ")[1]
+    const user = jwt.verify(token, process.env.JWT_SECRET)
+    created_by = user.email
+  }
   if (password.length < 8) {
     return res.status(403).json({ message: "La longitud de la contraseña debe ser >= 8" })
   }
@@ -54,6 +61,7 @@ module.exports.registerUser = async (req, res) => {
   // create user
   const random = seq()
   const user = await UserModel.create({
+    created_by,
     seq: random,
     first_ip: ip,
     email,
@@ -102,7 +110,7 @@ module.exports.changePassword = async (req, res) => {
     { email },
     {
       password: hashedPassword,
-    }
+    },
   )
 
   if (updated.modifiedCount > 0) {
@@ -165,7 +173,7 @@ module.exports.updateUser = async (req, res) => {
         usags_limit: usagsLimit,
         role,
       },
-    }
+    },
   )
   if (user) {
     const { email, role, _id, createdAt, ip_address, seq } = user
@@ -324,14 +332,17 @@ const generateToken = (user) => {
     process.env.JWT_SECRET || "qieroiqrjo45Ooisadfgoioioia2403287LKFJdfklasdfl:asdlfkj",
     {
       expiresIn: "7d",
-    }
+    },
   )
 }
 
 exports.getUsers = async (req, res) => {
   const { isActivity } = req.params
   try {
-    let users = await UserModel.find().sort({ createdAt: -1 })
+    const { email, role } = req.user
+    let filterBy = {}
+    if (role === "manager") filterBy = { created_by: email }
+    let users = await UserModel.find(filterBy).sort({ createdAt: -1 })
     if (isActivity == "true") {
       users = await UserModel.find().sort({ last_ping_timestamp: -1 })
     }
@@ -444,4 +455,21 @@ exports.resetBrowserHistory = async (req, res) => {
   } catch (error) {
     res.status(400).json({ message: "Failed to delete" })
   }
+}
+exports.resetApiActivity = async (req, res) => {
+  try {
+    const history = await userApiActivityModel.deleteMany()
+    if (history.deletedCount) {
+      return res.status(200).json({ message: history.deletedCount })
+    } else {
+      return res.status(200).json({ message: history.deletedCount || 0 })
+    }
+  } catch (error) {
+    res.status(400).json({ message: "Failed to delete" })
+  }
+}
+exports.getApiActivity = async (req, res) => {
+  const api_activity = await userApiActivityModel.find({}).sort({ createdAt: -1 }).limit(300)
+
+  return res.status(200).json({ api_activity })
 }

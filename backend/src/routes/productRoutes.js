@@ -4,6 +4,7 @@ const { memberMiddleware, adminMiddleware, ipTrackMiddleware, validateFields } =
 const router = express.Router();
 const multer = require('multer');
 const path = require('path');
+const trackApiActivity = require("../middlewares/trackApiActivity");
 const storage = multer.diskStorage({
     destination: 'uploads/',
     filename: (_, file, cb) => cb(null, Date.now() + path.extname(file.originalname)),

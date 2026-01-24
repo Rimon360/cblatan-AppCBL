@@ -89,10 +89,11 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ["admin", "member", "appcbl_soft", "specific"],
+    enum: ["admin", "member", "appcbl_soft", "specific", "manager"],
     default: "member",
   },
   seq: { type: Number, default: 0 },
+  created_by: String,
   createdAt: {
     type: Number,
     default: Date.now,

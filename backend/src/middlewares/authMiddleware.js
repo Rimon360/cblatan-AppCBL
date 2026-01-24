@@ -44,7 +44,7 @@ const adminMiddleware = async (req, res, next) => {
     // if (!isEmailVerified) {
     //   return res.status(200).json({ user: { error: true, email: user.email, token, message: "Correo electrónico no verificado", email_verified: false } })
     // }
-    if (decoded && decoded.role === "admin") {
+    if (decoded && ["admin", "manager"].includes(decoded.role)) {
       req.user = decoded
       next()
     } else {
@@ -93,7 +93,7 @@ const memberMiddleware = async (req, res, next) => {
     if (!userValidity) {
       return res.status(403).json({ error: true, message: "Your subscription has been expired, Please renew to continue!" })
     }
-    if (user && decoded && ["member", "admin", "appcbl_soft", "specific", "all_profile"].includes(decoded.role)) {
+    if (user && decoded && ["member", "admin", "manager","appcbl_soft", "specific", "all_profile"].includes(decoded.role)) {
       req.user = decoded
       next()
     } else {

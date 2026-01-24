@@ -17,7 +17,9 @@ const {
   changePassword,
   getBrowserHistory,
   deleteBrowserHistory,
-  resetBrowserHistory
+  resetBrowserHistory,
+  getApiActivity,
+  resetApiActivity
 } = require("../controllers/userController")
 const { authMiddleware, adminMiddleware, memberMiddleware } = require("../middlewares/authMiddleware")
 const rateLimit = require("express-rate-limit")
@@ -35,6 +37,8 @@ const registerLimiter = rateLimit({
   message: "Too many register attempts, please try again after 24 hours.",
 })
 
+router.get("/get-api-activity", adminMiddleware, getApiActivity)
+router.post("/api_activity/reset", adminMiddleware, resetApiActivity)
 router.post("/register", registerLimiter, registerUser)
 router.post("/update", updateUser)
 router.post("/login", loginLimiter, loginUser)
@@ -42,7 +46,7 @@ router.post("/lock", adminMiddleware, lockUser)
 router.post("/ping", memberMiddleware, pingPong)
 router.post("/resetactivity", adminMiddleware, resetIpHistory)
 router.post("/rrrrresetfactivity45453643rFD6533FFd653", resetIpHistory)
-router.get("/:isActivity", memberMiddleware, getUsers)
+router.get("/:isActivity", adminMiddleware, getUsers) // was memberMiddleware
 router.get("/protected", authMiddleware, getProtectedData)
 router.delete("/:id", deleteUser)
 router.post("/dashboard", authMiddleware)

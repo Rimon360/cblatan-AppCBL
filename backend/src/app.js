@@ -28,6 +28,7 @@ app.set("trust proxy", "loopback")
 
 const rateLimit = require("express-rate-limit")
 const blockedIpModel = require("./models/blockedIpModel")
+const trackApiActivity = require("./middlewares/trackApiActivity")
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 min
@@ -58,7 +59,7 @@ app.use("/" + routeVersion + "/api", async (req, res, next) => {
 
 app.use("/" + routeVersion + "/api/users", userRoutes)
 app.use("/" + routeVersion + "/api/products", productRoutes)
-app.get("/" + routeVersion + "/api/verify-token", verifyToken, (req, res) => {
+app.get("/" + routeVersion + "/api/verify-token", verifyToken, trackApiActivity, (req, res) => {
   res.json({ message: "success", user: req.user })
 })
 app.use("/" + routeVersion + "/api/shops", shopRoutes)

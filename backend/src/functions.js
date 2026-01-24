@@ -55,4 +55,17 @@ function getRandomInRange(min, max) {
   max = Math.floor(max)
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
-module.exports = { encrypt, decrypt, checkValidity, checkDaysLeft, uniqueString, getRandomInRange }
+const peruTime = () => {
+  return new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/Lima",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  }).format(new Date())
+}
+
+module.exports = { encrypt, decrypt, checkValidity, checkDaysLeft, uniqueString, getRandomInRange, peruTime }

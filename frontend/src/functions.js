@@ -37,5 +37,16 @@ function checkValidity(startDateStr, validityDays) {
   const diffTime = expiryDate - now
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
 }
+function getRandomDarkTransparentColor() {
+  // Dark colors: RGB 0–100
+  const r = Math.floor(Math.random() * 100)
+  const g = Math.floor(Math.random() * 100)
+  const b = Math.floor(Math.random() * 100)
 
-export { decrypt, getDomain, isValidURL, checkValidity }
+  // Alpha 0.5–0.8 for transparency
+  const a = (Math.random() * 0.3 + 0.5).toFixed(2)
+
+  return `rgba(${r}, ${g}, ${b}, ${a})`
+}
+
+export { decrypt, getDomain, isValidURL, checkValidity, getRandomDarkTransparentColor }

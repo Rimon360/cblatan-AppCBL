@@ -3,19 +3,36 @@ import { useEffect, useState } from "react"
 import axios from "../../axiosConfig"
 import { useGlobal } from "../context/globalContext"
 import { getToken } from "../funcitons"
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000"
+const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000"
 
 const AdsComponent = () => {
-  const [adsVisibility, setAdsVisibility] = useState(true) 
+  const [adsVisibility, setAdsVisibility] = useState(true)
   const [adsUrl, setAdsUrl] = useState("")
   const { state } = useGlobal()
+  const [checkAds, setAdsCheck] = useState(Date.now())
+  let lastAdsShown = localStorage.getItem("adsShownTime")
+  if (!parseInt(lastAdsShown)) {
+    const currentTime = Math.ceil(Date.now() / 1000) - 3 * 60 * 60 * 1e4
+    lastAdsShown = currentTime
+  }
   useEffect(() => {
     ;(async () => {
+      const currentTime = Math.ceil(Date.now() / 1000)
+      if (currentTime - lastAdsShown < 3 * 60 * 60) return
       const token = await getToken()
       if (state && state.email_verified == false) return
-      let result = await axios.get(API_URL + "/vHU6wxhS396wxhS39wxhS39/api/browser/ads/get", { headers: { Authorization: "Bearer " + token } })
+      if (!token) return
+      setAdsVisibility(true)
+      localStorage.setItem("adsShownTime", currentTime) 
+      let result = await axios.get(API_URL + "/api/browser/ads/get", { headers: { Authorization: "Bearer " + token } })
       setAdsUrl(result.data.url)
     })()
+  }, [checkAds])
+
+  useEffect(() => {
+    setInterval(() => {
+      setAdsCheck(Date.now())
+    }, 5 * 1000)
   }, [])
   return (
     <>
