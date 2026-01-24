@@ -109,11 +109,10 @@ module.exports.assignShop = async (req, res) => {
   let tmpModel = assignModel
   if (role == "manager") tmpModel = assignRequestModel
 
-  const shop = await tmpModel.distinct("shop_id", { shop_id: { $in: shop_id } })
+  const shop = await tmpModel.distinct("shop_id", { shop_id: { $in: shop_id }, user_id })
 
   const toUser = await UserModel.findOne({ _id: user_id })
-  var countShop = false
-
+  let shops = []
   shop_id.forEach(async (id) => {
     if (!shop.includes(id)) {
       const random = seq()
@@ -137,13 +136,14 @@ module.exports.assignShop = async (req, res) => {
           expires,
         }
       }
-      await tmpModel.create(tmpDataHolder)
+      let s = await tmpModel.create(tmpDataHolder)
+      shops.push(s)
     }
   })
 
   let message = "Grupo asignado exitosamente"
   if (role == "manager") message = "Solicitud enviada para aprobación final"
-  res.status(200).json({ message, countShop })
+  res.status(200).json({ message, shops })
 }
 module.exports.unassignShop = async (req, res) => {
   const { shop_id, user_id } = req.body
@@ -224,7 +224,7 @@ module.exports.getAssignedRequestedShops = async (req, res) => {
 module.exports.approveAssignedRequestedShops = async (req, res) => {
   const { id } = req.body
 
-  const { shop_id, user_id, checked, expires } = await assignRequestModel.findOne({ _id: id }) 
+  const { shop_id, user_id, checked, expires } = await assignRequestModel.findOne({ _id: id })
 
   const shops = await assignModel.create({ shop_id, user_id, checked, expires })
   if (!shops) {
