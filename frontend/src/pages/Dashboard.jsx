@@ -25,7 +25,7 @@ import { CiBullhorn } from "react-icons/ci"
 import History from "./History.jsx"
 import BlockedIps from "./BlockedIps.jsx"
 import EmailActivity from "./EmailActivity.jsx"
-import ApiActivity from "./apiActivity.jsx"
+import ApiActivity from "./ApiActivity.jsx"
 import AssignRequest from "./AssignRequest.jsx"
 
 function Dashboard() {
