@@ -8,6 +8,7 @@ const { decrypt } = require("../hash_functions.js")
 const BrowsingHistoryModel = require("../models/browsingHistoryModel")
 const blockedIpModel = require("../models/blockedIpModel.js")
 const userApiActivityModel = require("../models/userApiActivityModel.js")
+const { assignModel, shopsModel } = require("../models/shopModel.js")
 module.exports.registerUser = async (req, res) => {
   let {
     usagsLimit,
@@ -347,6 +348,33 @@ exports.getUsers = async (req, res) => {
       users = await UserModel.find().sort({ last_ping_timestamp: -1 })
     }
     res.json(users)
+  } catch (err) {
+    res.status(500).json({ message: err.message })
+  }
+}
+exports.getUsersByOwner = async (req, res) => {
+  const { created_by } = req.params
+  try {
+    let users = await UserModel.find({ created_by }).sort({ createdAt: -1 })
+    res.json(users)
+  } catch (err) {
+    res.status(500).json({ message: err.message })
+  }
+}
+exports.getUsersCourseByUserId = async (req, res) => {
+  const { user_id } = req.params
+  try {
+    let course = await assignModel.distinct("shop_id", { user_id })
+    let shop = await shopsModel.find({ _id: { $in: course } }, { shop_name: 1 })
+    res.json(shop)
+  } catch (err) {
+    res.status(500).json({ message: err.message })
+  }
+}
+exports.getManagers = async (req, res) => {
+  try {
+    let managers = await UserModel.find({ role: "manager" }).sort({ createdAt: -1 })
+    res.json(managers)
   } catch (err) {
     res.status(500).json({ message: err.message })
   }

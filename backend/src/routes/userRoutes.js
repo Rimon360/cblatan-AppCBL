@@ -19,7 +19,10 @@ const {
   deleteBrowserHistory,
   resetBrowserHistory,
   getApiActivity,
-  resetApiActivity
+  resetApiActivity,
+  getManagers,
+  getUsersByOwner,
+  getUsersCourseByUserId,
 } = require("../controllers/userController")
 const { authMiddleware, adminMiddleware, memberMiddleware } = require("../middlewares/authMiddleware")
 const rateLimit = require("express-rate-limit")
@@ -28,7 +31,7 @@ const router = express.Router()
 // Example: stricter limiter for login route
 const loginLimiter = rateLimit({
   windowMs: 5 * 60 * 1000,
-  max: 10,
+  max: 100000,
   message: "Too many login attempts, please try again later.",
 })
 const registerLimiter = rateLimit({
@@ -40,6 +43,9 @@ const registerLimiter = rateLimit({
 router.get("/get-api-activity", adminMiddleware, getApiActivity)
 router.post("/api_activity/reset", adminMiddleware, resetApiActivity)
 router.post("/register", registerLimiter, registerUser)
+router.get("/manager/get", adminMiddleware, getManagers)
+router.get("/manager/users/:created_by", adminMiddleware, getUsersByOwner)
+router.get("/manager/course/:user_id", adminMiddleware, getUsersCourseByUserId)
 router.post("/update", updateUser)
 router.post("/login", loginLimiter, loginUser)
 router.post("/lock", adminMiddleware, lockUser)

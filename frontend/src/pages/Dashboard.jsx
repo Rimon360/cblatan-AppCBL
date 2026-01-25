@@ -27,6 +27,7 @@ import BlockedIps from "./BlockedIps.jsx"
 import EmailActivity from "./EmailActivity.jsx"
 import ApiActivity from "./ApiActivity.jsx"
 import AssignRequest from "./AssignRequest.jsx"
+import ManagerList from "./ManagerList.jsx"
 
 function Dashboard() {
   const nav = useNavigate()
@@ -54,6 +55,16 @@ function Dashboard() {
                 <NavLink to={"/dashboard/users"} end className={({ isActive }) => (isActive ? "text-white bg-gray-950" : "")}>
                   <FaRegUser />
                   Usuaria
+                </NavLink>
+              ) : (
+                <></>
+              )}
+            </li>
+            <li>
+              {["admin"].includes(role) ? (
+                <NavLink to={"/dashboard/managers"} end className={({ isActive }) => (isActive ? "text-white bg-gray-950" : "")}>
+                  <FaRegUser />
+                  Lista del gerente
                 </NavLink>
               ) : (
                 <></>
@@ -196,6 +207,7 @@ function Dashboard() {
               <Route path="/email_activity" element={<EmailActivity />} />
               <Route path="/api_activity" element={<ApiActivity />} />
               <Route path="/assign_request" element={<AssignRequest />} />
+              <Route path="/managers" element={<ManagerList />} />
             </>
           ) : (
             <>

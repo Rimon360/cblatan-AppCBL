@@ -29,8 +29,8 @@ const Dashboard = () => {
   useEffect(() => {
     ;(async () => {
       try {
-        let token = await getToken()
-
+        let token = await getToken() 
+        
         if (!user && !token) {
           removeToken()
           nav("/login")

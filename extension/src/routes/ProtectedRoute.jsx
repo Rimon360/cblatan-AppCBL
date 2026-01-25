@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react" 
+import { useEffect, useState } from "react"
 import axios from "../../axiosConfig"
-import { Navigate, useNavigate } from "react-router-dom" 
+import { Navigate, useNavigate } from "react-router-dom"
 import { useGlobal } from "../context/globalContext"
 import { toast } from "react-toastify"
 import { getToken, removeToken } from "../funcitons"
@@ -21,7 +21,7 @@ function ProtectedRoute({ children }) {
           let user = res.data.user
           if (user && user.email_verified) {
             res.data.user.token = token
-            if (!["appcbl_soft", "admin", "specific", "member", "all_profile"].includes(user.role)) {
+            if (!["appcbl_soft", "admin", "specific", "member", "all_profile", "manager"].includes(user.role)) {
               toast.error("¡Aún no tienes permiso para utilizar este software!")
               setVerified(-1)
               return
@@ -41,7 +41,7 @@ function ProtectedRoute({ children }) {
           }
         })
         .catch(async (e) => {
-          toast.error(e?.response?.data.message || e.message || "User verification failed!") 
+          toast.error(e?.response?.data.message || e.message || "User verification failed!")
           await removeToken()
           setVerified(-1)
         })
