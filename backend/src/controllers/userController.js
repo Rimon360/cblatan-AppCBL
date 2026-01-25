@@ -31,9 +31,11 @@ module.exports.registerUser = async (req, res) => {
   } = req.body
   const authHeader = req.headers.authorization
   let created_by = "own_or_admin"
+  let email_verified = false
   if (authHeader) {
     const token = authHeader?.split(" ")[1]
     const user = jwt.verify(token, process.env.JWT_SECRET)
+    if (user?.role == "admin") email_verified = true
     created_by = user.email
   }
   if (password.length < 8) {
@@ -62,6 +64,7 @@ module.exports.registerUser = async (req, res) => {
   // create user
   const random = seq()
   const user = await UserModel.create({
+    email_verified,
     created_by,
     seq: random,
     first_ip: ip,
