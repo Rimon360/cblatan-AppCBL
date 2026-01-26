@@ -84,7 +84,7 @@ module.exports.getBrowserProfile = async (req, res) => {
     const { user } = req;
     const role = user.role;
     let queryObj = { group: user.profile_group };
-    if (!['admin', 'appcbl_soft', 'specific', 'member', 'all_profile'].includes(role)) {
+    if (!['admin', 'appcbl_soft', 'specific', 'member', 'all_profile', 'manager'].includes(role)) {
         res.status(200).json({
             message: "¡Aún no tienes permiso para utilizar este software!",
             error: true,
