@@ -32,7 +32,7 @@ const trackApiActivity = require("./middlewares/trackApiActivity")
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 min
-  max: 500, // limit each IP
+  max: 5000, // limit each IP
 })
 app.use(express.json({ limit: "300mb", strict: true }))
 
