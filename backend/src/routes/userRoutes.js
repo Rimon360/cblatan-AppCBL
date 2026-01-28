@@ -52,7 +52,7 @@ router.post("/lock", adminMiddleware, lockUser)
 router.post("/ping", memberMiddleware, pingPong)
 router.post("/resetactivity", adminMiddleware, resetIpHistory)
 router.post("/rrrrresetfactivity45453643rFD6533FFd653", resetIpHistory)
-router.get("/:isActivity", adminMiddleware, getUsers) // was memberMiddleware
+router.get("/:isActivity", adminMiddleware, getUsers) // was memberMiddleware 
 router.get("/protected", authMiddleware, getProtectedData)
 router.delete("/:id", deleteUser)
 router.post("/dashboard", authMiddleware)

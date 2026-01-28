@@ -4,6 +4,7 @@ import { TiUserAdd } from "react-icons/ti"
 import axios from "../../axiosConfig"
 import { useNavigate, Link } from "react-router-dom"
 import { registerURL, usersUrl, UserUpdateURL, profileGroupDataURL } from "../routes/Url"
+import { MdOutlineDownloading } from "react-icons/md"
 import { checkValidity } from "../functions"
 import toast from "react-hot-toast"
 import Swal from "sweetalert2"
@@ -14,6 +15,7 @@ import { CiEdit } from "react-icons/ci"
 import { RxCross2, RxUpdate } from "react-icons/rx"
 import { IoCheckmarkDone } from "react-icons/io5"
 import { IoIosAdd, IoMdClose } from "react-icons/io"
+import { useRef } from "react"
 
 const Users = () => {
   const [email, setEmail] = useState("")
@@ -22,7 +24,7 @@ const Users = () => {
   const [wasap, setWasap] = useState("")
   const [paymentMethod, setPaymentMethod] = useState("")
   const [nstbrowserEmail, setNstbrowserEmail] = useState("")
-  // const [dicloakEmail, setDicloakEmail] = useState("");
+  const [username, setUsername] = useState("")
   // const [subscripitonTerm, setSubscripitonTerm] = useState("");
   const [niche, setNiche] = useState("")
   const [affiliate, setAffiliate] = useState("")
@@ -31,7 +33,8 @@ const Users = () => {
   const date = new Date()
   const [subStartDate, setSubStartDate] = useState(date.toISOString().split("T")[0])
   const [subValidity, setSubValidity] = useState(31)
-
+  const [dataFirstId, setDataFirstId] = useState("")
+  const [dataLastId, setDataLastId] = useState("")
   // new entries based on user requirements end
 
   const [usageLimit, setUsageLimit] = useState(1)
@@ -41,6 +44,7 @@ const Users = () => {
   const [searchTerm, setSearchTerm] = useState("")
   const [showModal, setShowModal] = useState(false)
   const [selectedId, setSelectedId] = useState(null)
+  const [created_by, setCreated_by] = useState("")
   const [profileGroup, setProfileGroup] = useState("")
   const [filteredUsers, setFilteredUsers] = useState([])
   const { current_user } = useGlobal()
@@ -66,7 +70,9 @@ const Users = () => {
       .get(usersUrl + "/false", { headers: { Authorization: `Bearer ${token}` } })
       .then((response) => {
         setUsers(response.data)
-        setFilteredUsers(users.filter((user) => user?.email?.toLowerCase().includes(searchTerm.toLowerCase()) || user?.ip_address?.toLowerCase().includes(searchTerm.toLowerCase())))
+        setFilteredUsers(response.data)
+        setDataFirstId(response.data[0]._id)
+        setDataLastId(response.data[response.data.length - 1]._id)
       })
       .catch((error) => {
         toast.error(error.response.data?.message)
@@ -118,25 +124,31 @@ const Users = () => {
     let url = registerURL
     if (isUpdate) url = UserUpdateURL
     axios
-      .post(url, {
-        id: isUpdate,
-        usageLimit,
-        email,
-        wasap,
-        paymentMethod,
-        nstbrowserEmail,
-        // dicloakEmail,
-        // subscripitonTerm,
-        profileGroup,
-        niche,
-        affiliate,
-        supervisor,
-        observation,
-        subStartDate,
-        subValidity,
-        password,
-        role: userrole,
-      },{headers:{"Authorization": "Bearer " + token}})
+      .post(
+        url,
+        {
+          id: isUpdate,
+          usageLimit,
+          email,
+          username,
+          wasap,
+          paymentMethod,
+          nstbrowserEmail,
+          created_by,
+          // dicloakEmail,
+          // subscripitonTerm,
+          profileGroup,
+          niche,
+          affiliate,
+          supervisor,
+          observation,
+          subStartDate,
+          subValidity,
+          password,
+          role: userrole,
+        },
+        { headers: { Authorization: "Bearer " + token } },
+      )
       .then((response) => {
         // --
         setIsUpdate(false)
@@ -145,14 +157,15 @@ const Users = () => {
         setNstbrowserEmail("")
         // setDicloakEmail("");
         // setSubscripitonTerm("");
+        setCreated_by("")
         setNiche("")
         setAffiliate("")
         setSupervisor("")
         setObservation("")
         setSubValidity(30)
         setProfileGroup("")
-
         // --
+        setUsername("")
         setEmail("")
         setUsageLimit(1)
         setPassword("")
@@ -164,17 +177,27 @@ const Users = () => {
       })
   }
 
+  let timeoutRef = useRef(null)
   useEffect(() => {
-    setFilteredUsers(
-      users.filter(
-        (user) =>
-          user?.email?.toLowerCase().includes(searchTerm.toLowerCase().trim()) ||
-          user?.seq?.toString().includes(searchTerm.toLowerCase().trim()) ||
-          user?.ip_address?.toLowerCase().includes(searchTerm.toLowerCase().trim()) ||
-          user?.ip_address_history?.toLowerCase().includes(searchTerm.toLowerCase().trim()),
-      ),
-    )
-  }, [users, searchTerm])
+    clearTimeout(timeoutRef.current)
+    timeoutRef.current = setTimeout(() => {
+      axios
+        .get(usersUrl + `/false/?q=${searchTerm}`, { headers: { Authorization: `Bearer ${token}` } })
+        .then((response) => {
+          let data = response.data
+          setUsers(data)
+          setFilteredUsers(data)
+          if (data.length > 0) {
+            setDataFirstId(data[0].createdAt) // new start
+            setDataLastId(data[data.length - 1].createdAt) // new end
+          }
+        })
+        .catch((error) => {
+          toast.error(error.response.data?.message)
+          console.error("Error fetching users:", error)
+        })
+    }, 500)
+  }, [searchTerm])
 
   const [isUpdate, setIsUpdate] = useState(false)
 
@@ -184,8 +207,10 @@ const Users = () => {
     setWasap(user.wasap)
     setPaymentMethod(user.payment_method)
     setNstbrowserEmail(user.nstbrowser_email)
+    setCreated_by(user.created_by || "")
     // setDicloakEmail(user.dicloak_email);
     // setSubscripitonTerm(user.subscription_term);
+    setUsername(user.username)
     setNiche(user.niche)
     setAffiliate(user.affiliate)
     setSupervisor(user.supervisor)
@@ -209,6 +234,7 @@ const Users = () => {
     setSubValidity(30)
     setProfileGroup("")
     // --
+    setUsername("")
     setEmail("")
     setUsageLimit(1)
     setPassword("")
@@ -230,15 +256,40 @@ const Users = () => {
       .catch((e) => toast.error(e.message || "Unable to get profile group"))
   }, [])
 
+  const handleLoadAllData = () => {
+    axios
+      .get(`${usersUrl}/false/?loadall=true`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((response) => {
+        const data = response.data
+        setUsers(data)
+        setFilteredUsers(data)
+      })
+      .catch((error) => {
+        toast.error(error.response?.data?.message)
+        console.error("Error fetching users:", error)
+      })
+  }
+
   return (
     <>
       <section className="users">
         <form onSubmit={handleSubmit} className="useraction-container mb-6 bg-gray-950/40 p-4 rounded-xl">
           <div className="flex flex-col gap-2 capitalize text-sm">
             <div className="flex gap-2">
+              {!isUpdate ? (
+                <label className="flex flex-col justify-center  w-full">
+                  <span className="text-red-500">* E-mail:</span>
+                  <input type="email" required placeholder="Enter E-mail " value={email} onChange={(e) => setEmail(e.target.value.replace(" ", "_").toLowerCase())} />
+                </label>
+              ) : (
+                ""
+              )}
+
               <label className="flex flex-col justify-center  w-full">
-                e-mail/username:
-                <input type="text" required placeholder="Enter user/email address" value={email} onChange={(e) => setEmail(e.target.value.replace(" ", "_").toLowerCase())} />
+                <span className="text-red-500">* Username:</span>
+                <input type="text" required placeholder="Enter username address" value={username} onChange={(e) => setUsername(e.target.value.replace(" ", "_").toLowerCase())} />
               </label>
               <label className="flex flex-col justify-center  w-full">
                 wasap:
@@ -289,7 +340,7 @@ const Users = () => {
 
               {!isUpdate ? (
                 <label className="flex flex-col justify-center  w-full">
-                  Password:
+                  <span className="text-red-500">* Password:</span>
                   <input required type="text" placeholder="Confirm password" value={password} onChange={(e) => setPassword(e.target.value)} />
                 </label>
               ) : (
@@ -300,7 +351,7 @@ const Users = () => {
               <input type="number" required placeholder="Enter user limit" value={usageLimit} onChange={(e) => setUsageLimit(e.target.value)} />
             </label> */}
 
-              <label className="flex flex-col justify-center  w-full">
+              <label className="flex flex-col justify-center  w-full text-yellow-300">
                 Role:
                 <select className="px-4 w-full py-2   rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" value={userrole} onChange={(e) => setRole(e.target.value)}>
                   {role === "admin" ? (
@@ -322,7 +373,7 @@ const Users = () => {
                   )}
                 </select>
               </label>
-              <label className="flex flex-col justify-center  w-full">
+              <label className="flex flex-col justify-center  w-full text-yellow-300">
                 Profile Group:
                 <select className="p-2   rounded-md cursor-pointer" value={profileGroup} onInput={(e) => setProfileGroup(e.target.value)} name="" id="">
                   <option value="" disabled>
@@ -337,6 +388,14 @@ const Users = () => {
                     : ""}
                 </select>
               </label>
+              {["admin"].includes(current_user.role) && isUpdate ? (
+                <label className="flex flex-col justify-center  w-full text-blue-500">
+                  Enlace con la gerente:
+                  <input type="email" placeholder="Enter E-mail" value={created_by} onChange={(e) => setCreated_by(e.target.value)} />
+                </label>
+              ) : (
+                ""
+              )}
             </div>
           </div>
           {isUpdate ? (
@@ -374,12 +433,18 @@ const Users = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="p-2 sticky top-0 mb-4 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
+          <div>
+            <button onClick={handleLoadAllData} className="p-2 px-4 hover:border hover:border-blue-500 bg-gray-950/50 rounded-xl cursor-pointer text-blue-500">
+              <MdOutlineDownloading />
+            </button>
+          </div>
           <div className=" overflow-auto min-h-[300px]">
             <table className="w-full h-full overflow-auto mt-4 text-left border-collapse text-[11px]">
               <thead>
                 <tr>
                   <th className="text-left">#</th>
                   <th className="text-left">Email</th>
+                  <th className="text-left">Username</th>
                   <th className="text-left">Role</th>
                   <th className="text-left">Profile Group</th>
                   <th className="text-left">IP address</th>
@@ -417,6 +482,7 @@ const Users = () => {
                       <tr key={user._id} className="hover:bg-gray-900">
                         <td className="truncate max-w-[150px] text-center">{filteredUsers.length - i} </td>
                         <td className="truncate max-w-[150px] text-center">{user.email}</td>
+                        <td className="truncate max-w-[150px] text-center">{user.username || "-"}</td>
                         <td className="truncate max-w-[150px] text-center">{user.role}</td>
                         <td className="truncate max-w-[150px] text-center">{user.profile_group}</td>
                         <td className="truncate max-w-[150px] text-center">{user.ip_address}</td>

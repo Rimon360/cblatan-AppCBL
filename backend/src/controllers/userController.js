@@ -13,6 +13,7 @@ module.exports.registerUser = async (req, res) => {
   let {
     usagsLimit,
     email,
+    username,
     wasap,
     paymentMethod,
     nstbrowserEmail,
@@ -48,15 +49,19 @@ module.exports.registerUser = async (req, res) => {
 
   if (!role) role = "member"
   if (client) role = "member"
-  if (!email || !password) {
-    return res.status(400).json({ message: "Se requieren correo electrónico y contraseña" })
+  if (!email || !password || !username) {
+    return res.status(400).json({ message: "Faltan campos obligatorios. Por favor, rellene los campos obligatorios." })
   }
   const ip = req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress
   if (!ip) return res.status(400).json({ message: "Dirección IP no encontrada" })
   // check if user exists
   const userExists = await UserModel.findOne({ email })
   if (userExists) {
-    return res.status(400).json({ message: "La usuario ya existe" })
+    return res.status(409).json({ message: "El correo electrónico ya está registrado. ¡Intenta con otro!" })
+  }
+  const isUsernameTaken = await UserModel.findOne({ username })
+  if (isUsernameTaken) {
+    return res.status(409).json({ message: "El nombre de usuario ya está en uso. ¡Intenta con otro!" })
   }
   // hash password
   const solt = await bcrypt.genSalt(10)
@@ -69,6 +74,7 @@ module.exports.registerUser = async (req, res) => {
     seq: random,
     first_ip: ip,
     email,
+    username,
     wasap,
     payment_method: paymentMethod,
     nstbrowser_email: nstbrowserEmail,
@@ -132,6 +138,7 @@ module.exports.updateUser = async (req, res) => {
     email,
     wasap,
     paymentMethod,
+    created_by,
     nstbrowserEmail,
     // dicloakEmail,
     // subscripitonTerm,
@@ -139,6 +146,7 @@ module.exports.updateUser = async (req, res) => {
     niche,
     affiliate,
     supervisor,
+    username,
     observation,
     subStartDate,
     subValidity,
@@ -149,20 +157,30 @@ module.exports.updateUser = async (req, res) => {
   if (role === false) role = "i64V1k5uSiNAT9mlf6uw+Q==:tSXIZwCmgdx4uGtMar/5Mg=="
   if (!role) role = "member"
   if (client) role = "member"
-  if (!email) {
-    return res.status(400).json({ message: "Email and password are required" })
+  if (!email || !username) {
+    return res.status(400).json({ message: "Faltan campos obligatorios. Por favor, rellene los campos obligatorios." })
   }
   // check if user exists
   const userExists = await UserModel.findOne({ email })
   if (!userExists) {
-    return res.status(400).json({ message: "User not exists to make update" })
+    return res.status(409).json({ message: "Usuario no encontrado" })
+  }
+  const userCreatedbyExists = await UserModel.findOne({ created_by })
+  if (!userCreatedbyExists) {
+    return res.status(409).json({ message: "El administrador no existe. Intente cambiar su correo electrónico." })
+  }
+  const isUsernameTaken = await UserModel.find({ username })
+  if (isUsernameTaken.length > 0 && userExists.username !== username) {
+    return res.status(409).json({ message: "El nombre de usuario ya está en uso. ¡Intenta con otro!" })
   }
   const user = await UserModel.updateOne(
     { _id: id },
     {
       $set: {
         email,
+        username,
         wasap,
+        created_by,
         payment_method: paymentMethod,
         nstbrowser_email: nstbrowserEmail,
         // dicloak_email: dicloakEmail,
@@ -300,7 +318,7 @@ exports.loginUser = async (req, res) => {
   const ip = req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress
   if (!ip) return res.status(400).json({ message: "IP address not found" })
   try {
-    const user = await UserModel.findOne({ email })
+    const user = await UserModel.findOne({ $or: [{ email }, { username: email }] })
 
     if (!user) {
       return res.status(400).json({ message: "Credenciales inválidas" })
@@ -341,12 +359,19 @@ const generateToken = (user) => {
 }
 
 exports.getUsers = async (req, res) => {
-  const { isActivity } = req.params
   try {
+    const { isActivity } = req.params
+    const { q, loadall } = req.query
     const { email, role } = req.user
-    let filterBy = {}
-    if (role === "manager") filterBy = { created_by: email }
-    let users = await UserModel.find(filterBy).sort({ createdAt: -1 })
+    const searchQuery = [{ ip_address: { $regex: q || "", $options: "i" } }, { email: { $regex: q || "", $options: "i" } }, { username: { $regex: q || "", $options: "i" } }]
+    let filterBy = { $or: searchQuery }
+    if (role === "manager") filterBy = { created_by: email, $or: searchQuery }
+    let users = []
+    if (loadall == "true") {
+      users = await UserModel.find(filterBy).sort({ createdAt: -1 })
+    } else {
+      users = await UserModel.find(filterBy).sort({ createdAt: -1 }).limit(100)
+    }
     if (isActivity == "true") {
       users = await UserModel.find().sort({ last_ping_timestamp: -1 })
     }

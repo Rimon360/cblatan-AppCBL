@@ -58,9 +58,9 @@ function Login() {
           <div className="flex flex-col gap-2 w-full">
             <label className="text-gray-400">
               <span className="flex items-center gap-1">
-                <MdEmail /> Correo electrónico:
+                <MdEmail /> Introduzca su correo electrónico/nombre de usuario:
               </span>
-              <input autoFocus type="text" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Correo" required className="w-full px-4 py-2  " />
+              <input autoFocus type="text" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Correo electrónico/Nombre de usuario" required className="w-full px-4 py-2  " />
             </label>
             <label className="text-gray-400">
               <span className="flex items-center gap-1">

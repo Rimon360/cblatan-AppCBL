@@ -3,7 +3,7 @@ import { useState, useEffect } from "react"
 import axios from "../../axiosConfig"
 import { Toaster, toast } from "react-hot-toast"
 import { loginUrl } from "../routes/Url"
-import { FaUserGraduate } from "react-icons/fa"
+import { MdLockPerson } from "react-icons/md";
 function Login() {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
@@ -34,8 +34,8 @@ function Login() {
     <section className="login-section w-full h-screen flex items-center justify-center bg-gradient-to-br right-section">
       <div className="form w-full max-w-sm p-6 bg-gray-950/40 rounded-2xl shadow-lg    ">
         <h2 className="mb-6 flex justify-center text-8xl font-semibold text-blue-700">
-          <FaUserGraduate />
-        </h2>
+        <MdLockPerson />
+        </h2> 
         <form onSubmit={handleLogin} className="space-y-4">
           <input
             type="text"
