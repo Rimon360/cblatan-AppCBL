@@ -12,10 +12,10 @@ module.exports.insertGroupConversation = async (data) => {
 }
 // by ws
 module.exports.insertPrivateConversation = async (data, user) => {
-  try { 
+  try {
     if (!["admin"].includes(user.role)) {
-      let oldStatus = await UserModel.find({ _id: user.id }, { support_status: 1 }) 
-      
+      let oldStatus = await UserModel.find({ _id: user.id }, { support_status: 1 })
+
       if (oldStatus.support_status == "none" || !oldStatus.support_status) {
         await UserModel.updateOne({ _id: user.id }, { $set: { support_status: "pending" } })
       }
@@ -49,7 +49,7 @@ module.exports.getPrivateConversation = async (req, res) => {
 module.exports.getChatPrivateUsers = async (req, res) => {
   try {
     // const from = new Date(Date.now() - 24 * 60 * 60 * 1000)
-    let result = await UserModel.find({ support_status: { $ne: "none" } }, { email: 1, role: 1, support_status: 1, username: 1, last_ping_timestamp: 1 })
+    let result = await UserModel.find({ support_status: { $ne: "none", $exists: true } }, { email: 1, role: 1, support_status: 1, username: 1, last_ping_timestamp: 1 })
 
     res.status(200).json(result)
   } catch (err) {
