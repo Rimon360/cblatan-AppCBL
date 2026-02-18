@@ -11,6 +11,7 @@ export const getSocket = () => {
     if (!token) return null
 
     socket = io(SOCKET_URL, {
+      path: "/s/socket.io",
       transports: ["websocket"],
       auth: { token },
     })
