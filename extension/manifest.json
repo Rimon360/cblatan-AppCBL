@@ -1,0 +1,42 @@
+{
+    "manifest_version": 3,
+    "name": "KAIZEN-alpha",
+    "version": "1.5.3",
+    "description": "Your secure password manager",
+    "action": {
+        "default_icon": {
+            "16": "icon.png",
+            "48": "icon.png",
+            "128": "icon.png"
+        },
+        "default_title": "KAIZEN"
+    },
+    "permissions": [
+        "storage",
+        "tabs",
+        "alarms",
+        "cookies",
+        "proxy"
+    ],
+    "icons": {
+        "16": "icon.png",
+        "48": "icon.png",
+        "128": "icon.png"
+    },
+    "background": {
+        "service_worker": "backgroundScript.js"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "contentScript.js"
+            ]
+        }
+    ],
+    "host_permissions": [
+        "<all_urls>"
+    ]
+}

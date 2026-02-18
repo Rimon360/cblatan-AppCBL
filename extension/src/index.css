@@ -1,0 +1,168 @@
+@import "tailwindcss";
+
+hr {
+    @apply rounded mb-2 border-blue-300;
+}
+
+button {
+    @apply cursor-pointer
+}
+
+*[disabled] {
+    user-select: none !important;
+    pointer-events: none !important;
+    cursor: not-allowed !important;
+    opacity: .5 !important;
+
+}
+
+body {
+    @apply bg-radial from-gray-900 to-gray-950 to-90%;
+}
+
+table {
+    @apply w-full border-collapse text-sm text-gray-200 bg-gray-950;
+}
+
+table th {
+    @apply px-4 py-2 border border-gray-700 bg-gray-900 text-white text-left;
+}
+
+table td {
+    @apply px-4 py-2 border border-gray-700;
+}
+
+table tr:nth-child(even) {
+    @apply bg-gray-900;
+}
+
+table tr:hover {
+    @apply bg-gray-800;
+}
+
+.loading-overlay::before {
+    content: '';
+    position: fixed;
+    z-index: 9999;
+    background: rgba(0, 0, 0, 0.5);
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    backdrop-filter: blur(3px);
+    cursor: wait;
+}
+
+body.loading-overlay {
+    pointer-events: none;
+    user-select: none;
+}
+
+/* NProgress already shows the top bar */
+#nprogress .bar {
+    z-index: 99999 !important;
+}
+
+input {
+    @apply !text-white;
+}
+
+/* Fullscreen overlay below top bar */
+body.loading-overlay-active::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(3px);
+    z-index: 99998;
+    pointer-events: all;
+    cursor: wait;
+}
+
+
+::-webkit-scrollbar {
+    -webkit-appearance: none;
+    height: 8px;
+    width: 8px;
+    background: rgb(2, 19, 36);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgb(0, 72, 143);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgb(0, 100, 201);
+    cursor: move
+}
+
+
+th {
+    position: sticky;
+    top: 0;
+}
+
+
+label[type='button'] {
+    border-radius: 8px;
+    border: 1px solid transparent;
+
+    font-size: 1em;
+    font-weight: 500;
+    font-family: inherit;
+    @apply bg-gray-950 px-2 py-2;
+    cursor: pointer;
+}
+
+button:hover,
+label[type='button']:hover {
+    border-color: inherit;
+}
+
+button:focus,
+button:focus-visible,
+label[type='button']:focus {
+    border-style: dotted;
+}
+
+@media (prefers-color-scheme: light) {
+    :root {
+        color: #213547;
+        background-color: #ffffff;
+    }
+
+    a:hover {
+        color: #747bff;
+    }
+
+    button {
+        background-color: #f9f9f9;
+    }
+}
+
+input {
+    outline: none;
+    @apply p-2 rounded-md hover:border-[#646cff] hover:border-1 focus:border-dotted
+}
+
+form {
+    @apply flex gap-1 justify-center items-center
+}
+
+.titlebar {
+    -webkit-app-region: drag;
+}
+
+.titlebar button {
+    -webkit-app-region: no-drag;
+}
+
+button:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
