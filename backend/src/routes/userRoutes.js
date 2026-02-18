@@ -84,7 +84,7 @@ router.post("/change-password", changePassword)
 router.get("/chat/get-group-conversation", adminMiddleware, getGroupConversation)
 router.get("/chat/get-private-conversation/:toUserId", getPrivateConversation)
 router.get("/chat/get-users", adminMiddleware, getChatPrivateUsers)
-router.post("/chat/upload-in-private", memberMiddleware, upload.single("file"), handlePrivateChatFileUploading)
+router.post("/chat/upload-in-private", upload.single("file"), handlePrivateChatFileUploading)
 router.post("/chat/change-user-supportstatus-private", adminMiddleware, handleUserSupportStatusChange)
 
 module.exports = router

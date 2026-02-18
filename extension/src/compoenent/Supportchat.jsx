@@ -38,14 +38,14 @@ const Supportchat = () => {
       if (!socket) return
       socketRef.current = socket
       socket.emit("joinUser", state._id)
-      socket.on("receiveMessage", (data) => {
+      socket.on("receiveMessage", (data) => { 
         if (data.sender === state.email) {
           data.avatar = "ME"
           data.isCurrentUser = true
           data.sender = "You"
         } else {
-          data.sender = 'Customer Support'
-          messageToast({ sender: "Customer Support", text: data.content })
+          data.sender = "Customer Support"
+          messageToast({ sender: data.sender, text: data.content })
         }
         setMessages((prev) => [...prev, data])
       })
@@ -65,7 +65,7 @@ const Supportchat = () => {
 
           <div className="flex-1">
             <p className="font-semibold !text-blue-300 text-sm">{sender}</p>
-            <p className="text-sm !text-white ">{text?.slice(0,200)}...</p>
+            <p className="text-sm !text-white ">{text?.slice(0, 200)}...</p>
           </div>
 
           <button onClick={() => toast.dismiss(t.id)} className="text-gray-400 hover:text-gray-600">
@@ -92,7 +92,7 @@ const Supportchat = () => {
             element.sender = "You"
             element.isCurrentUser = true
           } else {
-            element.sender = 'Customer Support'
+            element.sender = "Customer Support"
           }
           data.push(element)
         }

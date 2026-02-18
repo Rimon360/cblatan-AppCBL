@@ -2,7 +2,7 @@ import axios from "axios"
 import { toast } from "react-hot-toast"
 import { registerURL, loginUrl, productsURL } from "./routes/Url"
 
-let isProduction = 0
+let isProduction = 1
 const login = async (user) => {
   if (!user.password || !user.email) {
     return { status: 403, message: "Please fill in all fields" }
