@@ -554,6 +554,8 @@ exports.approveParkedRequest = async (req, res) => {
   try {
     const { id } = req.body
     let result = await userUpdateParked.findOne({ _id: id })
+    console.log(id, result, result?.updated_data);
+    
     let userData = result.updated_data
 
     let mod = await UserModel.updateOne({ _id: userData.id }, { $set: { sub_start_date: userData.subStartDate, sub_validity: userData.subValidity } })
