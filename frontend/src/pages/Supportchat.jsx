@@ -38,7 +38,7 @@ const Supportchat = () => {
 
           <div className="flex-1">
             <p className="font-semibold !text-blue-300 text-sm">{sender}</p>
-            <p className="text-sm !text-white ">{text?.slice(0,200)}...</p>
+            <p className="text-sm !text-white ">{text?.slice(0, 200)}...</p>
           </div>
 
           <button onClick={() => toast.dismiss(t.id)} className="text-gray-400 hover:text-gray-600">
@@ -81,18 +81,22 @@ const Supportchat = () => {
       })
     }
   }, [])
-
+  const trackUserJoinRef = useRef([])
   useEffect(() => {
     const getIdFromHash = () => {
       const hash = window.location.hash
       const id = hash.split("chatid=")[1]
+      if (!id) return
       setChatSelectedUser(id)
       selectedUserIdRef.current = id
-      socketRef.current.emit("joinUser", id)
+      if (!trackUserJoinRef.current.includes(id)) {
+        socketRef.current.emit("joinUser", id)
+        trackUserJoinRef.current.push(id)
+      }
     }
     getIdFromHash()
   }, [])
-  const trackUserJoinRef = useRef([])
+
   useEffect(() => {
     try {
       ;(async () => {
@@ -100,7 +104,7 @@ const Supportchat = () => {
         let data = []
         for (const element of result.data) {
           element.avatar = element.username?.slice(0, 2).toUpperCase() || element.email?.slice(0, 2).toUpperCase()
-          if (socketRef.current && element.support_status == "pending" && !trackUserJoinRef.current.includes(element._id)) {
+          if (element._id && socketRef.current && element.support_status == "pending" && !trackUserJoinRef.current.includes(element._id)) {
             trackUserJoinRef.current.push(element._id)
             socketRef.current.emit("joinUser", element._id)
           }
@@ -175,10 +179,14 @@ const Supportchat = () => {
   }
 
   const handleChatUserChange = (id) => {
+    if (!id) return
     if (chatSelectedUser !== id) {
       setMessages([])
     }
-    socketRef.current.emit("joinUser", id)
+    if (!trackUserJoinRef.current.includes(id)) {
+      socketRef.current.emit("joinUser", id)
+      trackUserJoinRef.current.push(id)
+    }
     setChatSelectedUser(id)
     selectedUserIdRef.current = id
     window.location.hash = `chatid=${id}`
