@@ -38,12 +38,12 @@ const router = express.Router()
 // Example: stricter limiter for login route
 const loginLimiter = rateLimit({
   windowMs: 5 * 60 * 1000,
-  max: 100,
+  max: 6000,
   message: "Too many login attempts, please try again later.",
 })
 const registerLimiter = rateLimit({
   windowMs: 60 * 1000,
-  max: 60,
+  max: 6000,
   message: "Too many register attempts, please try again after 24 hours.",
 })
 const storage = multer.diskStorage({

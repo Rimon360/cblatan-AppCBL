@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "KAIZEN-alpha",
-    "version": "1.5.5",
+    "version": "1.5.6",
     "description": "Your secure password manager",
     "action": {
         "default_icon": {

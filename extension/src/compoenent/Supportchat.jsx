@@ -117,7 +117,7 @@ const Supportchat = () => {
         avatar: "YO",
         content: url,
         content_type: file.type,
-        createdAt: localTime(new Date()),
+        createdAt: new Date(),
         isCurrentUser: true,
       }
       socketRef.current.emit("privateMessage", newMessage)
@@ -131,7 +131,7 @@ const Supportchat = () => {
         avatar: "YO",
         content: inputMessage,
         content_type: "txt",
-        createdAt: localTime(+new Date()),
+        createdAt: new Date(),
         isCurrentUser: true,
       }
       socketRef.current.emit("privateMessage", newMessage)
