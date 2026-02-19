@@ -133,7 +133,7 @@ const Dashboard = () => {
         {!warning ? (
           <>
             <header className="flex items-center justify-between bg-blue-500/50 p-4 sticky top-0 z-10 backdrop-blur-md">
-              <NavLink to="/supportchat" className="!text-white text-2xl !bg-transparent hover:!bg-gray-200/20 rounded-xl px-2">
+              <NavLink target="_blank" to="/supportchat" className="!text-white text-2xl !bg-transparent hover:!bg-gray-200/20 rounded-xl px-2">
                 <button className="text-white text-2xl !bg-transparent">
                   <BiSupport className="text-xl" />
                 </button>

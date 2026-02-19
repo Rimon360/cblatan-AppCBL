@@ -196,18 +196,18 @@ function Dashboard() {
             </li>
             <li>
               {["admin", "manager"].includes(role) ? (
-                <NavLink to={"/dashboard/adminchat"} className={({ isActive }) => (isActive ? "text-white bg-gray-950" : "")}>
+                <a href={"/dashboard/adminchat"} className={({ isActive }) => (isActive ? "text-white bg-gray-950" : "")}>
                   <BsChatLeftDots /> Admin Chat
-                </NavLink>
+                </a>
               ) : (
                 <></>
               )}
             </li>
             <li>
               {["admin", "manager"].includes(role) ? (
-                <NavLink to={"/dashboard/supportchat"} className={({ isActive }) => (isActive ? "text-white bg-gray-950" : "")}>
+                <a href={"/dashboard/supportchat"} className={({ isActive }) => (isActive ? "text-white bg-gray-950" : "")}>
                   <BiSupport /> Support
-                </NavLink>
+                </a>
               ) : (
                 <></>
               )}

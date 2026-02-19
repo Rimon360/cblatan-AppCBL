@@ -1,6 +1,6 @@
 _init_()
 async function _init_() {
-    let emailInputSelectors = 'input[type="email"], input[name="email"], input[name="login"],input[placeholder="Email"], input#username,form input[id="email"]'
+    let emailInputSelectors = 'input[type="email"],input#userName, input[name="email"], input[name="login"],input[placeholder="Email"], input#username,form input[id="email"]'
     let passwordInputSelectors =
         'form input[type="password"],form input[name="password"],form input.password,form input#password,form input[aria-label="password"],input[type="password"], input[name="password"] '
     let emailInputs, passwordInputs

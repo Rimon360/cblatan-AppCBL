@@ -1,7 +1,7 @@
 import Login from "../compoenent/userLogin"
 import NotFound from "../compoenent/404"
 import Dashboard from "../compoenent/dashboard"
-import { MemoryRouter as Router, Routes, Route } from "react-router-dom"
+import { HashRouter as Router, Routes, Route } from "react-router-dom"
 import ProtectedRoute from "./ProtectedRoute"
 import Register from "../compoenent/register"
 import VerifyEmail from "../compoenent/VerifyEmail"
