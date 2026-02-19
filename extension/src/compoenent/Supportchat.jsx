@@ -131,7 +131,7 @@ const Supportchat = () => {
         avatar: "YO",
         content: inputMessage,
         content_type: "txt",
-        createdAt: localTime(new Date()),
+        createdAt: localTime(+new Date()),
         isCurrentUser: true,
       }
       socketRef.current.emit("privateMessage", newMessage)
