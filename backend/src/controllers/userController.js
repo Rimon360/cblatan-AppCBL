@@ -543,7 +543,7 @@ exports.parkUpdateUserForAdminApproval = async (req, res) => {
 exports.getParkedRequests = async (req, res) => {
   // userUpdateParked
   try {
-    let result = await userUpdateParked.find({}, { modification: 1, created_by: 1, createdAt: 1,to:1 })
+    let result = await userUpdateParked.find({}, { modification: 1, created_by: 1, createdAt: 1, to: 1 })
     res.status(200).json(result)
   } catch (error) {
     res.status(403).json({ error: error.message })
@@ -553,12 +553,11 @@ exports.approveParkedRequest = async (req, res) => {
   // userUpdateParked
   try {
     const { id } = req.body
-    let result = await userUpdateParked.findOne({ _id: id })
-    console.log(id, result, result?.updated_data);
-    
+    let result = await userUpdateParked.findOne({ _id: id }) 
+
     let userData = result.updated_data
 
-    let mod = await UserModel.updateOne({ _id: userData.id }, { $set: { sub_start_date: userData.subStartDate, sub_validity: userData.subValidity } })
+    let mod = await UserModel.updateOne({ email: userData.email }, { $set: { sub_start_date: userData.subStartDate, sub_validity: userData.subValidity } })
     await userUpdateParked.deleteOne({ _id: id })
 
     res.status(200).json({ message: `Approved ${mod.modifiedCount}` })
@@ -571,7 +570,7 @@ exports.deleteParkedRequest = async (req, res) => {
   try {
     const { id } = req.body
     let result = await userUpdateParked.deleteOne({ _id: id })
-    res.status(200).json({message:"Deleted"})
+    res.status(200).json({ message: "Deleted" })
   } catch (error) {
     res.status(403).json({ error: error.message })
   }
