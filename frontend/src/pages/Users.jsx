@@ -148,7 +148,7 @@ const Users = () => {
       password,
       role: userrole,
     }
-    if (current_user.role == "manager" && isSubscriptionChanged) {
+    if (current_user.role == "manager" && isSubscriptionChanged && isUpdate) {
       data = { updated_data: data, created_by: current_user.email, to: email, modification: `Start: ${subStartDate}, Validity: ${subValidity}` }
       url = BACKEND_URL + "/api/users/update/park"
     }

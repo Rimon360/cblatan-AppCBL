@@ -117,9 +117,8 @@ const Supportchat = () => {
 
   useEffect(() => {
     setInterval(() => {
-      setIsReloadUserList(generateRandomKey())
-      console.log("dd")
-    }, 10 * 1e3)
+      setIsReloadUserList(generateRandomKey()) 
+    }, 15 * 1e3)
   }, [])
 
   useEffect(() => {
