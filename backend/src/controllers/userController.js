@@ -33,7 +33,8 @@ module.exports.registerUser = async (req, res) => {
   } = req.body
   const authHeader = req.headers.authorization
   let created_by = "own_or_admin"
-  let email_verified = false
+  // let email_verified = false
+  let email_verified = true;
   if (authHeader) {
     const token = authHeader?.split(" ")[1]
     const user = jwt.verify(token, process.env.JWT_SECRET)

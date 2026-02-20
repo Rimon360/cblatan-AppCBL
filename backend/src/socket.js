@@ -11,8 +11,8 @@ module.exports = (io) => {
   io.use(async (socket, next) => {
     try {
       const token = socket.handshake.auth.token
-      const user = await jwt.verify(token, process.env.JWT_SECRET) 
-      
+      const user = await jwt.verify(token, process.env.JWT_SECRET)
+
       socket.user = { id: user._id, email: user.email, role: user.role }
       next()
     } catch {
@@ -80,21 +80,26 @@ module.exports = (io) => {
     })
 
     // ====== PRIVATE MESSAGE ======
-    socket.on("joinUser", (userId) => { 
+    socket.on("joinUser", (userId) => {
       socket.join(userId)
     })
     socket.on("removeUser", (userId) => {
       socket.leave(userId)
     })
-    socket.on("privateMessage", async(data) => { 
-      // const sockets = onlineUsers.get(data?.to) 
+    socket.on("privateMessage", async (data) => {
+      // const sockets = onlineUsers.get(data?.to)
       // if (!sockets) return
-      data.avatar = socket.user.email.slice(0, 2).toUpperCase() 
+      data.avatar = socket.user.email.slice(0, 2).toUpperCase()
       data.id = generateRandomKey()
       data.isCurrentUser = false
-      data.status = "delivered" 
-      io.to(data.to).emit("receiveMessage", data) 
-      await insertPrivateConversation(data,socket.user);
+      data.status = "delivered"
+      io.to(data.to).emit("receiveMessage", data)
+      await insertPrivateConversation(data, socket.user)
+    })
+
+    socket.on("broadcast", async (data) => {
+      socket.broadcast.emit("receiveMessage", data) 
+      await insertPrivateConversation(data, socket.user)
     })
 
     // ====== DISCONNECT ======

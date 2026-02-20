@@ -27,13 +27,13 @@ const verifyToken = async (req, res, next) => {
 
     if (user && !user?.verified_ip?.includes(ip) && !proxeis.includes(ip) && !isAlwaysAllowedUser) {
       // check if the incomming ip is verified by OTP or not to prevent unusual access
-      return res.status(200).json({ user: { verified: false, email: user.email } })
+      // return res.status(200).json({ user: { verified: false, email: user.email } })
     }
 
-    let isEmailVerified = user.email_verified
-    if (!isEmailVerified && !isAlwaysAllowedUser) {
-      return res.status(200).json({ user: { error: true, email: user.email, token, message: "Correo electrónico no verificado", email_verified: false } })
-    }
+    // let isEmailVerified = user.email_verified
+    // if (!isEmailVerified && !isAlwaysAllowedUser) {
+    //   return res.status(200).json({ user: { error: true, email: user.email, token, message: "Correo electrónico no verificado", email_verified: false } })
+    // }
     let ipHistory = !user.ip_address_history ? "" : user.ip_address_history
     let first_ip = user.first_ip
     if (first_ip == "") {

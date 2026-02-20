@@ -20,7 +20,16 @@ module.exports.insertPrivateConversation = async (data, user) => {
         await UserModel.updateOne({ _id: user.id }, { $set: { support_status: "pending" } })
       }
     }
-    await supportChatModel.insertOne(data)
+    if (data.to == "all") {
+      let msgArray = []
+      let allUsers = await UserModel.find({ email: { $ne: data.sender }, role: { $ne: "admin" } })
+      for (const user of allUsers) {
+        msgArray.push({ ...data, to: user._id.toString() })
+      }
+      await supportChatModel.insertMany(msgArray)
+    } else {
+      await supportChatModel.insertOne(data)
+    }
   } catch (err) {
     console.log(err.message)
   }
@@ -39,7 +48,7 @@ module.exports.getPrivateConversation = async (req, res) => {
   try {
     const { toUserId } = req.params
     const from = new Date(Date.now() - 24 * 60 * 60 * 1000)
-    let result = await supportChatModel.find({ to: toUserId, createdAt: { $gte: from } }).limit(300)
+    let result = await supportChatModel.find({ createdAt: { $gte: from }, $or: [{ to: toUserId }, { to: "all" }] }).limit(300)
     res.status(200).json(result)
   } catch (err) {
     console.log(err.message)
@@ -49,7 +58,7 @@ module.exports.getPrivateConversation = async (req, res) => {
 module.exports.getChatPrivateUsers = async (req, res) => {
   try {
     // const from = new Date(Date.now() - 24 * 60 * 60 * 1000)
-    let result = await UserModel.find({ support_status: { $ne: "none", $exists: true } }, { email: 1, role: 1, support_status: 1, username: 1, last_ping_timestamp: 1 })
+    let result = await UserModel.find({ support_status: { $ne: "none", $exists: true } }, { email: 1, role: 1, support_status: 1, username: 1, last_ping_timestamp: 1,created_by:1 })
 
     res.status(200).json(result)
   } catch (err) {

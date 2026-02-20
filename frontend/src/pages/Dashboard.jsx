@@ -196,7 +196,7 @@ function Dashboard() {
             </li>
             <li>
               {["admin", "manager"].includes(role) ? (
-                <a href={"/dashboard/adminchat"} className={({ isActive }) => (isActive ? "text-white bg-gray-950" : "")}>
+                <a href="/dashboard/adminchat" className={({ isActive }) => (isActive ? "text-white bg-gray-950" : "")}>
                   <BsChatLeftDots /> Admin Chat
                 </a>
               ) : (

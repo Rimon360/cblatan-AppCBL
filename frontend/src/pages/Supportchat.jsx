@@ -1,6 +1,6 @@
 import axios from "../../axiosConfig"
 import axios2 from "axios"
-import React, { useEffect, useRef, useState } from "react"
+import React, { useEffect, useMemo, useRef, useState } from "react"
 import { BsThreeDotsVertical, BsSearch, BsPaperclip, BsEmojiSmile } from "react-icons/bs"
 import { IoSend } from "react-icons/io5"
 import { FaUserCircle } from "react-icons/fa"
@@ -12,6 +12,7 @@ import { getSocket } from "../socket"
 import { useGlobal } from "../context/GlobalStete"
 import toast from "react-hot-toast"
 import { IoMdArrowDown } from "react-icons/io"
+import { BsSend } from "react-icons/bs"
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
 const Supportchat = () => {
@@ -54,9 +55,22 @@ const Supportchat = () => {
     playNotificationSound()
   }
   const [chatUsers, setChatUsers] = useState([])
+  const [unreadChat, setUnreadChat] = useState(new Map())
   const [chatSelectedUser, setChatSelectedUser] = useState(null)
   const socketRef = useRef(null)
   const selectedUserIdRef = useRef(null)
+  const [trackLoadedMessage, setTrackLoadedMessage] = useState({})
+  function changeUserUnread(id, v = 1) {
+    setUnreadChat((prev) => {
+      const next = new Map(prev)
+      if (v === 0) {
+        next.set(id, 0)
+        return next
+      }
+      next.set(id, (prev.get(id) || 0) + 1)
+      return next
+    })
+  }
   useEffect(() => {
     const socket = getSocket()
     if (!socket) return
@@ -68,7 +82,8 @@ const Supportchat = () => {
         data.isCurrentUser = true
       }
       let chatSelectedUser = selectedUserIdRef.current
-      if (chatSelectedUser && data.to !== chatSelectedUser) {
+      if (data.to !== chatSelectedUser) {
+        changeUserUnread(data.to)
         messageToast({ sender: data.sender, text: data.content })
         return
       }
@@ -81,6 +96,9 @@ const Supportchat = () => {
       })
     }
   }, [])
+
+  const chatUsersForRender = useMemo(() => chatUsers.map((u) => ({ ...u, unread: unreadChat.get(u._id) || 0 })), [chatUsers, unreadChat])
+
   const trackUserJoinRef = useRef([])
   useEffect(() => {
     const getIdFromHash = () => {
@@ -117,7 +135,7 @@ const Supportchat = () => {
 
   useEffect(() => {
     setInterval(() => {
-      setIsReloadUserList(generateRandomKey()) 
+      setIsReloadUserList(generateRandomKey())
     }, 15 * 1e3)
   }, [])
 
@@ -189,6 +207,7 @@ const Supportchat = () => {
     setChatSelectedUser(id)
     selectedUserIdRef.current = id
     window.location.hash = `chatid=${id}`
+    changeUserUnread(id, 0)
   }
 
   const handleFileSelection = async (e) => {
@@ -271,6 +290,34 @@ const Supportchat = () => {
       }
     }
   }
+
+  const [broadcastValue, setBroadcastValue] = useState("")
+
+  const handleBroadcasting = (e) => {
+    e.preventDefault()
+    console.log(broadcastValue)
+    const newMessage = {
+      sender: current_user.email,
+      to: "all",
+      avatar: "YO",
+      content: broadcastValue,
+      content_type: "txt",
+      createdAt: new Date(),
+      isCurrentUser: false,
+    }
+    socketRef.current.emit("broadcast", newMessage)
+    setBroadcastValue("")
+  }
+  const [chatSelectedUserData, setChatSelectedUserData] = useState({})
+
+  useEffect(() => {
+    for (const user of chatUsers) {
+      if (user._id == chatSelectedUser) {
+        setChatSelectedUserData(user)
+      }
+    }
+  }, [chatUsers, chatSelectedUser])
+
   return (
     <div className="flex h-screen bg-gray-900 text-gray-100">
       {/* Sidebar - SupportUsers List */}
@@ -290,7 +337,7 @@ const Supportchat = () => {
 
         <div className="flex-1 overflow-y-auto">
           {Object.entries(
-            chatUsers.reduce((acc, user) => {
+            chatUsersForRender.reduce((acc, user) => {
               ;(acc[user.support_status] ??= []).push(user)
               return acc
             }, {}),
@@ -307,17 +354,24 @@ const Supportchat = () => {
                   onClick={() => handleChatUserChange(user._id)}
                   className={`p-4 hover:bg-gray-700 ${user._id === chatSelectedUser ? "!bg-gray-700" : ""} cursor-pointer border-b border-gray-700/50`}
                 >
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-3 relative">
                     <div className="relative">
                       <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center font-semibold text-white">{user.avatar}</div>
+
                       <div
-                        className={`absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-gray-800 ${isOnline(user.last_ping_timestamp) === "online" ? "bg-green-500" : "bg-yellow-500"}`}
-                      />
+                        className={`absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-gray-800 ${isOnline(user.last_ping_timestamp) === "online" || user.unread ? "bg-green-500" : "bg-yellow-500"}`}
+                      ></div>
                     </div>
 
                     <div className="flex-1">
-                      <div className="font-semibold text-gray-100">{user.username || user.email}</div>
+                      <div className="font-semibold text-gray-100">
+                        {(user.username || user.email).slice(0, 22)}
+                        {(user.username || user.email).length > 22 ? "..." : ""}
+                      </div>
                       <div className="text-xs text-gray-400">{user.role}</div>
+                    </div>
+                    <div className={`text-white absolute  flex items-center justify-center text-sm p-2 h-6  ${user.unread ? "bg-blue-500" : ""} right-0 backdrop-blur-sm rounded-full`}>
+                      {user.unread || ""}
                     </div>
                   </div>
                 </div>
@@ -330,35 +384,49 @@ const Supportchat = () => {
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col">
         {/* Chat Header */}
-        <div className="bg-gray-800 border-b border-gray-700 p-4 flex items-center justify-between">
+        <div className="bg-gray-800 border-b border-gray-700 px-4 py-1 flex  justify-between">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center font-semibold">ST</div>
             <div>
               <h3 className="font-bold text-lg text-gray-100">Support Team Chat</h3>
               <p className="text-sm text-gray-400">{chatUsers.length} members </p>
+              <small className="text-gray-300">Gerente: {chatSelectedUserData.created_by}</small>
             </div>
           </div>
-          <div className="flex gap-1 flex-col justify-center ">
-            <p>Mark as</p>
-            <div className="flex gap-2">
-              <button onClick={(fa) => handleStatusChange("pending")} className="bg-yellow-500/50 hover:bg-yellow-500 rounded-md  px-1">
-                Pending
-              </button>
-              <button onClick={(fa) => handleStatusChange("solved")} className="bg-green-500/50 hover:bg-green-500 rounded-md  px-1">
-                Solved
-              </button>
-              <button onClick={(fa) => handleStatusChange("rejected")} className="bg-red-500/50 hover:bg-red-500 rounded-md  px-1">
-                Rejected
-              </button>
+          <div className="flex gap-2">
+            <div className="flex gap-1 flex-col justify-center border-1 border-dashed border-gray-500 rounded-xl px-4">
+              <p>Mark as</p>
+              <div className="flex gap-2">
+                <button onClick={(fa) => handleStatusChange("pending")} className="bg-yellow-500/50 hover:bg-yellow-500 rounded-md  px-1">
+                  Pending
+                </button>
+                <button onClick={(fa) => handleStatusChange("solved")} className="bg-green-500/50 hover:bg-green-500 rounded-md  px-1">
+                  Solved
+                </button>
+                <button onClick={(fa) => handleStatusChange("rejected")} className="bg-red-500/50 hover:bg-red-500 rounded-md  px-1">
+                  Rejected
+                </button>
+              </div>
+            </div>
+            <div className="border-1 border-dashed border-gray-500 rounded-xl px-4 py-1">
+              <p>Broadcast</p>
+              <div>
+                <form className="flex gap-2 items-center" onSubmit={handleBroadcasting}>
+                  <input value={broadcastValue} onInput={(e) => setBroadcastValue(e.target.value)} placeholder="Type your messgae..." type="text" />
+                  <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors flex items-center space-x-2 font-semibold">
+                    <BsSend />
+                  </button>
+                </form>
+              </div>
             </div>
           </div>
-          <button onClick={scrollToBottom} title="Bottom" className="p-2 hover:bg-blue-500 bg-gray-500/20 rounded-lg">
-            <IoMdArrowDown />
-          </button>
         </div>
 
         {/* Messages Area */}
         <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-900">
+          <button onClick={scrollToBottom} title="Bottom" className="p-2 shadow-xl backdrop-blur-sm fixed right-6 bottom-20 hover:bg-blue-500 bg-gray-500/20 rounded-lg">
+            <IoMdArrowDown />
+          </button>
           {chatSelectedUser ? (
             messages.map((msg) => (
               <div key={msg.id} className={`flex ${msg.isCurrentUser ? "justify-end" : "justify-start"}`}>

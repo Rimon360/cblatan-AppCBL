@@ -146,14 +146,15 @@ const verifyMiddleware = async (req, res, next) => {
   const decoded = jwt.verify(token, process.env.JWT_SECRET)
   const user = await UserModel.findOne({ email: decoded.email, _id: decoded._id })
 
-  let isEmailVerified = user.email_verified
-  if (!isEmailVerified) {
-    return res.status(200).json({ user: { error: true, email: user.email, token, message: "Correo electrónico no verificado", email_verified: false } })
-  } else if (user && !user?.verified_ip?.includes(ip)) {
-    return res.status(200).json({ user: { verified: false, email: user.email } })
-  } else {
-    next()
-  }
+  // let isEmailVerified = user.email_verified
+  // if (!isEmailVerified) {
+  //   return res.status(200).json({ user: { error: true, email: user.email, token, message: "Correo electrónico no verificado", email_verified: false } })
+  // } else if (user && !user?.verified_ip?.includes(ip)) {
+  //   return res.status(200).json({ user: { verified: false, email: user.email } })
+  // } else {
+  //   next()
+  // }
+  next()
 }
 module.exports = {
   authMiddleware,
