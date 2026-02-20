@@ -103,6 +103,7 @@ const Users = () => {
       const data = await res.json()
       if (data) {
         setUsers(users.filter((u) => u._id !== id))
+        setFilteredUsers(users.filter((u) => u._id !== id))
       } else {
         toast.error("Failed to delete the uses")
       }
@@ -175,7 +176,7 @@ const Users = () => {
         setUsageLimit(1)
         setPassword("")
         setLoadData(Date.now())
-        if (isSubscriptionChanged) {
+        if (isSubscriptionChanged && isUpdate) {
           toast.success("Submitted for final approval.")
         }
         setIsSubscriptionChanged(false)
