@@ -158,9 +158,11 @@ const Supportchat = () => {
     } catch (error) {}
   }, [chatSelectedUser])
   const fileRef = useRef("")
+  const [isBroadcasting, setIsBroadcasting] = useState(false)
+
   const handleSendMessage = async (e) => {
     e.preventDefault()
-    if (!chatSelectedUser) {
+    if (!chatSelectedUser && !isBroadcasting) {
       alert("Please select a user first")
       return
     }
@@ -169,7 +171,7 @@ const Supportchat = () => {
       let url = await handleFileUploading()
       const newMessage = {
         sender: current_user.email,
-        to: chatSelectedUser,
+        to: isBroadcasting ? "all" : chatSelectedUser,
         avatar: "YO",
         content: url,
         content_type: file.type,
@@ -183,7 +185,7 @@ const Supportchat = () => {
     if (inputMessage.trim()) {
       const newMessage = {
         sender: current_user.email,
-        to: chatSelectedUser,
+        to: isBroadcasting ? "all" : chatSelectedUser,
         avatar: "YO",
         content: inputMessage,
         content_type: "txt",
@@ -310,6 +312,7 @@ const Supportchat = () => {
   }
   const [chatSelectedUserData, setChatSelectedUserData] = useState({})
 
+  // this is to show which manager belongs to the selected user
   useEffect(() => {
     for (const user of chatUsers) {
       if (user._id == chatSelectedUser) {
@@ -318,6 +321,14 @@ const Supportchat = () => {
     }
   }, [chatUsers, chatSelectedUser])
 
+  const handlePaste = (e) => {
+    const items = e.clipboardData.items
+    const imageItem = Array.from(items).find((item) => item.type.startsWith("image"))
+    if (imageItem) {
+      const file = imageItem.getAsFile()
+      setFile(file)
+    }
+  }
   return (
     <div className="flex h-screen bg-gray-900 text-gray-100">
       {/* Sidebar - SupportUsers List */}
@@ -408,17 +419,10 @@ const Supportchat = () => {
                 </button>
               </div>
             </div>
-            <div className="border-1 border-dashed border-gray-500 rounded-xl px-4 py-1">
-              <p>Broadcast</p>
-              <div>
-                <form className="flex gap-2 items-center" onSubmit={handleBroadcasting}>
-                  <input value={broadcastValue} onInput={(e) => setBroadcastValue(e.target.value)} placeholder="Type your messgae..." type="text" />
-                  <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors flex items-center space-x-2 font-semibold">
-                    <BsSend />
-                  </button>
-                </form>
-              </div>
-            </div>
+            <label className="border-1 hover:border-1 border-dashed border-blue-500/50 cursor-pointer flex flex-col items-center border-dashed border-gray-500 rounded-xl px-4 py-1">
+              <p className="selection-none">Transmisión?</p>
+              <input type="checkbox" onChange={(e) => setIsBroadcasting(e.target.checked)} />
+            </label>
           </div>
         </div>
 
@@ -474,8 +478,12 @@ const Supportchat = () => {
 
           <form onSubmit={handleSendMessage} className="flex items-center space-x-3">
             <button disabled={!chatSelectedUser} type="button">
-              <label disabled={!chatSelectedUser} htmlFor="file" className="cursor-pointer p-2   block hover:bg-gray-700 rounded-lg transition-colors text-gray-400 hover:text-blue-400">
-                <input disabled={!chatSelectedUser} type="file" ref={fileRef} id="file" onInput={handleFileSelection} className="hidden" />
+              <label
+                disabled={isBroadcasting ? false : !chatSelectedUser}
+                htmlFor="file"
+                className="cursor-pointer p-2   block hover:bg-gray-700 rounded-lg transition-colors text-gray-400 hover:text-blue-400"
+              >
+                <input disabled={isBroadcasting ? false : !chatSelectedUser} type="file" ref={fileRef} id="file" onInput={handleFileSelection} className="hidden" />
                 <BsPaperclip className="text-xl" />
               </label>
             </button>
@@ -483,14 +491,19 @@ const Supportchat = () => {
               <BsEmojiSmile className="text-xl" />
             </button> */}
             <input
-              disabled={!chatSelectedUser || !file == true ? false : true}
+              disabled={isBroadcasting ? false : !chatSelectedUser || !file == true ? false : true}
               type="text"
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
-              placeholder="Type your message..."
+              onPaste={handlePaste}
+              placeholder="Escribe o pega tu mensaje..."
               className="flex-1 bg-gray-700 text-gray-100 px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            <button disabled={!chatSelectedUser} type="submit" className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors flex items-center space-x-2 font-semibold">
+            <button
+              disabled={isBroadcasting ? false : !chatSelectedUser}
+              type="submit"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors flex items-center space-x-2 font-semibold"
+            >
               <IoSend className="text-xl" />
             </button>
           </form>

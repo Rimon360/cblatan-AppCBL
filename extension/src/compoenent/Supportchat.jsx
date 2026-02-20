@@ -38,7 +38,7 @@ const Supportchat = () => {
       if (!socket) return
       socketRef.current = socket
       socket.emit("joinUser", state._id)
-      socket.on("receiveMessage", (data) => { 
+      socket.on("receiveMessage", (data) => {
         if (data.sender === state.email) {
           data.avatar = "ME"
           data.isCurrentUser = true
@@ -203,6 +203,15 @@ const Supportchat = () => {
     )
   }
 
+  const handlePaste = (e) => {
+    const items = e.clipboardData.items
+    const imageItem = Array.from(items).find((item) => item.type.startsWith("image"))
+    if (imageItem) {
+      const file = imageItem.getAsFile()
+      setFile(file)
+    }
+  }
+
   return (
     <div className="flex h-screen bg-gray-900 text-gray-100">
       {/* Main Chat Area */}
@@ -281,7 +290,8 @@ const Supportchat = () => {
               type="text"
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
-              placeholder="Type your message..."
+              onPaste={handlePaste}
+              placeholder="Escribe o pega tu mensaje..."
               className="flex-1 bg-gray-700 text-gray-100 px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <button disabled={!chatSelectedUser} type="submit" className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors flex items-center space-x-2 font-semibold">
