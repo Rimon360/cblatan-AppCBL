@@ -45,6 +45,8 @@ const Supportchat = () => {
           data.sender = "You"
         } else {
           data.sender = "Customer Support"
+          data.isCurrentUser = false
+          data.avatar = "CS"
           messageToast({ sender: data.sender, text: data.content })
         }
         setMessages((prev) => [...prev, data])

@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken")
 const { generateRandomKey } = require("./functions")
-const { insertGroupConversation, insertPrivateConversation } = require("./controllers/socketController")
+const { insertGroupConversation, insertPrivateConversation, getUnreadCount, addUnreadCount, removeUnreadCount } = require("./controllers/socketController")
 
 // ====== STATE ======
 const onlineUsers = new Map() // userId -> Set(socketId)
@@ -98,8 +98,15 @@ module.exports = (io) => {
     })
 
     socket.on("broadcast", async (data) => {
-      socket.broadcast.emit("receiveMessage", data) 
+      socket.broadcast.emit("receiveMessage", data)
       await insertPrivateConversation(data, socket.user)
+    })
+    socket.on("getunread", async () => {
+      let count = await getUnreadCount(socket.user.id) 
+      io.to(socket.user.id).emit("getunread", count)
+    }) 
+    socket.on("removeunread", async () => {
+      await removeUnreadCount(socket.user.id)
     })
 
     // ====== DISCONNECT ======

@@ -1,6 +1,7 @@
 const adminChatModel = require("../models/adminChatModel")
 const supportChatModel = require("../models/supportChatModel")
 const UserModel = require("../models/userModel")
+const unreadCountModel = require("../models/userUnreadBroadcastingCountModel")
 
 // by ws
 module.exports.insertGroupConversation = async (data) => {
@@ -25,6 +26,7 @@ module.exports.insertPrivateConversation = async (data, user) => {
       let allUsers = await UserModel.find({ email: { $ne: data.sender }, role: { $ne: "admin" } })
       for (const user of allUsers) {
         msgArray.push({ ...data, to: user._id.toString() })
+        addUnreadCount(user._id.toString())
       }
       await supportChatModel.insertMany(msgArray)
     } else {
@@ -58,7 +60,7 @@ module.exports.getPrivateConversation = async (req, res) => {
 module.exports.getChatPrivateUsers = async (req, res) => {
   try {
     // const from = new Date(Date.now() - 24 * 60 * 60 * 1000)
-    let result = await UserModel.find({ support_status: { $ne: "none", $exists: true } }, { email: 1, role: 1, support_status: 1, username: 1, last_ping_timestamp: 1,created_by:1 })
+    let result = await UserModel.find({ support_status: { $ne: "none", $exists: true } }, { email: 1, role: 1, support_status: 1, username: 1, last_ping_timestamp: 1, created_by: 1 })
 
     res.status(200).json(result)
   } catch (err) {
@@ -81,5 +83,36 @@ module.exports.handleUserSupportStatusChange = async (req, res) => {
     res.status(200).json(mod.modifiedCount)
   } catch (error) {
     res.status(403).json({ error: true, message: err.message })
+  }
+}
+
+async function addUnreadCount(user_id) {
+  try {
+    let user = await unreadCountModel.findOne({ user_id })
+    if (!user) {
+      await unreadCountModel.insertOne({ user_id, unread_count: 1 })
+      return 1
+    } else {
+      let count = user.unread_count + 1
+      await unreadCountModel.updateOne({ user_id }, { unread_count: count })
+      return count
+    }
+  } catch (error) {
+    console.log(error.message)
+  }
+}
+module.exports.removeUnreadCount = async (user_id) => {
+  try {
+    await unreadCountModel.updateOne({ user_id }, { unread_count: 0 })
+  } catch (error) {
+    return error
+  }
+}
+module.exports.getUnreadCount = async (user_id) => {
+  try {
+    let { unread_count } = await unreadCountModel.findOne({ user_id }, { unread_count: 1 }) 
+    return unread_count
+  } catch (error) {
+    return 0
   }
 }

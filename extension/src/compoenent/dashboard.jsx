@@ -1,7 +1,7 @@
 import { useGlobal } from "../context/globalContext"
 import { NavLink, useNavigate } from "react-router-dom"
 import { IoReload } from "react-icons/io5"
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { useEffect } from "react"
 import axios from "../../axiosConfig"
 import { getPasswordData } from "../routes/Url"
@@ -11,6 +11,8 @@ import { toast } from "react-hot-toast"
 import AdsComponent from "./adsComponent"
 import { MdOpenInNew } from "react-icons/md"
 import { BiSupport } from "react-icons/bi"
+import { getSocket } from "../socket"
+import { playNotificationSound } from "../functions"
 
 const Dashboard = () => {
   const refreshActivityPeriodInSecond = 30
@@ -24,6 +26,7 @@ const Dashboard = () => {
   const logout = () => {
     removeToken()
     nav("/login")
+    location.reload()
   }
   const [courseSearchQuery, setCourseSearchQuery] = useState(null)
   const [refreshActivity, setRefreshActivity] = useState(Date.now())
@@ -116,6 +119,36 @@ const Dashboard = () => {
     const t = new Date(time).toLocaleString("en-US", { timeZone })
     return `${t}  `
   }
+  const unreadBroadcasting = useRef(0)
+  const socketRef = useRef(null)
+  useEffect(() => {
+    ;(async () => {
+      const socket = await getSocket()
+      socketRef.current = socket
+      socket.emit("joinUser", state._id)
+      socket.emit("getunread", state._id)
+      socket.on("getunread", (count) => {
+        unreadBroadcasting.current = count
+        if (count > 0) {
+          window.open("/index.html#/supportchat", "_blank")
+          socketRef.current.emit("removeunread")
+          unreadBroadcasting.current = 0
+        }
+      })
+      socket.on("receiveMessage", (data) => {
+        if (data?.to == "all") {
+          unreadBroadcasting.current += 1
+          socket.emit("addunread")
+          playNotificationSound()
+        }
+      })
+    })()
+  }, [state])
+
+  const handleNotificationOpened = () => {
+    unreadBroadcasting.current = 0
+    socketRef.current.emit("removeunread")
+  }
 
   const [codeHere, setCodeHere] = useState({})
   return (
@@ -132,14 +165,23 @@ const Dashboard = () => {
         )}
         {!warning ? (
           <>
-            <header className="flex items-center justify-between bg-blue-500/50 p-4 sticky top-0 z-10 backdrop-blur-md">
-              <NavLink target="_blank" to="/supportchat" className="!text-white text-2xl !bg-transparent hover:!bg-gray-200/20 rounded-xl px-2">
-                <button className="text-white text-2xl !bg-transparent">
+            <header className="flex gap-2 items-center justify-between bg-blue-500/50 p-4 sticky top-0 z-10 backdrop-blur-md">
+              <NavLink onClick={handleNotificationOpened} target="_blank" to="/supportchat" className="!text-white text-2xl !bg-transparent hover:!bg-gray-200/20 rounded-xl px-2">
+                <button className="text-white text-2xl !bg-transparent relative">
+                  <small className={`absolute top-[-15px] text-[11px] right-[-10px] bg-red-500/50 ${unreadBroadcasting ? "px-2" : ""} index-10 rounded-2xl`}>{unreadBroadcasting.current || ""}</small>
                   <BiSupport className="text-xl" />
                 </button>
               </NavLink>
               <div className="text-white">
                 <span className="font-medium">You:</span> {user?.email || "N/A"}
+              </div>
+              <div className="px-4 ">
+                <button
+                  onClick={() => handleWebsiteLogin("https://email.appcbl.lat/email", codeHere.e, codeHere.k, codeHere.proxy, codeHere.id)}
+                  className="text-white !text-[18px] w-[200px] bg-gray-400/20  rounded-md py-2 hover:!bg-blue-500/50 flex justify-center items-center gap-2"
+                >
+                  CODIGOS AQUI <MdOpenInNew className="flex justify-center items-center" />
+                </button>
               </div>
               <div className="text-gray-700">
                 <button onClick={logout} className="text-center text-sm   text-white  hover:!bg-gray-200/20 rounded-md px-2 py-1  ">
@@ -149,16 +191,6 @@ const Dashboard = () => {
             </header>
 
             <div className="bg-gray-900 min-h-fit m-1 rounded-lg ">
-              <div className="p-4 flex justify-between gap-4  items-center">
-                <h2 className="text-2xl flex items-center font-bold text-gray-300 mb-4">Welcome, {user?.email || "User"}!</h2>
-                <button
-                  onClick={() => handleWebsiteLogin("https://email.appcbl.lat/email", codeHere.e, codeHere.k, codeHere.proxy, codeHere.id)}
-                  className="text-white !text-[18px] w-[200px] bg-gray-400/20  rounded-md py-2 hover:!bg-blue-500/50 flex justify-center items-center gap-2"
-                >
-                  CODIGOS AQUI <MdOpenInNew className="flex justify-center items-center" />
-                </button>
-              </div>
-              <hr />
               <div>
                 <input
                   name="search"
@@ -217,9 +249,8 @@ const Dashboard = () => {
                 </>
               ) : (
                 <div className="flex items-center gap-2 flex-col">
-                  <h1 className="text-gray-400 text-center text-sm">Empty!</h1>
                   <button
-                    className="text-blue-300 flex items-center gap-2 mb-3 "
+                    className="text-blue-300 flex items-center gap-2 py-4 "
                     onClick={() => {
                       location.reload()
                     }}

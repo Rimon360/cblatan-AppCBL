@@ -178,7 +178,7 @@ const Supportchat = () => {
         createdAt: new Date(),
         isCurrentUser: true,
       }
-      socketRef.current.emit("privateMessage", newMessage)
+      socketRef.current.emit(isBroadcasting ? "broadcast" : "privateMessage", newMessage)
       setInputMessage("")
       return
     }
@@ -192,7 +192,7 @@ const Supportchat = () => {
         createdAt: new Date(),
         isCurrentUser: true,
       }
-      socketRef.current.emit("privateMessage", newMessage)
+      socketRef.current.emit(isBroadcasting ? "broadcast" : "privateMessage", newMessage)
       setInputMessage("")
     }
   }
@@ -329,6 +329,7 @@ const Supportchat = () => {
       setFile(file)
     }
   }
+  const statusOrder = ["pending", "solved", "rejected"]
   return (
     <div className="flex h-screen bg-gray-900 text-gray-100">
       {/* Sidebar - SupportUsers List */}
@@ -347,48 +348,48 @@ const Supportchat = () => {
         </div>
 
         <div className="flex-1 overflow-y-auto">
-          {Object.entries(
-            chatUsersForRender.reduce((acc, user) => {
-              ;(acc[user.support_status] ??= []).push(user)
-              return acc
-            }, {}),
-          ).map(([status, users]) => (
-            <div key={status}>
-              {/* status label */}
-              <div className={`px-4 py-2 text-xs font-semibold uppercase ${status == "pending" ? "text-yellow-400" : status == "solved" ? "text-green-400" : "text-red-400"} bg-gray-800`}>
-                {status}
-              </div>
-
-              {users.map((user) => (
+          {["pending", "solved", "rejected", "none"]
+            .map((status) => [status, chatUsersForRender.filter((u) => u.support_status === status)])
+            .filter(([, users]) => users.length)
+            .map(([status, users]) => (
+              <div className="max-h-[30vh] overflow-auto" key={status}>
+                {/* status label */}
                 <div
-                  key={user._id}
-                  onClick={() => handleChatUserChange(user._id)}
-                  className={`p-4 hover:bg-gray-700 ${user._id === chatSelectedUser ? "!bg-gray-700" : ""} cursor-pointer border-b border-gray-700/50`}
+                  className={`px-4 sticky border-b-1 top-0 z-10 py-2 text-xs font-semibold uppercase ${status == "pending" ? "text-yellow-400" : status == "solved" ? "text-green-400" : "text-red-400"} bg-gray-800`}
                 >
-                  <div className="flex items-center space-x-3 relative">
-                    <div className="relative">
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center font-semibold text-white">{user.avatar}</div>
+                  {status}
+                </div>
 
-                      <div
-                        className={`absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-gray-800 ${isOnline(user.last_ping_timestamp) === "online" || user.unread ? "bg-green-500" : "bg-yellow-500"}`}
-                      ></div>
-                    </div>
+                {users.map((user) => (
+                  <div
+                    key={user._id}
+                    onClick={() => handleChatUserChange(user._id)}
+                    className={`p-4 hover:bg-gray-700 ${user._id === chatSelectedUser ? "!bg-gray-700" : ""} cursor-pointer border-b border-gray-700/50`}
+                  >
+                    <div className="flex items-center space-x-3 relative">
+                      <div className="relative">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center font-semibold text-white">{user.avatar}</div>
 
-                    <div className="flex-1">
-                      <div className="font-semibold text-gray-100">
-                        {(user.username || user.email).slice(0, 22)}
-                        {(user.username || user.email).length > 22 ? "..." : ""}
+                        <div
+                          className={`absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-gray-800 ${isOnline(user.last_ping_timestamp) === "online" || user.unread ? "bg-green-500" : "bg-yellow-500"}`}
+                        ></div>
                       </div>
-                      <div className="text-xs text-gray-400">{user.role}</div>
-                    </div>
-                    <div className={`text-white absolute  flex items-center justify-center text-sm p-2 h-6  ${user.unread ? "bg-blue-500" : ""} right-0 backdrop-blur-sm rounded-full`}>
-                      {user.unread || ""}
+
+                      <div className="flex-1">
+                        <div className="font-semibold text-gray-100">
+                          {(user.username || user.email).slice(0, 22)}
+                          {(user.username || user.email).length > 22 ? "..." : ""}
+                        </div>
+                        <div className="text-xs text-gray-400">{user.role}</div>
+                      </div>
+                      <div className={`text-white absolute  flex items-center justify-center text-sm p-2 h-6  ${user.unread ? "bg-blue-500" : ""} right-0 backdrop-blur-sm rounded-full`}>
+                        {user.unread || ""}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          ))}
+                ))}
+              </div>
+            ))}
         </div>
       </div>
 
