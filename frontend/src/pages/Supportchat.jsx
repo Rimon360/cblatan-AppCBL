@@ -352,7 +352,7 @@ const Supportchat = () => {
             .map((status) => [status, chatUsersForRender.filter((u) => u.support_status === status)])
             .filter(([, users]) => users.length)
             .map(([status, users]) => (
-              <div className="max-h-[30vh] overflow-auto" key={status}>
+              <div key={status}>
                 {/* status label */}
                 <div
                   className={`px-4 sticky border-b-1 top-0 z-10 py-2 text-xs font-semibold uppercase ${status == "pending" ? "text-yellow-400" : status == "solved" ? "text-green-400" : "text-red-400"} bg-gray-800`}
