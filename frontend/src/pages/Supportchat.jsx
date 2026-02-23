@@ -114,21 +114,34 @@ const Supportchat = () => {
     }
     getIdFromHash()
   }, [])
-
+  const oldUserIdRef = useRef([])
+  const newPendingUserIdRef = useRef([])
   useEffect(() => {
     try {
       ;(async () => {
         let result = await axios2.get(BACKEND_URL + "/api/users/chat/get-users", { headers: { Authorization: "Bearer " + token } })
         let data = []
+        let changesIds = []
+        if (oldUserIdRef.current.length == 0) oldUserIdRef.current = result.data.map((a) => a._id)
+
         for (const element of result.data) {
           element.avatar = element.username?.slice(0, 2).toUpperCase() || element.email?.slice(0, 2).toUpperCase()
           if (element._id && socketRef.current && element.support_status == "pending" && !trackUserJoinRef.current.includes(element._id)) {
             trackUserJoinRef.current.push(element._id)
             socketRef.current.emit("joinUser", element._id)
+            changesIds.push(element._id)
           }
           data.push(element)
+          if (!oldUserIdRef.current.includes(element._id)) {
+            oldUserIdRef.current.push(element._id)
+            newPendingUserIdRef.current.push(element._id)
+          }
+        } 
+        setChatUsers(data)
+        for (const id of newPendingUserIdRef.current) {
+          changeUserUnread(id)
         }
-        setChatUsers(result.data)
+        newPendingUserIdRef.current = []
       })()
     } catch (error) {}
   }, [isReloadUserList])
@@ -329,7 +342,6 @@ const Supportchat = () => {
       setFile(file)
     }
   }
-  const statusOrder = ["pending", "solved", "rejected"]
   return (
     <div className="flex h-screen bg-gray-900 text-gray-100">
       {/* Sidebar - SupportUsers List */}
