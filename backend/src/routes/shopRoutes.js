@@ -1,12 +1,12 @@
 const express = require("express");
-const { createShop, getAllShop, assignShop, unassignShop, getAssignedShops, getShopByUserId, deleteShop, getUserByShopId, createSubtitle, getSubtitle, updateShop, updateSubtitle, deleteSubtitle, getAssignedRequestedShops, approveAssignedRequestedShops, deleteAssignedRequestedShops, deleteAllAssignedRequestedShops } = require("../controllers/shopController");
+const { createShop, getAllShop, assignShop, unassignShop, getAssignedShops, getShopByUserId, deleteShop, getUserByShopId, createSubtitle, getSubtitle, updateShop, updateSubtitle, deleteSubtitle, getAssignedRequestedShops, approveAssignedRequestedShops, deleteAssignedRequestedShops, deleteAllAssignedRequestedShops, getAllShopByUserId } = require("../controllers/shopController");
 const { adminMiddleware, memberMiddleware } = require("../middlewares/authMiddleware");
 
 const router = express.Router();
 
 router.post("/create", adminMiddleware, createShop);
 router.post("/create_subtitle", adminMiddleware, createSubtitle);
-router.get("/subtitle/:id", adminMiddleware, getSubtitle);
+router.get("/subtitle/:id", adminMiddleware, getSubtitle); // by shop id
 router.post("/update", adminMiddleware, updateShop);
 router.post("/subtitle/update", adminMiddleware, updateSubtitle);
 router.post("/assign", adminMiddleware, assignShop);
@@ -20,6 +20,7 @@ router.delete("/unassign", adminMiddleware, unassignShop);
 router.delete("/delete", adminMiddleware, deleteShop);
 router.delete("/subtitle", adminMiddleware, deleteSubtitle);
 router.get("/", getAllShop);
+router.get("/extension",memberMiddleware, getAllShopByUserId);
 router.get("/member/:id", memberMiddleware, getShopByUserId);
 router.get("/getuserbyshopid/:shop_id", getUserByShopId);
 module.exports = router;

@@ -17,7 +17,8 @@ button {
 }
 
 body {
-    @apply bg-radial from-gray-900 to-gray-950 to-90%;
+    @apply bg-radial from-blue-950 to-gray-950 to-50%;
+    background-attachment: fixed
 }
 
 table {
@@ -165,4 +166,28 @@ form {
 button:disabled {
     opacity: .5;
     cursor: not-allowed;
+}
+
+.courseList {
+    @apply text-white  transition duration-1000 
+}
+
+.courseList ul {
+    @apply ml-2 border-l-1 border-blue-100/20
+}
+
+.courseList ul li, .courseList section {
+    @apply p-2 cursor-pointer hover:bg-blue-300/10 rounded-xl m-1 indent-1 relative capitalize
+}
+
+.locked-item {
+    @apply bg-radial from-purple-500/15 to-blue-500/15
+}
+
+.courseList ul li::before {
+    content: "";
+    @apply h-[2px] w-4 absolute left-[-4px] top-1/2 bg-gray-100/20;
+}
+.locked-item {
+    @apply !py-0 text-sm !rounded-md text-yellow-500/50  
 }

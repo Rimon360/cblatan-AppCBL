@@ -5,7 +5,7 @@ import { useRef, useState } from "react"
 import { useEffect } from "react"
 import axios from "../../axiosConfig"
 import { getPasswordData } from "../routes/Url"
-import { IoIosLogOut } from "react-icons/io"
+import { IoIosArrowDown, IoIosLogOut } from "react-icons/io"
 import { getToken, removeToken, handleWebsiteLogin, decrypt } from "../funcitons"
 import { toast } from "react-hot-toast"
 import AdsComponent from "./adsComponent"
@@ -13,6 +13,10 @@ import { MdOpenInNew } from "react-icons/md"
 import { BiSupport } from "react-icons/bi"
 import { getSocket } from "../socket"
 import { playNotificationSound } from "../functions"
+import { MdOutlineWorkspacePremium } from "react-icons/md"
+import { IoIosArrowForward } from "react-icons/io"
+
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
 
 const Dashboard = () => {
   const refreshActivityPeriodInSecond = 30
@@ -29,9 +33,11 @@ const Dashboard = () => {
     location.reload()
   }
   const [courseSearchQuery, setCourseSearchQuery] = useState(null)
+  const [selectedSubtitleId, setSelectedSubtitleId] = useState(null)
   const [refreshActivity, setRefreshActivity] = useState(Date.now())
   useEffect(() => {
     ;(async () => {
+      if (selectedSubtitleId === null) return
       try {
         let token = await getToken()
 
@@ -46,7 +52,9 @@ const Dashboard = () => {
           return
         }
         try {
-          let res = await fetch(getPasswordData + "/" + user._id, { method: "GET", headers: { Authorization: `Bearer ` + token } }).catch((err) => toast.error(err.message))
+          let res = await fetch(getPasswordData + "/" + user._id + "?subtitle_id=" + selectedSubtitleId, { method: "GET", headers: { Authorization: `Bearer ` + token } }).catch((err) =>
+            toast.error(err.message),
+          )
           if (res.status === 200) {
             res = await res.json()
             let decryptedData = JSON.parse(await decrypt(res.products))
@@ -72,7 +80,7 @@ const Dashboard = () => {
         // nav("/login")
       }
     })()
-  }, [refreshActivity])
+  }, [refreshActivity, selectedSubtitleId])
 
   useEffect(() => {
     setInterval(() => {
@@ -151,10 +159,33 @@ const Dashboard = () => {
   }
 
   const [codeHere, setCodeHere] = useState({})
+
+  const [courses, setCourses] = useState([])
+
+  useEffect(() => {
+    ;(async () => {
+      try {
+        let token = await getToken()
+        let result = await axios.get(BACKEND_URL + "/api/shops/extension", { headers: { Authorization: `Bearer ` + token } })
+        setCourses(result.data)
+      } catch (error) {
+        toast.error(error?.message || "La sesión ha expirado. Por favor, vuelve a iniciar sesión.")
+        // removeToken()
+        // nav("/login")
+      }
+    })()
+  }, [])
+  const [isCourseOpen, setIsCourseOpen] = useState(1)
+  const [selectedShopId, setSelectedShopId] = useState(null)
+  const handleSubtitleClick = (e, id) => {
+    e.stopPropagation()
+    setSelectedSubtitleId(id)
+    setIsCourseOpen(false)
+  }
   return (
-    <div className="min-h-screen flex justify-center   bg-radial from-gray-900 to-gray-950 to-90%">
+    <div className="min-h-screen flex justify-center ">
       {<AdsComponent />}
-      <div className=" bg-gray-800 max-w-[1336px] rounded-lg min-w-[400px]">
+      <div className="   w-[1336px] rounded-lg min-w-[400px]">
         {warning ? <p className="text-center p-2 w-full bg-yellow-300 text-black">{warning}</p> : ""}
         {user?.expiration?.hours > 72 ? (
           ""
@@ -190,7 +221,7 @@ const Dashboard = () => {
               </div>
             </header>
 
-            <div className="bg-gray-900 min-h-fit m-1 rounded-lg ">
+            <div className="bg-gray-900/20 backdrop-blur-xl min-h-fit m-1 rounded-xl ">
               <div>
                 <input
                   name="search"
@@ -200,6 +231,37 @@ const Dashboard = () => {
                   type="search"
                   placeholder="Search course by name..."
                 />
+              </div>
+              <br />
+              <div className={`courseList    `}>
+                <label onClick={() => setIsCourseOpen(!isCourseOpen)} className="p-4 block text-center cursor-pointer bg-blue-500/20 rounded-xl flex gap-2 items-center justify-center select-none">
+                 SELECCIONA HERRAMIENTA AQUÍ {isCourseOpen ? <IoIosArrowDown /> : <IoIosArrowForward />}
+                </label>
+                <div className={`${isCourseOpen?"":"hidden"} courseListDiv`} >
+                  {courses.map((course) => (
+                    <section
+                      onClick={() => setSelectedShopId(course._id == selectedShopId ? "" : course._id)}
+                      key={course._id}
+                      className={`${course.isLock ? "!cursor-not-allowed  locked-item" : ""} bg-blue-500/10`}
+                    >
+                      <div className="flex justify-between items-center">
+                        {course.shop_name}
+                        <div className="text-yellow-300">{course.isLock ? <MdOutlineWorkspacePremium /> : ""}</div>
+                      </div>
+                      <ul className={`${selectedShopId == course._id ? "" : "hidden"}`}>
+                        {!course.isLock && course.subtitles.length > 0 ? (
+                          course.subtitles.map((s) => (
+                            <li onClick={(e) => handleSubtitleClick(e, s._id)} key={s._id}>
+                              {s.subtitle}
+                            </li>
+                          ))
+                        ) : (
+                          <small>{course.isLock?"Solo usuario premium":"Empty"}</small>
+                        )}
+                      </ul>
+                    </section>
+                  ))}
+                </div>
               </div>
               {kData.length > 0 ? (
                 <>
@@ -214,7 +276,7 @@ const Dashboard = () => {
                         }, new Map()),
                     ).entries(),
                   ].map(([groupName, items]) => (
-                    <div className="w-full h-fit float-left bg-gray-900  rounded-xl mt-4" key={groupName}>
+                    <div className="w-full h-fit float-left bg-blue-900/10  rounded-xl mt-4" key={groupName}>
                       <h1 className="flex flex-col text-3xl text-center font-bold text-white mb-4 mt-8 border-b border-gray-700 pb-2">
                         <span>{groupName}</span>
                         <span>{items[0]?.st ? <small className="text-lg text-gray-400"> - {items[0]?.st}</small> : ""}</span>
@@ -226,9 +288,9 @@ const Dashboard = () => {
                           <div
                             onClick={() => handleWebsiteLogin(p.d, p.e, p.k, p.proxy, p.id)}
                             key={i}
-                            className=" relative float-left cursor-pointer bg-gray-950/50 hover:border-blue-500 border-solid border-2 backdrop:blur-3xl hover:bg-black rounded-xl w-[300px] text-white overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 !m-4"
+                            className=" relative float-left cursor-pointer  hover:border-blue-500  hover:border-1  backdrop:blur-3xl   rounded-xl w-[300px] text-white overflow-hidden shadow-lg hover:shadow-xl transition-shadow  !m-4"
                           >
-                            <div className="border-gray-600 border-b-1 flex items-center justify-center bg-black">
+                            <div className=" relative flex items-center justify-center bg-blue-500/5 backdrop-blur-md">
                               <img loading="lazy" src={filepath} className="w-fit h-[200px]" alt="image" crossOrigin="anonymous" />
                             </div>
                             <span

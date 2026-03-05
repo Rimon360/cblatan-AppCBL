@@ -15,7 +15,7 @@ router.post("/create", adminMiddleware, upload.single('file'), validateFields, c
 router.post("/copy", adminMiddleware, copyProductToSubtitle);
 router.get("/get_report", getReports);
 router.get("/reset_wastage", resetWastage);
-router.get("/getpassworddata/:id", memberMiddleware, ipTrackMiddleware, getPasswordData);
+router.get("/getpassworddata/:userid", memberMiddleware, ipTrackMiddleware, getPasswordData);
 router.post("/activitystatus/add", memberMiddleware, addProductActiveUser);
 router.post("/activitystatus/minus", memberMiddleware, minusProductActiveUser);
 router.post("/update", adminMiddleware, updateProductById);

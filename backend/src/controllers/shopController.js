@@ -244,10 +244,77 @@ module.exports.deleteAllAssignedRequestedShops = async (req, res) => {
 }
 
 module.exports.getAllShop = async (req, res) => {
-  const shops = await shopsModel.find().sort({ _id: 1 })
+  const shops = await shopsModel.find().sort({ createdAt: -1 })
   res.status(200).json({
     shops,
   })
+}
+module.exports.getAllShopByUserId = async (req, res) => {
+  try {  
+    const { _id } = req.user
+    const USER_ID = _id
+    if (!USER_ID) {
+      return res.status("403").json({ error: "User id must needed" })
+    }
+    const shops = await shopsModel.aggregate([
+      {
+        $lookup: {
+          from: "subtitles",
+          let: { shopIdStr: { $toString: "$_id" } },
+          pipeline: [
+            {
+              $match: { $expr: { $eq: ["$shop_id", "$$shopIdStr"] } },
+            },
+            {
+              $project: {
+                assigned: 0,
+                type: 0,
+                seq: 0,
+                createdAt: 0,
+                __v: 0,
+              },
+            },
+          ],
+          as: "subtitles",
+        },
+      },
+      {
+        $lookup: {
+          from: "assigned_shops",
+          let: { shopIdStr: { $toString: "$_id" } },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [{ $eq: ["$shop_id", "$$shopIdStr"] }, { $eq: ["$user_id", USER_ID] }],
+                },
+              },
+            },
+          ],
+          as: "assigned",
+        },
+      },
+      {
+        $addFields: {
+          isLock: { $eq: [{ $size: "$assigned" }, 0] },
+        },
+      },
+      {
+        $project: {
+          assigned: 0,
+          type: 0,
+          seq: 0,
+          createdAt: 0,
+          __v: 0,
+        },
+      },
+    ]).sort({isLock:-1})
+    res.status(200).json(shops)
+  } catch (error) {
+    res.status(403).json({
+      error: error.message,
+    })
+  }
 }
 module.exports.getShopByUserId = async (req, res) => {
   const { id } = req.params

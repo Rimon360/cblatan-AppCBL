@@ -99,9 +99,10 @@ module.exports.getReports = async (req, res) => {
   })
 }
 module.exports.getPasswordData = async (req, res) => {
-  const { id } = req.params
+  const { userid } = req.params
+  const { subtitle_id } = req.query
   const products = await assignModel.aggregate([
-    { $match: { user_id: id } },
+    { $match: { user_id: userid } },
     {
       $lookup: {
         from: "subtitles",
@@ -128,12 +129,16 @@ module.exports.getPasswordData = async (req, res) => {
     {
       $replaceRoot: {
         newRoot: {
-          $mergeObjects: ["$products", {
-            subtitle: "$subtitles.subtitle",
-            checked: "$checked",
-            expires: "$expires",
-            proxy: "$proxy"
-          }],
+          $mergeObjects: [
+            "$products",
+            {
+              subtitle: "$subtitles.subtitle",
+              subtitle_id: "$subtitles._id",
+              checked: "$checked",
+              expires: "$expires",
+              proxy: "$proxy",
+            },
+          ],
         },
       },
     },
@@ -148,10 +153,11 @@ module.exports.getPasswordData = async (req, res) => {
         m: "$file_path",
         t: "$createdAt",
         id: "$_id",
+        subtitle_id: "$subtitle_id",
         checked: "$checked",
         expires: "$expires",
         active_users: "$active_users",
-        proxy: "$proxy"
+        proxy: "$proxy",
       },
     },
     {
@@ -165,25 +171,23 @@ module.exports.getPasswordData = async (req, res) => {
     },
   ])
 
-
   let tmp = []
   for (const p of products) {
+    if (p.subtitle_id.toString() != subtitle_id) continue
     if (p.checked) {
-      let expires = p.expires;
-      let timestamp = new Date(expires).getTime();
-      let currentTimeStamp = Date.now();
-      if (timestamp - currentTimeStamp < 0) continue;
+      let expires = p.expires
+      let timestamp = new Date(expires).getTime()
+      let currentTimeStamp = Date.now()
+      if (timestamp - currentTimeStamp < 0) continue
       p.k = decrypt(p.k)
       tmp.push(p)
     } else {
       p.k = decrypt(p.k)
       tmp.push(p)
     }
-
   }
 
   return res.status(200).json({ products: encrypt(JSON.stringify(tmp)) })
-
 }
 
 module.exports.getProductByShopId = async (req, res) => {
@@ -286,20 +290,20 @@ module.exports.deleteProductById = async (req, res) => {
 module.exports.addProductActiveUser = async (req, res) => {
   try {
     const { id, country } = req.body
-    const user = req.user;
-    const currentTime = new Date().toLocaleString("en-US", { timeZone:'America/Lima' })
+    const user = req.user
+    const currentTime = new Date().toLocaleString("en-US", { timeZone: "America/Lima" })
     if (!id) {
-      return res.status(400).json()
+      return res.status(200).json({message:"Required filed missing"})
     }
     const productData = await productModel.findOne({ _id: id })
     if (productData) {
       let active_users = productData.active_users || []
 
-      if (typeof active_users === 'number') {
+      if (typeof active_users === "number") {
         active_users = []
       }
       active_users.push(`${user.email} : ${currentTime} : ${country}`)
-      let updated = await productModel.updateOne({ _id: id }, { active_users });
+      let updated = await productModel.updateOne({ _id: id }, { active_users })
       if (updated.modifiedCount > 0) {
         return res.status(200).json()
       }
@@ -314,7 +318,7 @@ module.exports.addProductActiveUser = async (req, res) => {
 module.exports.minusProductActiveUser = async (req, res) => {
   try {
     const { id } = req.body
-    const { email } = req.user;
+    const { email } = req.user
     if (!id) {
       return res.status(400).json()
     }
@@ -322,7 +326,7 @@ module.exports.minusProductActiveUser = async (req, res) => {
     if (productData) {
       let active_users = productData.active_users || 0
       let tmp = []
-      let matchedCount = 0;
+      let matchedCount = 0
       for (const el of active_users) {
         if (el.includes(email) && matchedCount === 0) {
           matchedCount++
@@ -331,9 +335,9 @@ module.exports.minusProductActiveUser = async (req, res) => {
         tmp.push(el)
       }
       // active_users = active_users.filter(el => !el.includes(email))
-      active_users = tmp;
+      active_users = tmp
       if (active_users < 0) active_users = 0
-      let updated = await productModel.updateOne({ _id: id }, { active_users });
+      let updated = await productModel.updateOne({ _id: id }, { active_users })
       if (updated.modifiedCount > 0) {
         return res.status(200).json()
       }
