@@ -161,9 +161,11 @@ const Dashboard = () => {
   const [codeHere, setCodeHere] = useState({})
 
   const [courses, setCourses] = useState([])
-
+  const [isCourseOpen, setIsCourseOpen] = useState(1)
+  const [selectedShopId, setSelectedShopId] = useState(null)
   useEffect(() => {
     ;(async () => {
+      if (!isCourseOpen || courses.length > 0) return
       try {
         let token = await getToken()
         let result = await axios.get(BACKEND_URL + "/api/shops/extension", { headers: { Authorization: `Bearer ` + token } })
@@ -174,13 +176,26 @@ const Dashboard = () => {
         // nav("/login")
       }
     })()
+  }, [isCourseOpen])
+  const [landingTool, setLandingTool] = useState([])
+  useEffect(() => {
+    ;(async () => {
+      try {
+        let token = await getToken()
+        let result = await axios.get(BACKEND_URL + "/api/products/getmostusedtool", { headers: { Authorization: `Bearer ` + token } })
+        let decryptedData = JSON.parse(await decrypt(result.data.products))
+        setLandingTool(decryptedData)
+      } catch (error) {
+        toast.error(error?.message || "La sesión ha expirado. Por favor, vuelve a iniciar sesión.")
+        // removeToken()
+        // nav("/login")
+      }
+    })()
   }, [])
-  const [isCourseOpen, setIsCourseOpen] = useState(1)
-  const [selectedShopId, setSelectedShopId] = useState(null)
+
   const handleSubtitleClick = (e, id) => {
     e.stopPropagation()
     setSelectedSubtitleId(id)
-    setIsCourseOpen(false)
   }
   return (
     <div className="min-h-screen flex justify-center ">
@@ -221,32 +236,21 @@ const Dashboard = () => {
               </div>
             </header>
 
-            <div className="bg-gray-900/20 backdrop-blur-xl min-h-fit m-1 rounded-xl ">
-              <div>
-                <input
-                  name="search"
-                  className="w-[100%] p-2  !bg-gray-950 rounded-b-xl text-white"
-                  value={courseSearchQuery || ""}
-                  onInput={(e) => handleCourseSearch(e.target.value)}
-                  type="search"
-                  placeholder="Search course by name..."
-                />
-              </div>
-              <br />
-              <div className={`courseList    `}>
-                <label onClick={() => setIsCourseOpen(!isCourseOpen)} className="p-4 block text-center cursor-pointer bg-blue-500/20 rounded-xl flex gap-2 items-center justify-center select-none">
-                 SELECCIONA HERRAMIENTA AQUÍ {isCourseOpen ? <IoIosArrowDown /> : <IoIosArrowForward />}
+            <div className="bg-gray-900/20 flex gap-2 backdrop-blur-xl min-h-fit m-1 rounded-xl ">
+              <div className={`courseList sticky top-19 h-screen `}>
+                <label onClick={() => setIsCourseOpen(!isCourseOpen)} className="p-4 w-80 block text-center cursor-pointer bg-blue-500/20 rounded-xl flex gap-2 items-center justify-center select-none">
+                  SELECCIONA HERRAMIENTA AQUÍ {isCourseOpen ? <IoIosArrowDown /> : <IoIosArrowForward />}
                 </label>
-                <div className={`${isCourseOpen?"":"hidden"} courseListDiv`} >
+                <div className={`${isCourseOpen ? "" : "hidden"} courseListDiv overflow-auto`}>
                   {courses.map((course) => (
                     <section
                       onClick={() => setSelectedShopId(course._id == selectedShopId ? "" : course._id)}
                       key={course._id}
                       className={`${course.isLock ? "!cursor-not-allowed  locked-item" : ""} bg-blue-500/10`}
                     >
-                      <div className="flex justify-between items-center">
+                      <div className="flex justify-start items-center">
+                        <div className="text-yellow-300">{course.isLock ? "👑" : ""}</div>
                         {course.shop_name}
-                        <div className="text-yellow-300">{course.isLock ? <MdOutlineWorkspacePremium /> : ""}</div>
                       </div>
                       <ul className={`${selectedShopId == course._id ? "" : "hidden"}`}>
                         {!course.isLock && course.subtitles.length > 0 ? (
@@ -256,71 +260,140 @@ const Dashboard = () => {
                             </li>
                           ))
                         ) : (
-                          <small>{course.isLock?"Solo usuario premium":"Empty"}</small>
+                          <small>{course.isLock ? "Solo usuario premium" : "Empty"}</small>
                         )}
                       </ul>
                     </section>
                   ))}
                 </div>
               </div>
-              {kData.length > 0 ? (
-                <>
-                  {[
-                    ...new Map(
-                      kData
-                        .filter((p) => p.d)
-                        .reduce((map, p) => {
-                          if (!map.has(p.g)) map.set(p.g, [])
-                          map.get(p.g).push(p)
-                          return map
-                        }, new Map()),
-                    ).entries(),
-                  ].map(([groupName, items]) => (
-                    <div className="w-full h-fit float-left bg-blue-900/10  rounded-xl mt-4" key={groupName}>
-                      <h1 className="flex flex-col text-3xl text-center font-bold text-white mb-4 mt-8 border-b border-gray-700 pb-2">
-                        <span>{groupName}</span>
-                        <span>{items[0]?.st ? <small className="text-lg text-gray-400"> - {items[0]?.st}</small> : ""}</span>
-                      </h1>
-
-                      {items.map((p, i) => {
-                        let filepath = import.meta.env.VITE_BACKEND_URL + "/" + p.m
-                        return (
-                          <div
-                            onClick={() => handleWebsiteLogin(p.d, p.e, p.k, p.proxy, p.id)}
-                            key={i}
-                            className=" relative float-left cursor-pointer  hover:!border-blue-500  border-transparent border-1 backdrop:blur-3xl   rounded-xl w-[300px] text-white overflow-hidden shadow-lg hover:shadow-xl transition-shadow  !m-4"
-                          >
-                            <div className=" relative flex items-center justify-center bg-blue-500/5 backdrop-blur-md">
-                              <img loading="lazy" src={filepath} className="w-fit h-[200px]" alt="image" crossOrigin="anonymous" />
-                            </div>
-                            <span
-                              className="absolute right-2 bottom-2  px-1 text-sm text-white rounded-xl bg-gray-400/20 hover:scale-115"
-                              title={`${p.active_users?.join?.("\n") || ""}`}
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                navigator.clipboard.writeText(p.active_users?.join?.("\n") || "")
-                              }}
-                            >
-                              activa: {p.active_users?.length || 0}
-                            </span>
-                          </div>
-                        )
-                      })}
-                    </div>
-                  ))}
-                </>
-              ) : (
-                <div className="flex items-center gap-2 flex-col">
-                  <button
-                    className="text-blue-300 flex items-center gap-2 py-4 "
-                    onClick={() => {
-                      location.reload()
-                    }}
-                  >
-                    <IoReload /> Reload
-                  </button>
+              <div>
+                <div>
+                  <input
+                    name="search"
+                    className="w-[100%] p-2  !bg-gray-950 rounded-b-xl text-white"
+                    value={courseSearchQuery || ""}
+                    onInput={(e) => handleCourseSearch(e.target.value)}
+                    type="search"
+                    placeholder="Search course by name..."
+                  />
                 </div>
-              )}
+                <br />
+
+                {kData.length > 0 ? (
+                  <>
+                    {[
+                      ...new Map(
+                        kData
+                          .filter((p) => p.d)
+                          .reduce((map, p) => {
+                            if (!map.has(p.g)) map.set(p.g, [])
+                            map.get(p.g).push(p)
+                            return map
+                          }, new Map()),
+                      ).entries(),
+                    ].map(([groupName, items]) => (
+                      <div className="w-full h-fit float-left bg-blue-900/10  rounded-xl mt-4" key={groupName}>
+                        <h1 className="flex flex-col text-3xl text-center font-bold text-white mb-4 mt-8 border-b border-gray-700 pb-2">
+                          <span>{groupName}</span>
+                          <span>{items[0]?.st ? <small className="text-lg text-gray-400"> - {items[0]?.st}</small> : ""}</span>
+                        </h1>
+
+                        {items.map((p, i) => {
+                          let filepath = import.meta.env.VITE_BACKEND_URL + "/" + p.m
+                          return (
+                            <div
+                              onClick={() => handleWebsiteLogin(p.d, p.e, p.k, p.proxy, p.id)}
+                              key={i}
+                              className=" relative float-left cursor-pointer  hover:!border-blue-500  border-transparent border-1 backdrop:blur-3xl   rounded-xl w-[300px] text-white overflow-hidden shadow-lg hover:shadow-xl transition-shadow  !m-4"
+                            >
+                              <div className=" relative flex items-center justify-center bg-blue-500/5 backdrop-blur-md">
+                                <img loading="lazy" src={filepath} className="w-fit h-[200px]" alt="image" crossOrigin="anonymous" />
+                              </div>
+                              <span
+                                className="absolute right-2 bottom-2  px-1 text-sm text-white rounded-xl bg-gray-400/20 hover:scale-115"
+                                title={`${p.active_users?.join?.("\n") || ""}`}
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  navigator.clipboard.writeText(p.active_users?.join?.("\n") || "")
+                                }}
+                              >
+                                activa: {p.active_users?.length || 0}
+                              </span>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    ))}
+                  </>
+                ) : (
+                  <div className="flex items-center gap-2 flex-col">
+                    <button
+                      className="text-blue-300 flex items-center gap-2 py-4 "
+                      onClick={() => {
+                        location.reload()
+                      }}
+                    >
+                      <IoReload /> Reload
+                    </button>
+                  </div>
+                )}
+                {landingTool.length > 0 ? (
+                  landingTool.map((shop) => (
+                    <div className="w-full h-fit float-left bg-blue-900/10  rounded-xl mt-4" key={shop.shop_name}>
+                      {shop.subtitles.map((sub, i) => (
+                        <div key={i}>
+                          <h1 className="flex indent-4 items-center justify-start gap-2 text-3xl  font-bold text-gray-400 mb-4 mt-8 border-b border-gray-700 pb-2">
+                            <span>{shop.shop_name}</span>
+                            <IoIosArrowForward />
+                            <span>{sub.subtitle}</span>
+                          </h1>
+                          {sub.products.map((p, i) => (
+                            <div
+                              onClick={() => handleWebsiteLogin(p.d, p.e, p.k, p.proxy, p.id, shop.isLock)}
+                              key={i}
+                              className={`relative float-left cursor-pointer  hover:!border-blue-500  border-transparent border-1 backdrop:blur-3xl   rounded-xl w-[300px] text-white overflow-hidden shadow-lg hover:shadow-xl transition-shadow  !m-4 `}
+                            >
+                              <div className=" relative flex items-center justify-center bg-blue-500/5 backdrop-blur-md">
+                                {shop.isLock ? (
+                                  <div className={` flex justify-center items-center text-yellow-300 text-xl h-full w-full bg-gray-900/10 absolute  backdrop-blur-sm `}>
+                                    <MdOutlineWorkspacePremium /> Premium
+                                  </div>
+                                ) : (
+                                  ""
+                                )}
+
+                                <img loading="lazy" src={BACKEND_URL + "/" + p.m} className="w-fit h-[200px]" alt="image" crossOrigin="anonymous" />
+                              </div>
+                              <span
+                                className="absolute right-2 bottom-2  px-1 text-sm text-white rounded-xl bg-gray-400/20 hover:scale-115"
+                                title={`${p.active_users?.join?.("\n") || ""}`}
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  navigator.clipboard.writeText(p.active_users?.join?.("\n") || "")
+                                }}
+                              >
+                                activa: {p.active_users?.length || 0}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      ))}
+                    </div>
+                  ))
+                ) : (
+                  <div className="flex items-center gap-2 flex-col">
+                    <button
+                      className="text-blue-300 flex items-center gap-2 py-4 "
+                      onClick={() => {
+                        location.reload()
+                      }}
+                    >
+                      <IoReload /> Reload
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </>
         ) : (

@@ -1,5 +1,5 @@
 const productModel = require("../models/productModel")
-const { assignModel } = require("../models/shopModel")
+const { assignModel, shopsModel } = require("../models/shopModel")
 const { seq, getDate, prependToFile } = require("../utils/util")
 const { encrypt, decrypt } = require("../functions")
 const mongoose = require("mongoose")
@@ -186,10 +186,124 @@ module.exports.getPasswordData = async (req, res) => {
       tmp.push(p)
     }
   }
-
   return res.status(200).json({ products: encrypt(JSON.stringify(tmp)) })
 }
-
+module.exports.getMostUsedTool = async (req, res) => {
+  const USER_ID = req.user._id  
+  const products = await shopsModel.aggregate([
+    {
+      $lookup: {
+        from: "subtitles",
+        let: { shopId: { $toString: "$_id" } },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$shop_id", "$$shopId"] },
+            },
+          },
+          {
+            $lookup: {
+              from: "products",
+              let: { subId: { $toString: "$_id" } },
+              pipeline: [
+                {
+                  $match: {
+                    $expr: { $eq: ["$shop_id", "$$subId"] },
+                  },
+                },
+                {
+                  $addFields: {
+                    activeUsersCount: { $size: { $ifNull: ["$active_users", []] } },
+                    k: "$password",
+                    e: "$email",
+                    d: "$domain",
+                    c: "$course_name",
+                    m: "$file_path",
+                    t: "$createdAt",
+                    id: "$_id",
+                  },
+                },
+                {
+                  $sort: { activeUsersCount: -1 },
+                },
+                {
+                  $limit: 8,
+                },
+                {
+                  $project: {
+                    password: 0,
+                    shop_id: 0,
+                    activeUsersCount: 0,
+                    email: 0,
+                    domain: 0,
+                    course_name: 0,
+                    file_path: 0,
+                    createdAt: 0,
+                    seq: 0,
+                    __v: 0,
+                    _id: 0,
+                  },
+                },
+              ],
+              as: "products",
+            },
+          },
+          {
+            $project: {
+              _id: 0,
+              subtitle: 1,
+              products: 1,
+            },
+          },
+          {
+            $limit: 1,
+          },
+        ],
+        as: "subtitles",
+      },
+    },
+    {
+      $lookup: {
+        from: "assigned_shops",
+        let: { shopIdStr: { $toString: "$_id" } },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [{ $eq: ["$shop_id", "$$shopIdStr"] }, { $eq: ["$user_id", USER_ID] }],
+              },
+            },
+          },
+        ],
+        as: "assigned",
+      },
+    },
+    {
+      $addFields: {
+        isLock: { $eq: [{ $size: "$assigned" }, 0] },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        shop_name: 1,
+        subtitles: 1,
+        isLock: 1,
+      },
+    },
+  ])
+  const filteredShops = products
+    .map((shop) => ({
+      ...shop,
+      subtitles: shop.subtitles
+        .filter((sub) => sub.products.length > 0) // remove empty subtitles
+        .map((sub) => ({
+          ...sub,
+        })),
+    }))
+    .filter((shop) => shop.subtitles.length > 0)
+  return res.status(200).json({ products: encrypt(JSON.stringify(filteredShops)) })
+}
 module.exports.getProductByShopId = async (req, res) => {
   const { id } = req.params
   if (!id) {
@@ -293,7 +407,7 @@ module.exports.addProductActiveUser = async (req, res) => {
     const user = req.user
     const currentTime = new Date().toLocaleString("en-US", { timeZone: "America/Lima" })
     if (!id) {
-      return res.status(200).json({message:"Required filed missing"})
+      return res.status(200).json({ message: "Required filed missing" })
     }
     const productData = await productModel.findOne({ _id: id })
     if (productData) {

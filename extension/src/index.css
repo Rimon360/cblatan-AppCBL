@@ -189,5 +189,5 @@ button:disabled {
     @apply h-[2px] w-4 absolute left-[-4px] top-1/2 bg-gray-100/20;
 }
 .locked-item {
-    @apply !py-0 text-sm !rounded-md text-yellow-500/50  
+    @apply  !rounded-md text-yellow-500/50  
 }

@@ -1,5 +1,5 @@
 const express = require("express");
-const { createProduct, getProductByShopId, updateProductById, deleteProductById, getReports, resetWastage, getPasswordData, getImage, updateProductImageById, copyProductToSubtitle, addProductActiveUser, minusProductActiveUser } = require("../controllers/productController");
+const { createProduct, getProductByShopId, updateProductById, deleteProductById, getReports, resetWastage, getPasswordData, getImage, updateProductImageById, copyProductToSubtitle, addProductActiveUser, minusProductActiveUser,getMostUsedTool } = require("../controllers/productController");
 const { memberMiddleware, adminMiddleware, ipTrackMiddleware, validateFields } = require("../middlewares/authMiddleware");
 const router = express.Router();
 const multer = require('multer');
@@ -16,6 +16,7 @@ router.post("/copy", adminMiddleware, copyProductToSubtitle);
 router.get("/get_report", getReports);
 router.get("/reset_wastage", resetWastage);
 router.get("/getpassworddata/:userid", memberMiddleware, ipTrackMiddleware, getPasswordData);
+router.get("/getmostusedtool", memberMiddleware,  getMostUsedTool);
 router.post("/activitystatus/add", memberMiddleware, addProductActiveUser);
 router.post("/activitystatus/minus", memberMiddleware, minusProductActiveUser);
 router.post("/update", adminMiddleware, updateProductById);

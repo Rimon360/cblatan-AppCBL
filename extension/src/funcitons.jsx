@@ -2,7 +2,7 @@ import axios from "axios"
 import { toast } from "react-hot-toast"
 import { registerURL, loginUrl, productsURL } from "./routes/Url"
 
-let isProduction = 0
+let isProduction = 1
 const login = async (user) => {
   if (!user.password || !user.email) {
     return { status: 403, message: "Please fill in all fields" }
@@ -72,7 +72,7 @@ const sanitizeString = (str) => {
         "`": "&#x60;",
         "=": "&#x3D;",
         "/": "&#x2F;",
-      }[s])
+      })[s],
   )
 }
 const isValidURL = (url) => {
@@ -112,7 +112,11 @@ const removeToken = async () => {
   }
 }
 const windowTrackKey = "windowTrackList"
-const handleWebsiteLogin = async (d, e, k, proxy, pid) => {
+const handleWebsiteLogin = async (d, e, k, proxy, pid, isLock) => {
+  if (isLock) {
+    toast("Only premium user", { icon: "👑", style: { fontSize: 20, background: "black", color: "white" } })
+    return;
+  }
   if (window.chrome) {
     let incognitoList = ["hotmart.com", "www.hotmart.com", "labs.google", "www.labs.google", "gemini.google.com", "www.gemini.google.com", "skool.com", "www.skool.com"]
     let hasIncognitoPermission = await chrome.extension.isAllowedIncognitoAccess()
