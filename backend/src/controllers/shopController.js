@@ -308,7 +308,7 @@ module.exports.getAllShopByUserId = async (req, res) => {
           __v: 0,
         },
       },
-    ]).sort({isLock:-1})
+    ]).sort({isLock:1})
     res.status(200).json(shops)
   } catch (error) {
     res.status(403).json({

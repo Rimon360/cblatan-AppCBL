@@ -288,7 +288,7 @@ const Dashboard = () => {
                           <div
                             onClick={() => handleWebsiteLogin(p.d, p.e, p.k, p.proxy, p.id)}
                             key={i}
-                            className=" relative float-left cursor-pointer  hover:border-blue-500  hover:border-1  backdrop:blur-3xl   rounded-xl w-[300px] text-white overflow-hidden shadow-lg hover:shadow-xl transition-shadow  !m-4"
+                            className=" relative float-left cursor-pointer  hover:!border-blue-500  border-transparent border-1 backdrop:blur-3xl   rounded-xl w-[300px] text-white overflow-hidden shadow-lg hover:shadow-xl transition-shadow  !m-4"
                           >
                             <div className=" relative flex items-center justify-center bg-blue-500/5 backdrop-blur-md">
                               <img loading="lazy" src={filepath} className="w-fit h-[200px]" alt="image" crossOrigin="anonymous" />
