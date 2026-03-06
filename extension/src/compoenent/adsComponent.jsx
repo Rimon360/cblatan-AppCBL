@@ -23,12 +23,12 @@ const AdsComponent = () => {
       if (state && state.email_verified == false) return
       if (!token) return
       setAdsVisibility(true)
-      localStorage.setItem("adsShownTime", currentTime) 
+      localStorage.setItem("adsShownTime", currentTime)
       let result = await axios.get(API_URL + "/api/browser/ads/get", { headers: { Authorization: "Bearer " + token } })
-      setAdsUrl(result.data.url)
+      setAdsUrl(result.data.url.name)
     })()
   }, [checkAds])
-
+ 
   useEffect(() => {
     setInterval(() => {
       setAdsCheck(Date.now())

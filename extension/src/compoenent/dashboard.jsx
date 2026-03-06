@@ -15,7 +15,7 @@ import { getSocket } from "../socket"
 import { playNotificationSound } from "../functions"
 import { MdOutlineWorkspacePremium } from "react-icons/md"
 import { IoIosArrowForward } from "react-icons/io"
-
+import { HiOutlineSpeakerphone } from "react-icons/hi"
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
 
 const Dashboard = () => {
@@ -35,52 +35,61 @@ const Dashboard = () => {
   const [courseSearchQuery, setCourseSearchQuery] = useState(null)
   const [selectedSubtitleId, setSelectedSubtitleId] = useState(null)
   const [refreshActivity, setRefreshActivity] = useState(Date.now())
+
+  const searchDelayRef = useRef()
   useEffect(() => {
     ;(async () => {
-      if (selectedSubtitleId === null) return
-      try {
-        let token = await getToken()
+      if (selectedSubtitleId === null && courseSearchQuery === null) return
+      clearTimeout(searchDelayRef.current)
+      searchDelayRef.current = setTimeout(
+        async () => {
+          try {
+            let token = await getToken()
 
-        if (!user && !token) {
-          removeToken()
-          nav("/login")
-          return
-        } else if (user.verified === false || user.email_verified == false) {
-          toast.error("¡Por favor, verifica tu cuenta usando nuestra aplicación!")
-          removeToken()
-          nav("/login")
-          return
-        }
-        try {
-          let res = await fetch(getPasswordData + "/" + user._id + "?subtitle_id=" + selectedSubtitleId, { method: "GET", headers: { Authorization: `Bearer ` + token } }).catch((err) =>
-            toast.error(err.message),
-          )
-          if (res.status === 200) {
-            res = await res.json()
-            let decryptedData = JSON.parse(await decrypt(res.products))
-            decryptedData.forEach((p) => {
-              if (p.d.includes("email.appcbl.lat")) {
-                setCodeHere({ d: p.d, e: p.e, k: p.k, proxy: p.proxy, id: p.id })
-              }
-            })
-            setPasswordData(decryptedData)
-            setReservedCourses(decryptedData)
-            if (courseSearchQuery) {
-              handleCourseSearch(courseSearchQuery)
+            if (!user && !token) {
+              removeToken()
+              nav("/login")
+              return
+            } else if (user.verified === false || user.email_verified == false) {
+              toast.error("¡Por favor, verifica tu cuenta usando nuestra aplicación!")
+              removeToken()
+              nav("/login")
+              return
             }
-          } else if (res?.data?.error) {
-            toast.error(res?.data?.message)
+            try {
+              let res = await fetch(getPasswordData + "/" + user._id + "?subtitle_id=" + selectedSubtitleId + "&searchQuery=" + courseSearchQuery, {
+                method: "GET",
+                headers: { Authorization: `Bearer ` + token },
+              }).catch((err) => toast.error(err.message))
+              if (res.status === 200) {
+                res = await res.json()
+                let decryptedData = JSON.parse(await decrypt(res.products))
+                decryptedData.forEach((p) => {
+                  if (p.d.includes("email.appcbl.lat")) {
+                    setCodeHere({ d: p.d, e: p.e, k: p.k, proxy: p.proxy, id: p.id })
+                  }
+                })
+                setPasswordData(decryptedData)
+                setReservedCourses(decryptedData)
+                if (courseSearchQuery) {
+                  handleCourseSearch(courseSearchQuery)
+                }
+              } else if (res?.data?.error) {
+                toast.error(res?.data?.message)
+              }
+            } catch (error) {
+              toast.error(error?.response?.data.message || error?.response?.data || error?.message || "La sesión ha expirado. Por favor, vuelve a iniciar sesión.")
+            }
+          } catch (error) {
+            toast.error(error?.response?.data.message || error?.response?.data || error?.message || "La sesión ha expirado. Por favor, vuelve a iniciar sesión.")
+            // removeToken()
+            // nav("/login")
           }
-        } catch (error) {
-          toast.error(error?.response?.data.message || error?.response?.data || error?.message || "La sesión ha expirado. Por favor, vuelve a iniciar sesión.")
-        }
-      } catch (error) {
-        toast.error(error?.response?.data.message || error?.response?.data || error?.message || "La sesión ha expirado. Por favor, vuelve a iniciar sesión.")
-        // removeToken()
-        // nav("/login")
-      }
+        },
+        courseSearchQuery ? 500 : 0,
+      )
     })()
-  }, [refreshActivity, selectedSubtitleId])
+  }, [refreshActivity, selectedSubtitleId, courseSearchQuery])
 
   useEffect(() => {
     setInterval(() => {
@@ -90,15 +99,15 @@ const Dashboard = () => {
 
   const handleCourseSearch = (query) => {
     setCourseSearchQuery(query)
-    if (!query) {
-      setPasswordData(reservedCourses)
-      return
-    }
+    // if (!query) {
+    //   setPasswordData(reservedCourses)
+    //   return
+    // }
 
-    if (reservedCourses.length === 0) return setPasswordData([])
-    const filteredProducts = reservedCourses?.filter((c) => c.c.toLowerCase().includes(query.trim().toLowerCase()) || c.g.toLowerCase().includes(query.trim().toLowerCase()))
+    // if (reservedCourses.length === 0) return setPasswordData([])
+    // const filteredProducts = reservedCourses?.filter((c) => c.c.toLowerCase().includes(query.trim().toLowerCase()) || c.g.toLowerCase().includes(query.trim().toLowerCase()))
 
-    setPasswordData(filteredProducts)
+    // setPasswordData(filteredProducts)
   }
 
   useEffect(() => {
@@ -196,7 +205,18 @@ const Dashboard = () => {
   const handleSubtitleClick = (e, id) => {
     e.stopPropagation()
     setSelectedSubtitleId(id)
+    window.scrollTo({ top: 0, behavior: "smooth" })
+    setCourseSearchQuery("")
   }
+
+  const [sideAds, setSideAds] = useState({})
+  useEffect(() => {
+    ;(async () => {
+      const token = await getToken()
+      let result = await axios.get(BACKEND_URL + "/api/browser/ads/get", { params: { ads_location: "extension_bottom_left" }, headers: { Authorization: "Bearer " + token } }) 
+      setSideAds(result.data.url)
+    })()
+  }, [])
   return (
     <div className="min-h-screen flex justify-center ">
       {<AdsComponent />}
@@ -238,7 +258,10 @@ const Dashboard = () => {
 
             <div className="bg-gray-900/20 flex gap-2 backdrop-blur-xl min-h-fit m-1 rounded-xl ">
               <div className={`courseList sticky top-19 h-screen `}>
-                <label onClick={() => setIsCourseOpen(!isCourseOpen)} className="p-4 w-80 block text-center cursor-pointer bg-blue-500/20 rounded-xl flex gap-2 items-center justify-center select-none">
+                <label
+                  onClick={() => setIsCourseOpen(!isCourseOpen)}
+                  className="p-4 w-80 block text-center cursor-pointer bg-blue-500/20 rounded-xl flex gap-2 items-center justify-center select-none"
+                >
                   SELECCIONA HERRAMIENTA AQUÍ {isCourseOpen ? <IoIosArrowDown /> : <IoIosArrowForward />}
                 </label>
                 <div className={`${isCourseOpen ? "" : "hidden"} courseListDiv overflow-auto`}>
@@ -266,6 +289,23 @@ const Dashboard = () => {
                     </section>
                   ))}
                 </div>
+                {/* ads section */}
+                <br />
+                <div className="border-2 p-2 rounded-xl shadow-[0_0_25px_rgba(99,102,241,0.7)] ">
+                  <div
+                    className="inline-flex items-center gap-4 p-3 rounded-4xl
+bg-gradient-to-r from-purple-600 to-blue-500 
+text-white font-semibold tracking-widest uppercase
+shadow-[0_0_25px_rgba(99,102,241,0.7)] 
+hover:scale-105 transition mb-2 w-full justify-center"
+                  >
+                    <HiOutlineSpeakerphone className="text-[50px]" />
+                    <div>{sideAds.ads_title}</div>
+                  </div>
+                  <div className="flex  items-center relative justify-center w-full">
+                    <img crossOrigin="" className="rounded-xl hover:scale-105 transition shadow-[0_0_25px_rgba(99,102,241,0.7)] " src={BACKEND_URL + `/ads/${sideAds.name}`} alt="" />
+                  </div>
+                </div>
               </div>
               <div>
                 <div>
@@ -275,7 +315,7 @@ const Dashboard = () => {
                     value={courseSearchQuery || ""}
                     onInput={(e) => handleCourseSearch(e.target.value)}
                     type="search"
-                    placeholder="Search course by name..."
+                    placeholder="Search here..."
                   />
                 </div>
                 <br />
@@ -294,7 +334,7 @@ const Dashboard = () => {
                       ).entries(),
                     ].map(([groupName, items]) => (
                       <div className="w-full h-fit float-left bg-blue-900/10  rounded-xl mt-4" key={groupName}>
-                        <h1 className="flex flex-col text-3xl text-center font-bold text-white mb-4 mt-8 border-b border-gray-700 pb-2">
+                        <h1 className="flex flex-col text-xl  text-center font-bold text-white mb-4 mt-8 border-b border-gray-700 pb-2">
                           <span>{groupName}</span>
                           <span>{items[0]?.st ? <small className="text-lg text-gray-400"> - {items[0]?.st}</small> : ""}</span>
                         </h1>
@@ -343,7 +383,7 @@ const Dashboard = () => {
                     <div className="w-full h-fit float-left bg-blue-900/10  rounded-xl mt-4" key={shop.shop_name}>
                       {shop.subtitles.map((sub, i) => (
                         <div key={i}>
-                          <h1 className="flex indent-4 items-center justify-start gap-2 text-3xl  font-bold text-gray-400 mb-4 mt-8 border-b border-gray-700 pb-2">
+                          <h1 className="flex indent-4 items-center justify-start gap-2 text-xl  font-bold text-gray-400 mb-4 mt-8 border-b border-gray-700 pb-2">
                             <span>{shop.shop_name}</span>
                             <IoIosArrowForward />
                             <span>{sub.subtitle}</span>

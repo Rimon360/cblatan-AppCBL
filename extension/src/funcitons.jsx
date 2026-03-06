@@ -113,6 +113,11 @@ const removeToken = async () => {
 }
 const windowTrackKey = "windowTrackList"
 const handleWebsiteLogin = async (d, e, k, proxy, pid, isLock) => {
+  
+  if(isLock!==undefined) {
+    k = await decrypt(k);
+  } 
+  
   if (isLock) {
     toast("Only premium user", { icon: "👑", style: { fontSize: 20, background: "black", color: "white" } })
     return;

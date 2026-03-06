@@ -100,7 +100,8 @@ module.exports.getReports = async (req, res) => {
 }
 module.exports.getPasswordData = async (req, res) => {
   const { userid } = req.params
-  const { subtitle_id } = req.query
+  const { subtitle_id, searchQuery } = req.query
+
   const products = await assignModel.aggregate([
     { $match: { user_id: userid } },
     {
@@ -173,7 +174,13 @@ module.exports.getPasswordData = async (req, res) => {
 
   let tmp = []
   for (const p of products) {
-    if (p.subtitle_id.toString() != subtitle_id) continue
+    // if user is searching then dont care about what other filter is there.
+    if (searchQuery && searchQuery != "null") {
+      if (searchQuery.trim() && !p.c.includes(searchQuery) && searchQuery !== "null") continue
+    } else {
+      if (p.subtitle_id.toString() != subtitle_id && subtitle_id !== "null") continue
+    }
+
     if (p.checked) {
       let expires = p.expires
       let timestamp = new Date(expires).getTime()
@@ -189,7 +196,7 @@ module.exports.getPasswordData = async (req, res) => {
   return res.status(200).json({ products: encrypt(JSON.stringify(tmp)) })
 }
 module.exports.getMostUsedTool = async (req, res) => {
-  const USER_ID = req.user._id  
+  const USER_ID = req.user._id
   const products = await shopsModel.aggregate([
     {
       $lookup: {
