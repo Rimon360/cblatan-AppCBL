@@ -176,7 +176,7 @@ module.exports.getPasswordData = async (req, res) => {
   for (const p of products) {
     // if user is searching then dont care about what other filter is there.
     if (searchQuery && searchQuery != "null") {
-      if (searchQuery.trim() && !p.c.includes(searchQuery) && searchQuery !== "null") continue
+      if (searchQuery.trim() && !p.c.toLowerCase().includes(searchQuery.toLowerCase()) && searchQuery !== "null") continue
     } else {
       if (p.subtitle_id.toString() != subtitle_id && subtitle_id !== "null") continue
     }

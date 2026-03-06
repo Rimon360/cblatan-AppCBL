@@ -57,28 +57,23 @@ const Dashboard = () => {
               return
             }
             try {
-              let res = await fetch(getPasswordData + "/" + user._id + "?subtitle_id=" + selectedSubtitleId + "&searchQuery=" + courseSearchQuery, {
-                method: "GET",
+              let result = await axios.get(getPasswordData + "/" + user._id + "?subtitle_id=" + selectedSubtitleId + "&searchQuery=" + courseSearchQuery, {
                 headers: { Authorization: `Bearer ` + token },
-              }).catch((err) => toast.error(err.message))
-              if (res.status === 200) {
-                res = await res.json()
-                let decryptedData = JSON.parse(await decrypt(res.products))
-                decryptedData.forEach((p) => {
-                  if (p.d.includes("email.appcbl.lat")) {
-                    setCodeHere({ d: p.d, e: p.e, k: p.k, proxy: p.proxy, id: p.id })
-                  }
-                })
-                setPasswordData(decryptedData)
-                setReservedCourses(decryptedData)
-                if (courseSearchQuery) {
-                  handleCourseSearch(courseSearchQuery)
+              })
+              result = result.data
+              let decryptedData = JSON.parse(await decrypt(result.products))
+              decryptedData.forEach((p) => {
+                if (p.d.includes("email.appcbl.lat")) {
+                  setCodeHere({ d: p.d, e: p.e, k: p.k, proxy: p.proxy, id: p.id })
                 }
-              } else if (res?.data?.error) {
-                toast.error(res?.data?.message)
+              })
+              setPasswordData(decryptedData)
+              setReservedCourses(decryptedData)
+              if (courseSearchQuery) {
+                handleCourseSearch(courseSearchQuery)
               }
             } catch (error) {
-              toast.error(error?.response?.data.message || error?.response?.data || error?.message || "La sesión ha expirado. Por favor, vuelve a iniciar sesión.")
+              toast.error(error?.message || "La sesión ha expirado. Por favor, vuelve a iniciar sesión.")
             }
           } catch (error) {
             toast.error(error?.response?.data.message || error?.response?.data || error?.message || "La sesión ha expirado. Por favor, vuelve a iniciar sesión.")
@@ -89,7 +84,7 @@ const Dashboard = () => {
         courseSearchQuery ? 500 : 0,
       )
     })()
-  }, [refreshActivity, selectedSubtitleId, courseSearchQuery])
+  }, [selectedSubtitleId, courseSearchQuery])
 
   useEffect(() => {
     setInterval(() => {
@@ -213,7 +208,7 @@ const Dashboard = () => {
   useEffect(() => {
     ;(async () => {
       const token = await getToken()
-      let result = await axios.get(BACKEND_URL + "/api/browser/ads/get", { params: { ads_location: "extension_bottom_left" }, headers: { Authorization: "Bearer " + token } }) 
+      let result = await axios.get(BACKEND_URL + "/api/browser/ads/get", { params: { ads_location: "extension_bottom_left" }, headers: { Authorization: "Bearer " + token } })
       setSideAds(result.data.url)
     })()
   }, [])
@@ -291,21 +286,26 @@ const Dashboard = () => {
                 </div>
                 {/* ads section */}
                 <br />
-                <div className="border-2 p-2 rounded-xl shadow-[0_0_25px_rgba(99,102,241,0.7)] ">
-                  <div
-                    className="inline-flex items-center gap-4 p-3 rounded-4xl
+
+                {sideAds && sideAds.ads_title ? (
+                  <div className="border-2 p-2 rounded-xl shadow-[0_0_25px_rgba(99,102,241,0.7)] ">
+                    <div
+                      className="inline-flex items-center gap-4 p-3 rounded-4xl
 bg-gradient-to-r from-purple-600 to-blue-500 
 text-white font-semibold tracking-widest uppercase
 shadow-[0_0_25px_rgba(99,102,241,0.7)] 
 hover:scale-105 transition mb-2 w-full justify-center"
-                  >
-                    <HiOutlineSpeakerphone className="text-[50px]" />
-                    <div>{sideAds.ads_title}</div>
+                    >
+                      <HiOutlineSpeakerphone className="text-[50px]" />
+                      <div>{sideAds.ads_title}</div>
+                    </div>
+                    <div className="flex  items-center relative justify-center w-full">
+                      <img crossOrigin="" className="rounded-xl hover:scale-105 transition shadow-[0_0_25px_rgba(99,102,241,0.7)] " src={BACKEND_URL + `/ads/${sideAds.name}`} alt="" />
+                    </div>
                   </div>
-                  <div className="flex  items-center relative justify-center w-full">
-                    <img crossOrigin="" className="rounded-xl hover:scale-105 transition shadow-[0_0_25px_rgba(99,102,241,0.7)] " src={BACKEND_URL + `/ads/${sideAds.name}`} alt="" />
-                  </div>
-                </div>
+                ) : (
+                  ""
+                )}
               </div>
               <div>
                 <div>
