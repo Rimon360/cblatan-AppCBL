@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { adminMiddleware, memberMiddleware } = require("../middlewares/authMiddleware");
-const blacklistModel = require("../models/blacklistModel")
+const {blacklistModel} = require("../models/blacklistModel")
 
 router.post('/add', adminMiddleware, async (req, res) => {
     const { blacklistUrl } = req.body;
@@ -19,7 +19,7 @@ router.post('/add', adminMiddleware, async (req, res) => {
 })
 
 router.get('/get', async (req, res) => {
-    const blacklistUrl = (await blacklistModel.findOne({}, { blacklistUrl: 1, _id: 0 }))
+    const blacklistUrl = await blacklistModel.findOne({}, { blacklistUrl: 1, _id: 0 })  
     if (blacklistUrl) return res.status(200).json({ blacklistUrl: atob(blacklistUrl.blacklistUrl) });
     res.status(200).json(blacklistUrl);
 

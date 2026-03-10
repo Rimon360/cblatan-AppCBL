@@ -289,18 +289,18 @@ const Dashboard = () => {
 
                 {sideAds && sideAds.ads_title ? (
                   <div className="border-2 p-2 rounded-xl shadow-[0_0_25px_rgba(99,102,241,0.7)] ">
+                    <div className="flex mb-2 items-center relative justify-center w-full">
+                      <img crossOrigin="" className="rounded-xl hover:scale-105 transition shadow-[0_0_25px_rgba(99,102,241,0.7)] " src={BACKEND_URL + `/ads/${sideAds.name}`} alt="" />
+                    </div>
                     <div
                       className="inline-flex items-center gap-4 p-3 rounded-4xl
 bg-gradient-to-r from-purple-600 to-blue-500 
 text-white font-semibold tracking-widest uppercase
 shadow-[0_0_25px_rgba(99,102,241,0.7)] 
-hover:scale-105 transition mb-2 w-full justify-center"
+hover:scale-105 transition  w-full justify-center"
                     >
                       <HiOutlineSpeakerphone className="text-[50px]" />
                       <div>{sideAds.ads_title}</div>
-                    </div>
-                    <div className="flex  items-center relative justify-center w-full">
-                      <img crossOrigin="" className="rounded-xl hover:scale-105 transition shadow-[0_0_25px_rgba(99,102,241,0.7)] " src={BACKEND_URL + `/ads/${sideAds.name}`} alt="" />
                     </div>
                   </div>
                 ) : (

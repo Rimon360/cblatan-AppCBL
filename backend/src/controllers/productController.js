@@ -5,6 +5,8 @@ const { encrypt, decrypt } = require("../functions")
 const mongoose = require("mongoose")
 const fs = require("fs")
 const path = require("path")
+const { toolBlockedListModel } = require("../models/blacklistModel")
+const UserModel = require("../models/userModel")
 
 module.exports.createProduct = async (req, res) => {
   const file_path = req?.file?.path // Assuming the file upload is handled by multer and file_path is available
@@ -46,7 +48,6 @@ module.exports.copyProductToSubtitle = async (req, res) => {
     let newPath = "uploads\\" + Date.now() + ext
     fs.copyFile(tmp.file_path, newPath, (err) => {
       if (err) throw err
-      console.log("Image copied and renamed.")
     })
     tmp.file_path = newPath
     let result = await productModel.insertOne(tmp)
@@ -101,6 +102,9 @@ module.exports.getReports = async (req, res) => {
 module.exports.getPasswordData = async (req, res) => {
   const { userid } = req.params
   const { subtitle_id, searchQuery } = req.query
+  const user = req.user
+
+  const blockedTools = await toolBlockedListModel.find({ $or: [{ username_or_email: user.email }, { isBlockedForAll: true }] }).distinct("tool_url")
 
   const products = await assignModel.aggregate([
     { $match: { user_id: userid } },
@@ -180,7 +184,7 @@ module.exports.getPasswordData = async (req, res) => {
     } else {
       if (p.subtitle_id.toString() != subtitle_id && subtitle_id !== "null") continue
     }
-
+    if (blockedTools.includes(p.d)) continue
     if (p.checked) {
       let expires = p.expires
       let timestamp = new Date(expires).getTime()
@@ -197,6 +201,8 @@ module.exports.getPasswordData = async (req, res) => {
 }
 module.exports.getMostUsedTool = async (req, res) => {
   const USER_ID = req.user._id
+  const user = req.user
+  const blockedTools = await toolBlockedListModel.find({ $or: [{ username_or_email: user.email }, { isBlockedForAll: true }] }).distinct("tool_url")
   const products = await shopsModel.aggregate([
     {
       $lookup: {
@@ -216,6 +222,7 @@ module.exports.getMostUsedTool = async (req, res) => {
                 {
                   $match: {
                     $expr: { $eq: ["$shop_id", "$$subId"] },
+                    domain: { $nin: blockedTools },
                   },
                 },
                 {
@@ -309,6 +316,7 @@ module.exports.getMostUsedTool = async (req, res) => {
         })),
     }))
     .filter((shop) => shop.subtitles.length > 0)
+
   return res.status(200).json({ products: encrypt(JSON.stringify(filteredShops)) })
 }
 module.exports.getProductByShopId = async (req, res) => {
@@ -468,5 +476,57 @@ module.exports.minusProductActiveUser = async (req, res) => {
     res.status(400).json({
       message: error.message,
     })
+  }
+}
+
+module.exports.addBlockedTool = async (req, res) => {
+  try {
+    const { isBlockedForAll, username_or_email, tool_url } = req.body
+
+    // check if already exists
+    const blockedList = await toolBlockedListModel.findOne({ isBlockedForAll, username_or_email, tool_url })
+
+    if (blockedList) {
+      res.status(404).json({ message: "Already there!" })
+      return
+    }
+    // check if tool or user exists or not
+    const product = await productModel.findOne({ domain: tool_url })
+    const user = await UserModel.findOne({ $or: [{ username: username_or_email }, { email: username_or_email }] })
+    if (!isBlockedForAll && !user?.email) {
+      res.status(404).json({ message: "User not exists added!" })
+      return
+    }
+    if (!product?.domain) {
+      res.status(404).json({ message: "The tool not exists!" })
+      return
+    }
+    await toolBlockedListModel.insertOne({ isBlockedForAll, username_or_email, tool_url })
+    res.status(200).json({ message: "Successfully added!" })
+  } catch (error) {
+    res.status(403).json({ message: error.message, error: true })
+  }
+}
+module.exports.getBlockedTool = async (req, res) => {
+  try {
+    const result = await toolBlockedListModel.find()
+    res.status(200).json(result)
+  } catch (error) {
+    res.status(403).json({ message: error.message, error: true })
+  }
+}
+module.exports.removeBlockedTool = async (req, res) => {
+  try {
+    const { _id } = req.body
+    const mod = await toolBlockedListModel.deleteOne({ _id })
+    if (mod.deletedCount > 0) {
+      res.status(200).json({ message: "Successfully removed!" })
+      return
+    } else {
+      res.status(200).json({ message: "Failed to remove!" })
+      return
+    }
+  } catch (error) {
+    res.status(403).json({ message: error.message, error: true })
   }
 }
