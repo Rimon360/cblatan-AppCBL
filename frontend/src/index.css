@@ -189,3 +189,12 @@ input:disabled {
   cursor: not-allowed;
   opacity: .5;
 }
+.chat-link {
+    display: inline-block;
+    color: #76c7fd;
+    word-break: break-all;
+}
+
+.chat-link:hover {
+    text-decoration: underline;
+}

@@ -2,7 +2,7 @@ import axios from "axios"
 import { toast } from "react-hot-toast"
 import { registerURL, loginUrl, productsURL } from "./routes/Url"
 
-let isProduction = 1
+let isProduction = 0
 const login = async (user) => {
   if (!user.password || !user.email) {
     return { status: 403, message: "Please fill in all fields" }
@@ -113,14 +113,13 @@ const removeToken = async () => {
 }
 const windowTrackKey = "windowTrackList"
 const handleWebsiteLogin = async (d, e, k, proxy, pid, isLock) => {
-  
-  if(isLock!==undefined) {
-    k = await decrypt(k);
-  } 
-  
+  if (isLock !== undefined) {
+    k = await decrypt(k)
+  }
+
   if (isLock) {
     toast("Only premium user", { icon: "👑", style: { fontSize: 20, background: "black", color: "white" } })
-    return;
+    return
   }
   if (window.chrome) {
     let incognitoList = ["hotmart.com", "www.hotmart.com", "labs.google", "www.labs.google", "gemini.google.com", "www.gemini.google.com", "skool.com", "www.skool.com"]
@@ -262,4 +261,8 @@ async function decrypt(encryptedB64) {
 
   return new TextDecoder().decode(decrypted)
 }
-export { logout, login, getDomain, getToken, setToken, removeToken, isValidURL, handleWebsiteLogin, remove, register, decrypt, disableInspect }
+function linkify(text) {
+  const urlPattern = /(\bhttps?:\/\/[^\s]+)/gi
+  return text.replace(urlPattern, '<a href="$1" target="_blank">$1</a>')
+}
+export { logout, login, getDomain, getToken, setToken, removeToken, isValidURL, handleWebsiteLogin, remove, register, decrypt, disableInspect, linkify }

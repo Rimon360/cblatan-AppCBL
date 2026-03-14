@@ -12,6 +12,7 @@ import toast from "react-hot-toast"
 import { IoMdArrowDown } from "react-icons/io"
 import { IoArrowBack } from "react-icons/io5"
 import { playNotificationSound } from "../functions.js"
+import Linkify from "react-linkify"
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
 const Supportchat = () => {
   const token = localStorage.getItem("token")
@@ -248,7 +249,23 @@ const Supportchat = () => {
                       </div>
                     ) : (
                       <div className={`px-4 py-2 rounded-2xl ${msg.isCurrentUser ? "bg-blue-600 text-white rounded-tr-sm" : "bg-gray-800 text-gray-100 rounded-tl-sm"}`}>
-                        <p>{msg.content}</p>
+                        <p>
+                          <Linkify
+                            componentDecorator={(decoratedHref, decoratedText, key) => (
+                              <a
+                                href={decoratedHref}
+                                key={key}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="chat-link"
+                              >
+                                {decoratedText}
+                              </a>
+                            )}
+                          >
+                            {msg.content}
+                          </Linkify>
+                        </p>
                       </div>
                     )}
                     <span className="text-xs text-gray-500 mt-1">{localTime(msg.createdAt)}</span>

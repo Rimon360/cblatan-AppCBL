@@ -23,6 +23,7 @@
     "react-dom": "^19.0.0",
     "react-hot-toast": "^2.5.2",
     "react-icons": "^5.5.0",
+    "react-linkify": "^1.0.0-alpha",
     "react-router-dom": "^7.4.1",
     "serve": "^14.2.4",
     "socket.io-client": "^4.8.3",

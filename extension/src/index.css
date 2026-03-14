@@ -169,7 +169,7 @@ button:disabled {
 }
 
 .courseList {
-    @apply text-white  transition duration-1000 
+    @apply text-white transition duration-1000
 }
 
 .courseList ul {
@@ -188,6 +188,17 @@ button:disabled {
     content: "";
     @apply h-[2px] w-4 absolute left-[-4px] top-1/2 bg-gray-100/20;
 }
+
 .locked-item {
-    @apply  !rounded-md text-yellow-500/50  
+    @apply !rounded-md text-yellow-500/50
+}
+
+.chat-link {
+    display: inline-block;
+    color: #76c7fd;
+    word-break: break-all;
+}
+
+.chat-link:hover {
+    text-decoration: underline;
 }

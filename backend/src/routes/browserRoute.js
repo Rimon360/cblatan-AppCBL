@@ -177,8 +177,8 @@ router.post("/group/delete", adminMiddleware, async (req, res) => {
 router.post("/ads/upload", adminMiddleware, adsUpload.single("file"), async (req, res) => {
   try {
     const name = req.file.filename
-    const { ads_title, ads_location } = req.body || {}
-    await AdsModel.insertOne({ name, ads_title, ads_location })
+    const { ads_title, ads_location, ads_url } = req.body || {}
+    await AdsModel.insertOne({ name, ads_title, ads_location,ads_url })
   } catch (error) {
     res.status(403).json({ error: error.message, message: error.message })
   }

@@ -28,12 +28,16 @@ const LogoCrud = () => {
     fd.append("file", file)
     fd.append("ads_title", ads_title)
     fd.append("ads_location", ads_location)
+    fd.append("ads_url", ads_url)
     let result = await axios
       .post(browserUrl + "/ads/upload", fd, { headers: { Authorization: "Bearer " + token, "Content-Type": "application/multipart-form-data" } })
       .catch((e) => toast.error(e.message))
     if (result.status == 200) {
       toast.success("Uploaded successfully")
       setFile(null)
+      setAdsTitle("")
+      setAdsURL("")
+      setAdsLocation("")
       setUpdateData(Date.now())
     } else {
       toast.error("Unable to upload logo!")
@@ -50,10 +54,11 @@ const LogoCrud = () => {
     }
   }
   const [ads_title, setAdsTitle] = useState("")
+  const [ads_url, setAdsURL] = useState("")
   const [ads_location, setAdsLocation] = useState("")
   return (
     <section>
-      <div className="sticky top-[-16px] z-100 ">
+      <div className="sticky top-[-16px] z-100 bg-gray-950">
         <form onSubmit={handleFormSubmit} className="border-b-2 border-gray-500 border-dashed flex items-center pb-2 pt-2 justify-center gap-2">
           <label className="p-2   text-gray-400 border-dashed border-1 border-gray-400  rounded-md hover:bg-green-50/5 hover:text-gray-400 cursor-pointer">
             + Choose ads image
@@ -61,6 +66,9 @@ const LogoCrud = () => {
           </label>
           <label htmlFor="">
             <input className="p-2 rounded-xl !bg-gray-500/20" value={ads_title} onInput={(e) => setAdsTitle(e.target.value)} type="text" placeholder="Ads title (optional)..." />
+          </label>
+          <label htmlFor="">
+            <input className="p-2 rounded-xl !bg-gray-500/20" value={ads_url} onInput={(e) => setAdsURL(e.target.value)} type="text" placeholder="Ads URL (optional)..." />
           </label>
           <label htmlFor="">
             <select className="p-2 rounded-xl bg-gray-500/20 text-white" value={ads_location} onChange={(e) => setAdsLocation(e.target.value)} name="" id="">
@@ -76,19 +84,38 @@ const LogoCrud = () => {
       </div>
       <br />
       <div className="flex justify-center w-full">
-        <div className="overflow-auto w-fit">
+        <div className="">
           {ads.length > 0 ? (
             ads.map((add) => (
-              <div key={add.name} className="flex flex-col gap-1 justify-between  bg-blue-500/10 hover:bg-blue-500/20 rounded-xl float-left m-1 max-w-[200px] h-[300px]">
+              <div key={add.name} className="flex flex-col gap-1 justify-between  bg-blue-500/10 hover:bg-blue-500/20 rounded-xl float-left m-1 max-w-[300px] h-[300px]">
                 <div>
                   <div className="w-auto  border-1 border-green-200 border-dashed rounded-xl max-w-[450px] max-h-fit  relative overflow-hidden">
-                    <a href={BACKEND_URL + "/ads/" + add.name} target="_blank" rel="noopener noreferrer">
-                      <img crossOrigin="" className="max-w-[200px] max-h-[450px]" src={BACKEND_URL + "/ads/" + add.name} alt="Logo" />
+                    <a href={add.ads_url ? add.ads_url : BACKEND_URL + "/ads/" + add.name} target="_blank" rel="noopener noreferrer">
+                      <img crossOrigin="" className="max-w-[300px] max-h-[300px]" src={BACKEND_URL + "/ads/" + add.name} alt="Logo" />
                     </a>
                   </div>
                   <div className="bg-gray-950/20 capitalize text-sm mt-1   px-2 py-2">
-                    {add.ads_title ? <div><span className="text-gray-400" >Title:</span> {add.ads_title}</div> : ""}
-                    {add.ads_location ? <div><span className="text-gray-400" >Location:</span> {add.ads_location}</div> : ""}
+                    {add.ads_title ? (
+                      <div className="truncate">
+                        <span className="text-gray-400">Title:</span> {add.ads_title}
+                      </div>
+                    ) : (
+                      ""
+                    )}
+                    {add.ads_location ? (
+                      <div className="truncate">
+                        <span className="text-gray-400">Location:</span> {add.ads_location}
+                      </div>
+                    ) : (
+                      ""
+                    )}
+                    {add.ads_url ? (
+                      <div className="truncate">
+                        <span className="text-gray-400 truncate">URL:</span> {add.ads_url}
+                      </div>
+                    ) : (
+                      ""
+                    )}
                   </div>
                 </div>
                 <div className="flex justify-center ">

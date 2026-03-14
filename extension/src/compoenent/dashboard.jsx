@@ -172,6 +172,10 @@ const Dashboard = () => {
       if (!isCourseOpen || courses.length > 0) return
       try {
         let token = await getToken()
+        if (!token) {
+          nav("/login")
+          return
+        }
         let result = await axios.get(BACKEND_URL + "/api/shops/extension", { headers: { Authorization: `Bearer ` + token } })
         setCourses(result.data)
       } catch (error) {
@@ -186,6 +190,10 @@ const Dashboard = () => {
     ;(async () => {
       try {
         let token = await getToken()
+        if (!token) {
+          nav("/login")
+          return
+        }
         let result = await axios.get(BACKEND_URL + "/api/products/getmostusedtool", { headers: { Authorization: `Bearer ` + token } })
         let decryptedData = JSON.parse(await decrypt(result.data.products))
         setLandingTool(decryptedData)
@@ -208,6 +216,10 @@ const Dashboard = () => {
   useEffect(() => {
     ;(async () => {
       const token = await getToken()
+      if (!token) {
+        nav("/login")
+        return
+      }
       let result = await axios.get(BACKEND_URL + "/api/browser/ads/get", { params: { ads_location: "extension_bottom_left" }, headers: { Authorization: "Bearer " + token } })
       setSideAds(result.data.url)
     })()
@@ -289,19 +301,21 @@ const Dashboard = () => {
 
                 {sideAds && sideAds.ads_title ? (
                   <div className="border-2 p-2 rounded-xl shadow-[0_0_25px_rgba(99,102,241,0.7)] ">
-                    <div className="flex mb-2 items-center relative justify-center w-full">
-                      <img crossOrigin="" className="rounded-xl hover:scale-105 transition shadow-[0_0_25px_rgba(99,102,241,0.7)] " src={BACKEND_URL + `/ads/${sideAds.name}`} alt="" />
-                    </div>
-                    <div
-                      className="inline-flex items-center gap-4 p-3 rounded-4xl
+                    <a href={`${sideAds.ads_url}`} target="_blank" >
+                      <div className="flex mb-2 items-center relative justify-center w-full">
+                        <img crossOrigin="" className="rounded-xl hover:scale-105 transition shadow-[0_0_25px_rgba(99,102,241,0.7)] " src={BACKEND_URL + `/ads/${sideAds.name}`} alt="" />
+                      </div>
+                      <div
+                        className="inline-flex items-center gap-4 p-3 rounded-4xl
 bg-gradient-to-r from-purple-600 to-blue-500 
 text-white font-semibold tracking-widest uppercase
 shadow-[0_0_25px_rgba(99,102,241,0.7)] 
 hover:scale-105 transition  w-full justify-center"
-                    >
-                      <HiOutlineSpeakerphone className="text-[50px]" />
-                      <div>{sideAds.ads_title}</div>
-                    </div>
+                      >
+                        <HiOutlineSpeakerphone className="text-[50px]" />
+                        <div>{sideAds.ads_title}</div>
+                      </div>
+                    </a>
                   </div>
                 ) : (
                   ""
