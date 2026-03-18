@@ -58,6 +58,15 @@ function Dashboard() {
           <ul className="space-y-1 overflow-auto">
             <li>
               {["admin", "manager"].includes(role) ? (
+                <a href={"/dashboard/supportchat"} className={({ isActive }) => (isActive ? "text-white bg-gray-950" : "")}>
+                  <BiSupport /> Support
+                </a>
+              ) : (
+                <></>
+              )}
+            </li>
+            <li>
+              {["admin", "manager"].includes(role) ? (
                 <NavLink to={"/dashboard/users"} end className={({ isActive }) => (isActive ? "text-white bg-gray-950" : "")}>
                   <FaRegUser />
                   Usuaria
@@ -198,15 +207,6 @@ function Dashboard() {
               {["admin", "manager"].includes(role) ? (
                 <a href="/dashboard/adminchat" className={({ isActive }) => (isActive ? "text-white bg-gray-950" : "")}>
                   <BsChatLeftDots /> Admin Chat
-                </a>
-              ) : (
-                <></>
-              )}
-            </li>
-            <li>
-              {["admin", "manager"].includes(role) ? (
-                <a href={"/dashboard/supportchat"} className={({ isActive }) => (isActive ? "text-white bg-gray-950" : "")}>
-                  <BiSupport /> Support
                 </a>
               ) : (
                 <></>

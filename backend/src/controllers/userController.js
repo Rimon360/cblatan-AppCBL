@@ -34,7 +34,7 @@ module.exports.registerUser = async (req, res) => {
   const authHeader = req.headers.authorization
   let created_by = "own_or_admin"
   // let email_verified = false
-  let email_verified = true;
+  let email_verified = true
   if (authHeader) {
     const token = authHeader?.split(" ")[1]
     const user = jwt.verify(token, process.env.JWT_SECRET)
@@ -538,7 +538,7 @@ exports.parkUpdateUserForAdminApproval = async (req, res) => {
     await userUpdateParked.insertOne({ created_by, modification, updated_data, to })
     res.status(200).json()
   } catch (error) {
-    res.status(403).json({ error: error.message })
+    res.status(403).json({ message: error.message })
   }
 }
 exports.getParkedRequests = async (req, res) => {
@@ -547,14 +547,14 @@ exports.getParkedRequests = async (req, res) => {
     let result = await userUpdateParked.find({}, { modification: 1, created_by: 1, createdAt: 1, to: 1 })
     res.status(200).json(result)
   } catch (error) {
-    res.status(403).json({ error: error.message })
+    res.status(403).json({ message: error.message })
   }
 }
 exports.approveParkedRequest = async (req, res) => {
   // userUpdateParked
   try {
     const { id } = req.body
-    let result = await userUpdateParked.findOne({ _id: id }) 
+    let result = await userUpdateParked.findOne({ _id: id })
 
     let userData = result.updated_data
 
@@ -563,16 +563,16 @@ exports.approveParkedRequest = async (req, res) => {
 
     res.status(200).json({ message: `Approved ${mod.modifiedCount}` })
   } catch (error) {
-    res.status(403).json({ error: error.message })
+    res.status(403).json({ message: error.message })
   }
 }
 exports.deleteParkedRequest = async (req, res) => {
   // userUpdateParked
   try {
     const { id } = req.body
-    let result = await userUpdateParked.deleteOne({ _id: id })
+    await userUpdateParked.deleteOne({ _id: id })
     res.status(200).json({ message: "Deleted" })
   } catch (error) {
-    res.status(403).json({ error: error.message })
+    res.status(403).json({ message: error.message })
   }
 }

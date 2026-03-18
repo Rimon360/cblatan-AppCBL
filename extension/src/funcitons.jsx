@@ -25,7 +25,7 @@ const login = async (user) => {
     }
   } catch (err) {
     console.error(err)
-    toast.error(err.response.data.message || "Something unknown happend. Please try again later!")
+    toast.error(err.response?.data?.message || err.message|| "Something unknown happend. Please try again later!")
   }
 }
 const register = async (user) => {
@@ -50,7 +50,7 @@ const register = async (user) => {
     }
   } catch (err) {
     console.error(err)
-    toast.error(err.response.data.message || "Something unknown happend. Please try again later!")
+    toast.error(err.response?.data?.message || err.message|| "Something unknown happend. Please try again later!")
   }
 }
 

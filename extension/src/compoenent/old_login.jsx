@@ -25,8 +25,8 @@ const Login = () => {
             setState(decodedToken.data.user)
             setIsLoggedIn(true)
           }
-        } catch (error) {
-          toast.error(error.response?.data.message || error.response?.data || error?.message || "La sesión ha expirado. Por favor, vuelve a iniciar sesión.")
+        } catch (err) {
+          toast.error(err.response?.data?.message || err.message|| "La sesión ha expirado. Por favor, vuelve a iniciar sesión.")
           await removeToken()
           await remove("product")
         }
@@ -63,8 +63,8 @@ const Login = () => {
                 }
                 setLoginClicked(false)
               })
-              .catch((error) => {
-                toast.error(error.response?.data?.message || error.response.data || "Login failed. Please try again.")
+              .catch((err) => {
+                toast.error(err.response?.data?.message || err.message||"Login failed. Please try again.")
                 setLoginClicked(false)
               })
           }}

@@ -50,7 +50,7 @@ function VerifyEmail() {
         toast.error("OTP sending failed!")
       }
     } catch (err) {
-      toast.error(err.response?.data?.message || "Something error happened")
+      toast.error(err.response?.data?.message || err.message||"Something error happened")
       console.error("Something error happened:", err)
     }
   }
@@ -72,7 +72,7 @@ function VerifyEmail() {
         toast.error("Something error happened")
       }
     } catch (err) {
-      toast.error(err.response?.data?.message || "Something error happened")
+      toast.error(err.response?.data?.message || err.message|| "Something error happened")
       console.error("Something error happened:", err)
     }
   }

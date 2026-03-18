@@ -254,7 +254,7 @@ module.exports.getAllShopByUserId = async (req, res) => {
     const { _id } = req.user
     const USER_ID = _id
     if (!USER_ID) {
-      return res.status("403").json({ error: "User id must needed" })
+      return res.status(403).json({ error: "User id must needed" })
     }
     const shops = await shopsModel.aggregate([
       {

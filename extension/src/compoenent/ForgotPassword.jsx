@@ -27,7 +27,7 @@ function ForgotPassword() {
         toast.error("El correo electrónico o la contraseña son incorrectos")
       }
     } catch (err) {
-      toast.error(err.response?.data?.message || "Something error happened")
+      toast.error(err.response?.data?.message || err.message||"Something error happened")
       console.error("Something error happened:", err)
     }
   }

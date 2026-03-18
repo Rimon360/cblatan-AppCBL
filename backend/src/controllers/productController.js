@@ -56,7 +56,7 @@ module.exports.copyProductToSubtitle = async (req, res) => {
         message: "Copied",
       })
     } else {
-      res.status(400).json({ message: "Failed" })
+      res.status(400).json({ message: "Product copy Failed" })
     }
   }
 }
@@ -366,7 +366,7 @@ module.exports.updateProductImageById = async (req, res) => {
       }
     }
     const result = await productModel.updateOne({ _id: id }, { file_path })
-    if (result.modifiedCount === 0) return res.status(400).json({ message: "Image chaning failed!" })
+    if (result.modifiedCount === 0) return res.status(400).json({ message: "Image changing failed!" })
     res.status(200).json({ message: "Image changed successfully" })
   } catch (error) {
     res.status(400).json({ message: error.message })
@@ -437,7 +437,7 @@ module.exports.addProductActiveUser = async (req, res) => {
         return res.status(200).json()
       }
     }
-    return res.status(404).json()
+    return res.status(404).json({})
   } catch (error) {
     res.status(400).json({
       message: error.message,

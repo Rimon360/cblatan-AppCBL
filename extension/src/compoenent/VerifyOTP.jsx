@@ -41,7 +41,7 @@ function VerifyOTP() {
       }
     } catch (err) {
       navigate("/forgot-password")
-      toast.error(err.response?.data?.message || "Something error happened")
+      toast.error(err.response?.data?.message || err.message|| "Something error happened")
       console.error("Something error happened:", err)
     }
   }
@@ -67,7 +67,7 @@ function VerifyOTP() {
         toast.error("Something error happened")
       }
     } catch (err) {
-      toast.error(err.response?.data?.message || "Something error happened")
+      toast.error(err.response?.data?.message || err.message|| "Something error happened")
       console.error("Something error happened:", err)
     }
   }

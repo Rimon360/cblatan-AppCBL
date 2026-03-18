@@ -6,14 +6,14 @@ const { checkDaysLeft } = require("../functions")
 const authMiddleware = (req, res, next) => {
   const token = req.header("Authorization")?.split(" ")[1]
   if (!token) {
-    return res.status(403).json({ message: "Access denied" })
+    return res.status(403).json({ message: "Acceso denegado" })
   }
   try {
     const decoded = jwt.verify(token, "abc123")
     req.user = decoded // User information from decoded token
     next()
   } catch (error) {
-    return res.status(400).json({ message: "Invalid token" })
+    return res.status(400).json({ message: "Token no válido" })
   }
 }
 const validateFields = (req, res, next) => {
@@ -21,7 +21,7 @@ const validateFields = (req, res, next) => {
 
   const file_path = req?.file // Assuming the file upload is handled by multer and file_path is available
   if (!shop_id || !domain || !email || !password || !course_name || !file_path) {
-    return res.status(400).json({ message: "Every field is required!" })
+    return res.status(400).json({ message: "¡Todos los campos son obligatorios!" })
   }
   next()
 }
@@ -29,7 +29,7 @@ const adminMiddleware = async (req, res, next) => {
   const authHeader = req.headers.authorization
   const token = authHeader?.split(" ")[1]
   const ip = req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress
-  if (!token) return res.status(401).json({ message: "Access Denied" })
+  if (!token) return res.status(401).json({ message: "Acceso denegado" })
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
@@ -59,7 +59,7 @@ const memberMiddleware = async (req, res, next) => {
   const authHeader = req.headers.authorization
   const token = authHeader?.split(" ")[1]
 
-  if (!token) return res.status(401).json({ message: "Access Denied" })
+  if (!token) return res.status(401).json({ message: "Acceso denegado" })
   const ip = req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
@@ -86,12 +86,12 @@ const memberMiddleware = async (req, res, next) => {
     }
 
     if (user && user?.is_locked == true) {
-      return res.status(503).json({ error: true, message: "Sorry, your account has been locked by admin!" })
+      return res.status(503).json({ error: true, message: "Lo sentimos, ¡tu cuenta ha sido bloqueada por el administrador!" })
     }
     // check user sub validity
     let userValidity = checkDaysLeft(user.sub_start_date, user.sub_validity)
     if (!userValidity) {
-      return res.status(403).json({ error: true, message: "Your subscription has been expired, Please renew to continue!" })
+      return res.status(403).json({ error: true, message: "Tu suscripción ha caducado. ¡Renuévala para continuar!" })
     }
     if (user && decoded && ["member", "admin", "manager","appcbl_soft", "specific", "all_profile"].includes(decoded.role)) {
       req.user = decoded
@@ -100,15 +100,15 @@ const memberMiddleware = async (req, res, next) => {
       res.status(403).json({ message: "Rol no permitido" })
     }
   } catch (err) {
-    res.status(403).json({ message: err.message || "Invalid Token" })
+    res.status(403).json({ message: err.message || "Token no válido" })
   }
 }
 const ipTrackMiddleware = async (req, res, next) => {
   const authHeader = req.headers.authorization
   const token = authHeader?.split(" ")[1]
   const ip = req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress
-  if (!ip) return res.status(400).json({ message: "IP address not found" })
-  if (!token) return res.status(401).json({ message: "Authorization token missing" })
+  if (!ip) return res.status(400).json({ message: "Dirección IP no encontrada" })
+  if (!token) return res.status(401).json({ message: "Falta el token de autorización" })
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
@@ -127,21 +127,21 @@ const ipTrackMiddleware = async (req, res, next) => {
         return
       }
       if (!user) {
-        res.status(403).json({ error: true, message: "Account not exists" })
+        res.status(403).json({ error: true, message: "La cuenta no existe." })
         return
       }
-      res.status(200).json({ error: true, message: "Sorry, the account is already in use!" })
+      res.status(200).json({ error: true, message: "Lo sentimos, ¡la cuenta ya está en uso!" })
     } else {
       res.status(403).json({ error: true, message: "Rol no permitido" })
     }
   } catch {
-    res.status(403).json({ error: true, message: "Invalid Token" })
+    res.status(403).json({ error: true, message: "Token no válido" })
   }
 }
 const verifyMiddleware = async (req, res, next) => {
   const authHeader = req.headers.authorization
   const token = authHeader?.split(" ")[1]
-  if (!token) return res.status(401).json({ message: "Access Denied" })
+  if (!token) return res.status(401).json({ message: "Acceso denegado" })
   const ip = req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress
   const decoded = jwt.verify(token, process.env.JWT_SECRET)
   const user = await UserModel.findOne({ email: decoded.email, _id: decoded._id })

@@ -72,11 +72,11 @@ const Dashboard = () => {
               if (courseSearchQuery) {
                 handleCourseSearch(courseSearchQuery)
               }
-            } catch (error) {
-              toast.error(error?.message || "La sesión ha expirado. Por favor, vuelve a iniciar sesión.")
+            } catch (err) {
+              toast.error(err.response?.data?.message || err.message || "La sesión ha expirado. Por favor, vuelve a iniciar sesión.")
             }
-          } catch (error) {
-            toast.error(error?.response?.data.message || error?.response?.data || error?.message || "La sesión ha expirado. Por favor, vuelve a iniciar sesión.")
+          } catch (err) {
+            toast.error(err.response?.data?.message || err.message|| "La sesión ha expirado. Por favor, vuelve a iniciar sesión.")
             // removeToken()
             // nav("/login")
           }
@@ -178,8 +178,8 @@ const Dashboard = () => {
         }
         let result = await axios.get(BACKEND_URL + "/api/shops/extension", { headers: { Authorization: `Bearer ` + token } })
         setCourses(result.data)
-      } catch (error) {
-        toast.error(error?.message || "La sesión ha expirado. Por favor, vuelve a iniciar sesión.")
+      } catch (err) {
+        toast.error(err.response?.data?.message || err.message|| "La sesión ha expirado. Por favor, vuelve a iniciar sesión.")
         // removeToken()
         // nav("/login")
       }
@@ -197,8 +197,8 @@ const Dashboard = () => {
         let result = await axios.get(BACKEND_URL + "/api/products/getmostusedtool", { headers: { Authorization: `Bearer ` + token } })
         let decryptedData = JSON.parse(await decrypt(result.data.products))
         setLandingTool(decryptedData)
-      } catch (error) {
-        toast.error(error?.message || "La sesión ha expirado. Por favor, vuelve a iniciar sesión.")
+      } catch (err) {
+        toast.error(err.response?.data?.message || err.message||"La sesión ha expirado. Por favor, vuelve a iniciar sesión.")
         // removeToken()
         // nav("/login")
       }

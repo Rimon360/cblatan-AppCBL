@@ -56,7 +56,7 @@ function Register() {
         return
       }
     } catch (err) {
-      toast.error(err.response.data.message || "Something unknown happend. Please try again later!")
+      toast.error(err.response?.data?.message || err.message|| "Something unknown happend. Please try again later!")
     }
   }
 
@@ -65,7 +65,7 @@ function Register() {
     <section className=" w-full h-[95vh] flex items-center justify-center">
       <div className="form w-full max-w-sm p-6 bg-gray-900 rounded-2xl shadow-lg border border-blue-900">
         <div className="w-full flex justify-center">
-          <img src={logo} alt="Logo" className="rounded-xl w-50" srcset="" />
+          <img src={logo} alt="Logo" className="rounded-xl w-50" srcSet="" />
         </div>
         <h2 className="mb-7 text-center text-2xl font-semibold text-gray-500 ">Registrar una cuenta</h2>
         <form onSubmit={handleRegister} className="space-y-6 flex flex-col">
@@ -78,9 +78,9 @@ function Register() {
             </label>
             <label className="text-gray-400">
               <span className="flex items-center gap-1">
-                <MdEmail /> Correo electrónico:
+                <MdEmail /> Nombre de usuario:
               </span>
-              <input autoFocus type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" required className="w-full px-4 py-2 bg-gray-950 " />
+              <input autoFocus type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="nombre de usuario" required className="w-full px-4 py-2 bg-gray-950 " />
             </label>
             <label className="text-gray-400">
               <span className="flex items-center gap-1">

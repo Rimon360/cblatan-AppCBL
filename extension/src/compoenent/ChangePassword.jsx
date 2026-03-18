@@ -56,7 +56,7 @@ function ChangePassword() {
         toast.error("El correo electrónico o la contraseña son incorrectos")
       }
     } catch (err) {
-      toast.error(err.response?.data?.message || "Ocurrió un error")
+      toast.error(err.response?.data?.message || err.message || "Ocurrió un error")
       console.error("Ocurrió un error:", err)
     }
   }
