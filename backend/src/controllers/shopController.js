@@ -317,9 +317,9 @@ module.exports.getAllShopByUserId = async (req, res) => {
       if (shop.is_premium === true) {
         premium.push(shop)
       } else {
+        normalCount++
         if (shop.isLock && normalCount > normalLimit) continue
         normal.push(shop)
-        normalCount++
       }
     }
     res.status(200).json({ normal, premium })
