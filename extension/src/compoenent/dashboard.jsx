@@ -274,26 +274,30 @@ const Dashboard = () => {
                   >
                     SELECCIONA HERRAMIENTA AQUÍ {isCourseOpen ? <IoIosArrowDown /> : <IoIosArrowForward />}
                   </label>
+
                   <div className={`${isCourseOpen ? "" : "hidden"} courseListDiv overflow-auto`}>
-                    <div className="premium border-2 border-purple-500 p-1 rounded-xl flex flex-col items-center">
-                      <label className="  flex flex-col items-center w-full block text-center cursor-pointer   rounded-xl flex gap-2 items-center justify-center select-none">
-                       💎 Selecciones especiales para ti 🥳
-                      </label>
-                      <div className={`${isCourseOpen ? "" : "hidden"} courseListDiv overflow-auto w-full`}>
-                        {premiumTools.map((course) => (
-                          <section
-                            onClick={() => setSelectedShopId(course._id == selectedShopId ? "" : course._id)}
-                            key={course._id}
-                            className={`${course.is_premium ? "!cursor-not-allowed  locked-item" : ""} bg-purple-600 !text-white`}
-                          >
-                            <div className="flex justify-start items-center">
-                              <div className="text-yellow-300">{course.is_premium ? "👑" : ""}</div>
-                              {course.shop_name}
-                            </div>
-                          </section>
-                        ))}
+                    {premiumTools.length > 0 && (
+                      <div className="premium border-2 border-purple-500 p-1 rounded-xl flex flex-col items-center">
+                        <label className="  flex flex-col items-center w-full block text-center cursor-pointer   rounded-xl flex gap-2 items-center justify-center select-none">
+                          💎 Selecciones especiales para ti 🥳
+                        </label>
+                        <div className={`${isCourseOpen ? "" : "hidden"} courseListDiv overflow-auto w-full`}>
+                          {premiumTools.map((course) => (
+                            <section
+                              onClick={() => setSelectedShopId(course._id == selectedShopId ? "" : course._id)}
+                              key={course._id}
+                              className={`${course.is_premium ? "!cursor-not-allowed  locked-item" : ""} bg-purple-600 !text-white`}
+                            >
+                              <div className="flex justify-start items-center">
+                                <div className="text-yellow-300">{course.is_premium ? "👑" : ""}</div>
+                                {course.shop_name}
+                              </div>
+                            </section>
+                          ))}
+                        </div>
                       </div>
-                    </div>
+                    )}
+
                     <div className="mt-2">
                       {courses.map((course, i) => (
                         <section
