@@ -1,34 +1,34 @@
-const mongoose = require("mongoose");
+const mongoose = require("mongoose")
 
 const shopSchema = new mongoose.Schema({
   shop_name: {
     type: String,
-    required: true
+    required: true,
   },
   type: {
     type: String,
-    default: "title"
+    default: "title",
   },
   seq: { type: Number, default: 0 },
   createdAt: {
     type: Date,
     default: Date.now,
   },
-});
+})
 const subtitleSchema = new mongoose.Schema({
   subtitle: {
     type: String,
-    required: true
+    required: true,
   },
   shop_id: {
     type: String,
-    default: "title"
+    default: "title",
   },
   createdAt: {
     type: Date,
     default: Date.now,
   },
-});
+})
 
 const assignedShopSchema = new mongoose.Schema({
   shop_id: {
@@ -37,10 +37,14 @@ const assignedShopSchema = new mongoose.Schema({
   },
   checked: {
     type: Boolean,
-    default: false
+    default: false,
   },
   expires: {
-    type: String
+    type: String,
+  },
+  is_premium: {
+    type: Boolean,
+    default: false,
   },
   user_id: {
     type: String,
@@ -51,9 +55,9 @@ const assignedShopSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-});
+})
 
-const shopsModel = mongoose.model("shops", shopSchema);
-const assignModel = mongoose.model("assigned_shops", assignedShopSchema);
-const subtitleModel = mongoose.model("subtitles", subtitleSchema);
-module.exports = { shopsModel, assignModel, subtitleModel };
+const shopsModel = mongoose.model("shops", shopSchema)
+const assignModel = mongoose.model("assigned_shops", assignedShopSchema)
+const subtitleModel = mongoose.model("subtitles", subtitleSchema)
+module.exports = { shopsModel, assignModel, subtitleModel }

@@ -63,7 +63,7 @@ const Assign_shop = () => {
             let tmp = tmpShops.map((shop) => {
               const match = assignedShops.find((e) => e.shop_id === shop._id) // Convert shop._id to string if necessary
               const isAssigned = !!match
-              return { ...shop, isAssigned, checked: match?.checked, expires: match?.expires || "" }
+              return { ...shop, isAssigned, checked: match?.checked, expires: match?.expires || "", is_premium: match?.is_premium || false }
             })
             setShops(tmp)
           })
@@ -83,7 +83,7 @@ const Assign_shop = () => {
   const handleShopSearch = (value) => {
     setShopSearch(value)
   }
-  const handleAssingShop = (shop, isAssigned, checked, expires) => {
+  const handleAssingShop = (shop, isAssigned, checked, expires, is_premium) => {
     return (e) => {
       e.preventDefault()
       if (shop.isAssigned) {
@@ -112,7 +112,7 @@ const Assign_shop = () => {
           }
         })
       } else {
-        const data = { shop_id: [shop._id], user_id: userId, checked, expires }
+        const data = { shop_id: [shop._id], user_id: userId, checked, expires, is_premium }
         axios
           .post(assignURL, data, { headers: { Authorization: "Bearer " + token } })
           .then((res) => {
@@ -188,6 +188,11 @@ const Assign_shop = () => {
       return prev.map((p) => (p._id === shop._id ? { ...p, expires: e.target.value } : p))
     })
   }
+  const handleAssignmentLock = (e, shop) => {
+    setFilteredShops((prev) => {
+      return prev.map((p) => (p._id === shop._id ? { ...p, is_premium: e.target.checked } : p))
+    })
+  }
   const getTodayISO = () => new Date().toISOString().split("T")[0]
 
   return (
@@ -196,7 +201,7 @@ const Assign_shop = () => {
         <div>
           <input type="search" value={shopSearch} onInput={(e) => handleShopSearch(e.target.value)} placeholder="Search shop" />
         </div>
-        <br /> 
+        <br />
         <div className="flex justify-between">
           <button
             onClick={() => handleAssigningAll(shops)}
@@ -207,7 +212,7 @@ const Assign_shop = () => {
             {isAssignedAll ? "Unassign all group" : "Assign all group"} <BsArrowRight className="inline" />
           </button>
         </div>
-        <p className="mb-2 w-fit text-center text-yellow-300/50 px-2 rounded-md">Nota: La inercia de fecha solo funciona para asignaciones individuales.</p> 
+        <p className="mb-2 w-fit text-center text-yellow-300/50 px-2 rounded-md">Nota: La inercia de fecha solo funciona para asignaciones individuales.</p>
         <div className="shop-container  mb-6">
           <ul className="max-h-300 overflow-auto shadow rounded mt-2">
             {filteredShops && filteredShops.length > 0 ? (
@@ -223,13 +228,20 @@ const Assign_shop = () => {
                   </p>
 
                   <div className="flex gap-2 items-center">
+                    <div>
+                      <label className="flex gap-2 items-center  bg-red-500/20 hover:bg-red-500/30 cursor-pointer rounded-xl p-1 " htmlFor={`islock` + i}>
+                        <span className="text-sm px-2">Is Premium?</span>
+                        <input checked={shop.is_premium} id={`islock` + i} onChange={(e) => handleAssignmentLock(e, shop)} className="!p-0 !m-0 !mr-2" type="checkbox" />
+                      </label>
+                    </div>
+                    <span className="text-gray-700">|</span>
                     <p className="flex justify-between items-center  gap-1">
                       <input type="checkbox" checked={shop?.checked || false} onChange={(e) => handleGroupCheckbox(e, shop)} />
                       <input value={shop.expires} type="date" disabled={shop?.checked ? false : true} onChange={(e) => handleGroupExpireDate(e, shop)} />
                     </p>
                     <div className="w-[110px] flex justify-end ">
                       <button
-                        onClick={handleAssingShop(shop, shop.isAssigned, shop.checked, shop.expires)}
+                        onClick={handleAssingShop(shop, shop.isAssigned, shop.checked, shop.expires, shop.is_premium)}
                         className={` pl-2 pr-2 pt-1 pb-1 rounded-lg cursor-pointer  ${
                           shop.isAssigned ? "bg-red-100 text-red-500 hover:bg-red-500 hover:text-white" : "bg-blue-100 text-blue-500 hover:bg-blue-500 hover:text-white"
                         }`}

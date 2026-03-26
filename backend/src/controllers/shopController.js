@@ -97,7 +97,7 @@ module.exports.updateSubtitle = async (req, res) => {
   }
 }
 module.exports.assignShop = async (req, res) => {
-  const { shop_id, user_id, checked, expires } = req.body
+  const { shop_id, user_id, checked, expires, is_premium } = req.body
   const { email, role } = req.user
 
   if (shop_id.length < 1) {
@@ -122,6 +122,7 @@ module.exports.assignShop = async (req, res) => {
         user_id,
         checked,
         expires,
+        is_premium,
       }
       if (role == "manager") {
         let selectedShop = await shopsModel.findOne({ _id: shop_id })
@@ -134,6 +135,7 @@ module.exports.assignShop = async (req, res) => {
           user_id,
           checked,
           expires,
+          is_premium,
         }
       }
       let s = await tmpModel.create(tmpDataHolder)
@@ -208,7 +210,7 @@ module.exports.getAssignedShops = async (req, res) => {
   if (!user_id) {
     return res.status(400).json({ message: "user id is required" })
   }
-  const shops = await assignModel.find({ user_id }, { shop_id: 1, checked: 1, expires: 1 }).sort({ createdAt: -1 })
+  const shops = await assignModel.find({ user_id }, { shop_id: 1, checked: 1, expires: 1, is_premium: 1 }).sort({ createdAt: -1 })
   if (!shops) {
     return res.status(200).json({ message: "No Group assigned", shops: [] })
   }
@@ -244,13 +246,13 @@ module.exports.deleteAllAssignedRequestedShops = async (req, res) => {
 }
 
 module.exports.getAllShop = async (req, res) => {
-  const shops = await shopsModel.find().sort({ createdAt: -1 })
+  const shops = await shopsModel.find().sort({ createdAt: 1 })
   res.status(200).json({
     shops,
   })
 }
 module.exports.getAllShopByUserId = async (req, res) => {
-  try {  
+  try {
     const { _id } = req.user
     const USER_ID = _id
     if (!USER_ID) {
@@ -266,13 +268,7 @@ module.exports.getAllShopByUserId = async (req, res) => {
               $match: { $expr: { $eq: ["$shop_id", "$$shopIdStr"] } },
             },
             {
-              $project: {
-                assigned: 0,
-                type: 0,
-                seq: 0,
-                createdAt: 0,
-                __v: 0,
-              },
+              $project: { assigned: 0, type: 0, seq: 0, createdAt: 0, __v: 0 },
             },
           ],
           as: "subtitles",
@@ -297,6 +293,7 @@ module.exports.getAllShopByUserId = async (req, res) => {
       {
         $addFields: {
           isLock: { $eq: [{ $size: "$assigned" }, 0] },
+          is_premium: { $arrayElemAt: ["$assigned.is_premium", 0] },
         },
       },
       {
@@ -308,8 +305,21 @@ module.exports.getAllShopByUserId = async (req, res) => {
           __v: 0,
         },
       },
-    ]).sort({isLock:1})
-    res.status(200).json(shops)
+      {
+        $sort: { isLock: 1 },
+      },
+    ])
+    let premium = []
+    let normal = []
+    let normalLimit = 4
+    for (const shop of shops) {
+      if (shop.is_premium === true) {
+        premium.push(shop)
+      } else if(normal.length<=normalLimit) {
+        normal.push(shop)
+      }
+    }
+    res.status(200).json({normal, premium})
   } catch (error) {
     res.status(403).json({
       error: error.message,

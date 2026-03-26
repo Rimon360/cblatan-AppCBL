@@ -76,7 +76,7 @@ const Dashboard = () => {
               toast.error(err.response?.data?.message || err.message || "La sesión ha expirado. Por favor, vuelve a iniciar sesión.")
             }
           } catch (err) {
-            toast.error(err.response?.data?.message || err.message|| "La sesión ha expirado. Por favor, vuelve a iniciar sesión.")
+            toast.error(err.response?.data?.message || err.message || "La sesión ha expirado. Por favor, vuelve a iniciar sesión.")
             // removeToken()
             // nav("/login")
           }
@@ -165,6 +165,7 @@ const Dashboard = () => {
   const [codeHere, setCodeHere] = useState({})
 
   const [courses, setCourses] = useState([])
+  const [premiumTools, setPremiumTools] = useState([])
   const [isCourseOpen, setIsCourseOpen] = useState(1)
   const [selectedShopId, setSelectedShopId] = useState(null)
   useEffect(() => {
@@ -177,9 +178,10 @@ const Dashboard = () => {
           return
         }
         let result = await axios.get(BACKEND_URL + "/api/shops/extension", { headers: { Authorization: `Bearer ` + token } })
-        setCourses(result.data)
+        setCourses(result.data.normal)
+        setPremiumTools(result.data.premium)
       } catch (err) {
-        toast.error(err.response?.data?.message || err.message|| "La sesión ha expirado. Por favor, vuelve a iniciar sesión.")
+        toast.error(err.response?.data?.message || err.message || "La sesión ha expirado. Por favor, vuelve a iniciar sesión.")
         // removeToken()
         // nav("/login")
       }
@@ -198,7 +200,7 @@ const Dashboard = () => {
         let decryptedData = JSON.parse(await decrypt(result.data.products))
         setLandingTool(decryptedData)
       } catch (err) {
-        toast.error(err.response?.data?.message || err.message||"La sesión ha expirado. Por favor, vuelve a iniciar sesión.")
+        toast.error(err.response?.data?.message || err.message || "La sesión ha expirado. Por favor, vuelve a iniciar sesión.")
         // removeToken()
         // nav("/login")
       }
@@ -265,43 +267,67 @@ const Dashboard = () => {
 
             <div className="bg-gray-900/20 flex gap-2 backdrop-blur-xl min-h-fit m-1 rounded-xl ">
               <div className={`courseList sticky top-19 h-screen `}>
-                <label
-                  onClick={() => setIsCourseOpen(!isCourseOpen)}
-                  className="p-4 w-80 block text-center cursor-pointer bg-blue-500/20 rounded-xl flex gap-2 items-center justify-center select-none"
-                >
-                  SELECCIONA HERRAMIENTA AQUÍ {isCourseOpen ? <IoIosArrowDown /> : <IoIosArrowForward />}
-                </label>
-                <div className={`${isCourseOpen ? "" : "hidden"} courseListDiv overflow-auto`}>
-                  {courses.map((course) => (
-                    <section
-                      onClick={() => setSelectedShopId(course._id == selectedShopId ? "" : course._id)}
-                      key={course._id}
-                      className={`${course.isLock ? "!cursor-not-allowed  locked-item" : ""} bg-blue-500/10`}
-                    >
-                      <div className="flex justify-start items-center">
-                        <div className="text-yellow-300">{course.isLock ? "👑" : ""}</div>
-                        {course.shop_name}
+                <div className="flex flex-col gap-2">
+                  <label
+                    onClick={() => setIsCourseOpen(!isCourseOpen)}
+                    className="p-4 w-80 block text-center cursor-pointer bg-blue-500/20 rounded-xl flex gap-2 items-center justify-center select-none"
+                  >
+                    SELECCIONA HERRAMIENTA AQUÍ {isCourseOpen ? <IoIosArrowDown /> : <IoIosArrowForward />}
+                  </label>
+                  <div className={`${isCourseOpen ? "" : "hidden"} courseListDiv overflow-auto`}>
+                    <div className="premium border-2 border-purple-500 p-1 rounded-xl flex flex-col items-center">
+                      <label className="  flex flex-col items-center w-full block text-center cursor-pointer   rounded-xl flex gap-2 items-center justify-center select-none">
+                       💎 Selecciones especiales para ti 🥳
+                      </label>
+                      <div className={`${isCourseOpen ? "" : "hidden"} courseListDiv overflow-auto w-full`}>
+                        {premiumTools.map((course) => (
+                          <section
+                            onClick={() => setSelectedShopId(course._id == selectedShopId ? "" : course._id)}
+                            key={course._id}
+                            className={`${course.is_premium ? "!cursor-not-allowed  locked-item" : ""} bg-purple-600 !text-white`}
+                          >
+                            <div className="flex justify-start items-center">
+                              <div className="text-yellow-300">{course.is_premium ? "👑" : ""}</div>
+                              {course.shop_name}
+                            </div>
+                          </section>
+                        ))}
                       </div>
-                      <ul className={`${selectedShopId == course._id ? "" : "hidden"}`}>
-                        {!course.isLock && course.subtitles.length > 0 ? (
-                          course.subtitles.map((s) => (
-                            <li onClick={(e) => handleSubtitleClick(e, s._id)} key={s._id}>
-                              {s.subtitle}
-                            </li>
-                          ))
-                        ) : (
-                          <small>{course.isLock ? "Solo usuario premium" : "Empty"}</small>
-                        )}
-                      </ul>
-                    </section>
-                  ))}
+                    </div>
+                    <div className="mt-2">
+                      {courses.map((course, i) => (
+                        <section
+                          onClick={() => setSelectedShopId(course._id == selectedShopId ? "" : course._id)}
+                          key={course._id}
+                          className={`${course.isLock ? "!cursor-not-allowed  locked-item" : ""} bg-blue-500/10`}
+                        >
+                          <div className="flex justify-start items-center">
+                            <div className="text-yellow-300">{course.isLock ? "👑" : ""}</div>
+                            {course.shop_name}
+                          </div>
+                          <ul className={`${selectedShopId == course._id ? "" : "hidden"}`}>
+                            {!course.isLock && course.subtitles.length > 0 ? (
+                              course.subtitles.map((s) => (
+                                <li onClick={(e) => handleSubtitleClick(e, s._id)} key={s._id}>
+                                  {s.subtitle}
+                                </li>
+                              ))
+                            ) : (
+                              <small>{course.isLock ? "Solo usuario premium" : "Empty"}</small>
+                            )}
+                          </ul>
+                        </section>
+                      ))}
+                    </div>
+                  </div>
                 </div>
+
                 {/* ads section */}
                 <br />
 
                 {sideAds && sideAds.ads_title ? (
                   <div className="border-2 p-2 rounded-xl shadow-[0_0_25px_rgba(99,102,241,0.7)] ">
-                    <a href={`${sideAds.ads_url}`} target="_blank" >
+                    <a href={`${sideAds.ads_url}`} target="_blank">
                       <div className="flex mb-2 items-center relative justify-center w-full">
                         <img crossOrigin="" className="rounded-xl hover:scale-105 transition shadow-[0_0_25px_rgba(99,102,241,0.7)] " src={BACKEND_URL + `/ads/${sideAds.name}`} alt="" />
                       </div>

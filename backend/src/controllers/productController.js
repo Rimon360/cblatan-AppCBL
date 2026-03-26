@@ -283,6 +283,7 @@ module.exports.getMostUsedTool = async (req, res) => {
         pipeline: [
           {
             $match: {
+              is_premium:{$ne:true},
               $expr: {
                 $and: [{ $eq: ["$shop_id", "$$shopIdStr"] }, { $eq: ["$user_id", USER_ID] }],
               },

@@ -467,6 +467,9 @@ const Users = () => {
               <thead>
                 <tr>
                   <th className="text-left">#</th>
+                  <th className="text-left">Del</th>
+                  <th className="text-left">Edit</th>
+                  <th className="text-left">Assign Tools</th>
                   <th className="text-left">Email</th>
                   <th className="text-left">Username</th>
                   <th className="text-left">Role</th>
@@ -486,9 +489,6 @@ const Users = () => {
                   <th className="text-left">Validity</th>
                   <th className="text-left">Days left</th>
                   <th className="text-left">Opening date</th>
-                  <th className="text-left">Edit</th>
-                  <th className="text-left">Assign Tools</th>
-                  <th className="text-left">Del</th>
                 </tr>
               </thead>
               <tbody>
@@ -505,6 +505,35 @@ const Users = () => {
                     return (
                       <tr key={user._id} className="hover:bg-gray-900">
                         <td className="truncate max-w-[150px] text-center">{filteredUsers.length - i} </td>
+                        <td>
+                          <div className=" flex items-center justify-center">
+                            {user.role === "adminss" ? (
+                              "N/A"
+                            ) : (
+                              <button onClick={() => openModal(user._id, user.email)} className="px-2 py-1 text-blue-400 rounded hover:bg-blue-200">
+                                <RiDeleteBin6Line />
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                        <td>
+                          <div className="flex items-center justify-center">
+                            <button
+                              onClick={(e) => handleUserEdit(user)}
+                              className="hover:bg-blue-300/50 text-xl text-blue-400 h-[20px] items-center w-full flex justify-center rounded-md hover:text-blue-500"
+                            >
+                              <CiEdit />
+                            </button>
+                          </div>
+                        </td>
+                        <td>
+                          <div className="flex items-center justify-center">
+                            <Link to={"/dashboard/assign-product/" + user._id} className="px-2 py-1 text-blue-400 rounded hover:bg-blue-200">
+                              <FaExternalLinkAlt />
+                            </Link>
+                          </div>
+                        </td>
+
                         <td className="truncate max-w-[150px] text-center">{user.email}</td>
                         <td className="truncate max-w-[150px] text-center">{user.username || "-"}</td>
                         <td className="truncate max-w-[150px] text-center">{user.role}</td>
@@ -524,35 +553,6 @@ const Users = () => {
                         <td className="truncate max-w-[150px] text-center">{user.sub_validity}</td>
                         <td className={`text-center font-bold text-md  ${isAlmostFinished ? "text-red-500 font-bold" : ""} ${results == false ? "text-red-500" : ""} `}>{isExpired}</td>
                         <td className="text-center">{new Date(user.createdAt).toLocaleString("en-US", { timeZone: "America/Lima" })}</td>
-
-                        <td>
-                          <div className="flex items-center justify-center">
-                            <button
-                              onClick={(e) => handleUserEdit(user)}
-                              className="hover:bg-blue-300/50 text-xl text-blue-400 h-[20px] items-center w-full flex justify-center rounded-md hover:text-blue-500"
-                            >
-                              <CiEdit />
-                            </button>
-                          </div>
-                        </td>
-                        <td>
-                          <div className="flex items-center justify-center">
-                            <Link to={"/dashboard/assign-product/" + user._id} className="px-2 py-1 text-blue-400 rounded hover:bg-blue-200">
-                              <FaExternalLinkAlt />
-                            </Link>
-                          </div>
-                        </td>
-                        <td>
-                          <div className=" flex items-center justify-center">
-                            {user.role === "adminss" ? (
-                              "N/A"
-                            ) : (
-                              <button onClick={() => openModal(user._id, user.email)} className="px-2 py-1 text-blue-400 rounded hover:bg-blue-200">
-                                <RiDeleteBin6Line />
-                              </button>
-                            )}
-                          </div>
-                        </td>
                       </tr>
                     )
                   })
