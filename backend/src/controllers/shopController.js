@@ -312,14 +312,14 @@ module.exports.getAllShopByUserId = async (req, res) => {
     let premium = []
     let normal = []
     let normalLimit = 4
-    let isLockCount = 0 // max allowed 4 by default;
+    let normalCount = 0 // max allowed 4 by default;
     for (const shop of shops) {
       if (shop.is_premium === true) {
         premium.push(shop)
       } else {
-        if (shop.isLock) continue
+        if (shop.isLock && normalCount > normalLimit) continue
         normal.push(shop)
-        if (shop.isLock) isLockCount++
+        normalCount++
       }
     }
     res.status(200).json({ normal, premium })
