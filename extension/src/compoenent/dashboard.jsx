@@ -67,6 +67,8 @@ const Dashboard = () => {
                   setCodeHere({ d: p.d, e: p.e, k: p.k, proxy: p.proxy, id: p.id })
                 }
               })
+              console.log(decryptedData)
+
               setPasswordData(decryptedData)
               setReservedCourses(decryptedData)
               if (courseSearchQuery) {
@@ -389,21 +391,23 @@ hover:scale-105 transition  w-full justify-center"
                             <div
                               onClick={() => handleWebsiteLogin(p.d, p.e, p.k, p.proxy, p.id)}
                               key={i}
-                              className=" relative float-left cursor-pointer  hover:!border-blue-500  border-transparent border-1 backdrop:blur-3xl   rounded-xl w-[300px] text-white overflow-hidden shadow-lg hover:shadow-xl transition-shadow  !m-4"
+                              className=" relative float-left cursor-pointer  hover:!border-blue-500  border-transparent border-1 backdrop:blur-3xl   rounded-xl w-[300px] text-white overflow-hidden shadow-lg hover:shadow-xl transition-shadow  !m-4 h-[250px]"
                             >
                               <div className=" relative flex items-center justify-center bg-blue-500/5 backdrop-blur-md">
                                 <img loading="lazy" src={filepath} className="w-fit h-[200px]" alt="image" crossOrigin="anonymous" />
+                                <span
+                                  className="absolute right-2 bottom-2  px-1 text-sm text-white rounded-xl bg-gray-400/20 hover:scale-115"
+                                  title={`${p.active_users?.join?.("\n") || ""}`}
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    navigator.clipboard.writeText(p.active_users?.join?.("\n") || "")
+                                  }}
+                                >
+                                  activa: {p.active_users?.length || 0}
+                                </span>{" "}
                               </div>
-                              <span
-                                className="absolute right-2 bottom-2  px-1 text-sm text-white rounded-xl bg-gray-400/20 hover:scale-115"
-                                title={`${p.active_users?.join?.("\n") || ""}`}
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  navigator.clipboard.writeText(p.active_users?.join?.("\n") || "")
-                                }}
-                              >
-                                activa: {p.active_users?.length || 0}
-                              </span>
+
+                              {p.tool_note&&<div className=" p-2 text-center  max-h-[70px]  line-clamp-3 rounded-xl mt-2  text-sm  bg-gradient-to-r from-orange-500 via-red-500 to-pink-600 !text-white border-2 border-white">{p.tool_note}</div>}
                             </div>
                           )
                         })}
@@ -459,7 +463,7 @@ hover:scale-105 transition  w-full justify-center"
                                   activa: {p.active_users?.length || 0}
                                 </span>
                               </div>
-                              <div className=" p-2 text-center border-b-2 border-blue-200/25 max-h-[70px]  line-clamp-3 rounded-xl mt-2  text-sm">{p.tool_note}</div>
+                              {p.tool_note&&<div className=" p-2 text-center  max-h-[70px]  line-clamp-3 rounded-xl mt-2  text-sm  bg-gradient-to-r from-orange-500 via-red-500 to-pink-600 !text-white border-2 border-white">{p.tool_note}</div>}
                             </div>
                           ))}
                         </div>

@@ -583,9 +583,7 @@ exports.deleteParkedRequest = async (req, res) => {
 exports.deleteOlderPrivateChat = async (req, res) => {
   try {
     const oneYearAgo = new Date()
-    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1)
-
-    const oneMinuteAgo = new Date(Date.now() - 60 * 1000)
+    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1) 
 
     let result = await supportChatModel.find({ createdAt: { $lt: oneYearAgo } })
 

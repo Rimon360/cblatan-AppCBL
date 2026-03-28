@@ -28,6 +28,7 @@ const Supportchat = () => {
   const messagesEndRef = useRef(null)
   const [isUp, setIsUp] = useState(false)
   const [chatTopId, setChatTopId] = useState(null)
+  const [isSearching, setIsSearching] = useState(false)
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }
@@ -60,10 +61,12 @@ const Supportchat = () => {
     playNotificationSound()
   }
   const [chatUsers, setChatUsers] = useState([])
+  const [allUsers, setAllUsers] = useState([])
   const [unreadChat, setUnreadChat] = useState(new Map())
   const [chatSelectedUser, setChatSelectedUser] = useState(null)
   const socketRef = useRef(null)
   const selectedUserIdRef = useRef(null)
+  const [chatUserSearchQuery, setChatUserSearchQuery] = useState(null)
   const [trackLoadedMessage, setTrackLoadedMessage] = useState({})
   function changeUserUnread(id, v = 1) {
     setUnreadChat((prev) => {
@@ -125,6 +128,7 @@ const Supportchat = () => {
   useEffect(() => {
     try {
       ;(async () => {
+        if (chatUserSearchQuery) return
         let result = await axios2.get(BACKEND_URL + "/api/users/chat/get-users", { headers: { Authorization: "Bearer " + token } })
         let data = []
         let changesIds = []
@@ -144,13 +148,14 @@ const Supportchat = () => {
           }
         }
         setChatUsers(data)
+        setAllUsers(data)
         for (const id of newPendingUserIdRef.current) {
           changeUserUnread(id)
         }
         newPendingUserIdRef.current = []
       })()
     } catch (error) {}
-  }, [isReloadUserList])
+  }, [isReloadUserList, chatUserSearchQuery])
 
   useEffect(() => {
     setInterval(() => {
@@ -230,7 +235,7 @@ const Supportchat = () => {
     selectedUserIdRef.current = id
     window.location.hash = `chatid=${id}`
     changeUserUnread(id, 0)
-    setIsUp(false)  
+    setIsUp(false)
   }
 
   const handleFileSelection = async (e) => {
@@ -376,21 +381,34 @@ const Supportchat = () => {
       })()
     } catch (error) {}
   }
+
+  const handleSearchUser = (e) => {
+    let query = e.target.value
+    setChatUserSearchQuery(query)
+    setIsSearching(true)
+    setChatUsers(allUsers.filter((u) => u.email.toLowerCase().includes(query.toLowerCase())))
+  }
   return (
     <div className="flex h-screen bg-gray-900 text-gray-100">
       {/* Sidebar - SupportUsers List */}
       <div className="w-80 bg-gray-800 border-r border-gray-700 flex flex-col">
         <div className="p-4 border-b border-gray-700">
           <h2 className="text-xl font-bold text-blue-400 mb-3">Support Team</h2>
-          {/* <div className="relative">
+          <div className="relative">
             <BsSearch className="absolute right-3 top-4 text-gray-400" />
             <input
               onInput={handleSearchUser}
+              onBlur={() => {
+                setIsSearching(false)
+              }}
+              onSelect={() => {
+                setIsSearching(true)
+              }}
               type="text"
               placeholder="Search"
               className="w-full bg-gray-700 text-gray-100 pl-10 pr-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-          </div> */}
+          </div>
         </div>
 
         <div className="flex-1 overflow-y-auto">
