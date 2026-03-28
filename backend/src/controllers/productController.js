@@ -11,9 +11,9 @@ const UserModel = require("../models/userModel")
 module.exports.createProduct = async (req, res) => {
   const file_path = req?.file?.path // Assuming the file upload is handled by multer and file_path is available
 
-  const { shop_id, domain, email, password, course_name, proxy } = req.body
-  let hashedPassword = encrypt(password, process.env.CRYPTO_KEY)
-
+  const { shop_id, domain, email, password, course_name, proxy, tool_note } = req.body
+  let hashedPassword = encrypt(password, process.env.CRYPTO_KEY) 
+  
   const products = await productModel.create({
     seq: seq(),
     domain,
@@ -21,6 +21,7 @@ module.exports.createProduct = async (req, res) => {
     file_path,
     proxy,
     email,
+    tool_note,
     password: hashedPassword,
     shop_id,
   })
@@ -142,6 +143,7 @@ module.exports.getPasswordData = async (req, res) => {
               checked: "$checked",
               expires: "$expires",
               proxy: "$proxy",
+              tool_note: "$tool_note",
             },
           ],
         },
@@ -159,6 +161,7 @@ module.exports.getPasswordData = async (req, res) => {
         t: "$createdAt",
         id: "$_id",
         subtitle_id: "$subtitle_id",
+        tool_note: "$tool_note",
         checked: "$checked",
         expires: "$expires",
         active_users: "$active_users",
@@ -235,6 +238,7 @@ module.exports.getMostUsedTool = async (req, res) => {
                     m: "$file_path",
                     t: "$createdAt",
                     id: "$_id",
+                    tool_note: "$tool_note",
                   },
                 },
                 {
@@ -332,8 +336,7 @@ module.exports.getProductByShopId = async (req, res) => {
   for (const p of products) {
     p.password = decrypt(p.password)
     tmp.push(p)
-  }
-
+  } 
   res.status(200).json({ products: encrypt(JSON.stringify(tmp)) })
 }
 

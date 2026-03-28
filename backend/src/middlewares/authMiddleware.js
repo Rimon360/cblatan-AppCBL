@@ -130,7 +130,7 @@ const ipTrackMiddleware = async (req, res, next) => {
         res.status(403).json({ error: true, message: "La cuenta no existe." })
         return
       }
-      res.status(200).json({ error: true, message: "Lo sentimos, ¡la cuenta ya está en uso!" })
+      res.status(403).json({ error: true, message: "Lo sentimos, ¡la cuenta ya está en uso!" })
     } else {
       res.status(403).json({ error: true, message: "Rol no permitido" })
     }

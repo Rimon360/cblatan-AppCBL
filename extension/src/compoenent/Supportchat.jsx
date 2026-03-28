@@ -13,6 +13,7 @@ import { IoMdArrowDown } from "react-icons/io"
 import { IoArrowBack } from "react-icons/io5"
 import { playNotificationSound } from "../functions.js"
 import Linkify from "react-linkify"
+import { MdOutlineKeyboardDoubleArrowUp } from "react-icons/md"
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
 const Supportchat = () => {
   const token = localStorage.getItem("token")
@@ -23,13 +24,17 @@ const Supportchat = () => {
   const [progress, setProgress] = useState(0)
   const [inputMessage, setInputMessage] = useState("")
   const messagesEndRef = useRef(null)
+  const [isUp, setIsUp] = useState(false)
+  const [chatTopId, setChatTopId] = useState(null)
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }
 
   useEffect(() => {
+    setChatTopId(messages[0]?._id)
+    if (isUp) return
     scrollToBottom()
-  }, [messages])
+  }, [messages, isUp])
 
   const [chatSelectedUser, setChatSelectedUser] = useState(state._id)
   const socketRef = useRef(null)
@@ -50,6 +55,7 @@ const Supportchat = () => {
           data.avatar = "CS"
           messageToast({ sender: data.sender, text: data.content })
         }
+        setIsUp(false)
         setMessages((prev) => [...prev, data])
       })
       return () => {
@@ -215,6 +221,32 @@ const Supportchat = () => {
     }
   }
 
+  const messageContainerRef = useRef()
+
+  const handleChatPagination = (e) => { 
+    try {
+      messageContainerRef.current.scrollTop = 0
+      ;(async () => {
+        if (!chatSelectedUser) return
+        let result = await axios.get(BACKEND_URL + "/api/users/chat/get-private-conversation/" + chatSelectedUser, { params: { _id: chatTopId }, headers: { Authorization: "Bearer " + token } })
+        let data = []
+        if (result.data.length == 0) {
+          return toast.success("You have reached the top")
+        } 
+        for (const element of result.data) {
+          if (element.sender === state.email) {
+            element.avatar = "ME"
+            element.sender = "You"
+            element.isCurrentUser = true
+          }
+          data.push(element)
+        }
+        setIsUp(true)
+        setMessages((prev) => [...data, ...prev])
+      })()
+    } catch (error) {}
+  }
+
   return (
     <div className="flex h-screen bg-gray-900 text-gray-100">
       {/* Main Chat Area */}
@@ -232,7 +264,20 @@ const Supportchat = () => {
         </div>
 
         {/* Messages Area */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-900">
+        <button onClick={handleChatPagination} className="p-2 flex justify-center shadow-xl backdrop-blur-sm  left-2 top-2 hover:bg-blue-500/20 bg-gray-800/20  ">
+          <MdOutlineKeyboardDoubleArrowUp />
+        </button>
+        <div ref={messageContainerRef} className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-900">
+          <button
+            onClick={() => {
+              setIsUp(false)
+              scrollToBottom(false)
+            }}
+            title="Bottom"
+            className="p-2 shadow-xl backdrop-blur-sm fixed right-6 bottom-20 hover:bg-blue-500 bg-gray-500/20 rounded-lg"
+          >
+            <IoMdArrowDown />
+          </button>
           {chatSelectedUser ? (
             messages.map((msg) => (
               <div key={msg.id} className={`flex ${msg.isCurrentUser ? "justify-end" : "justify-start"}`}>
@@ -252,13 +297,7 @@ const Supportchat = () => {
                         <p>
                           <Linkify
                             componentDecorator={(decoratedHref, decoratedText, key) => (
-                              <a
-                                href={decoratedHref}
-                                key={key}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="chat-link"
-                              >
+                              <a href={decoratedHref} key={key} target="_blank" rel="noopener noreferrer" className="chat-link">
                                 {decoratedText}
                               </a>
                             )}

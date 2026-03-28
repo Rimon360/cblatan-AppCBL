@@ -5,6 +5,7 @@ import { BsThreeDotsVertical, BsSearch, BsPaperclip, BsEmojiSmile } from "react-
 import { IoSend } from "react-icons/io5"
 import { FaUserCircle } from "react-icons/fa"
 import { checkFileBeforeUploading, generateRandomKey, isOnline, localTime, playNotificationSound } from "../functions"
+import { MdOutlineKeyboardDoubleArrowUp } from "react-icons/md"
 import { FiExternalLink } from "react-icons/fi"
 import { useNavigate, useParams } from "react-router-dom"
 import { IoCloseOutline } from "react-icons/io5"
@@ -25,13 +26,16 @@ const Supportchat = () => {
   const [inputMessage, setInputMessage] = useState("")
   const [isReloadUserList, setIsReloadUserList] = useState("")
   const messagesEndRef = useRef(null)
+  const [isUp, setIsUp] = useState(false)
+  const [chatTopId, setChatTopId] = useState(null)
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }
-
   useEffect(() => {
+    setChatTopId(messages[0]?._id)
+    if (isUp) return
     scrollToBottom()
-  }, [messages])
+  }, [messages, isUp])
   const messageToast = ({ sender, text }) => {
     toast.custom(
       (t) => (
@@ -88,6 +92,7 @@ const Supportchat = () => {
         messageToast({ sender: data.sender, text: data.content })
         return
       }
+      setIsUp(false)
       setMessages((prev) => [...prev, data])
     })
     return () => {
@@ -167,10 +172,11 @@ const Supportchat = () => {
           }
           data.push(element)
         }
-        setMessages(result.data)
+        setMessages(data)
       })()
     } catch (error) {}
   }, [chatSelectedUser])
+
   const fileRef = useRef("")
   const [isBroadcasting, setIsBroadcasting] = useState(false)
 
@@ -224,6 +230,7 @@ const Supportchat = () => {
     selectedUserIdRef.current = id
     window.location.hash = `chatid=${id}`
     changeUserUnread(id, 0)
+    setIsUp(false)  
   }
 
   const handleFileSelection = async (e) => {
@@ -343,6 +350,32 @@ const Supportchat = () => {
       setFile(file)
     }
   }
+
+  const messageContainerRef = useRef()
+
+  const handleChatPagination = (e) => {
+    try {
+      messageContainerRef.current.scrollTop = 0
+      ;(async () => {
+        if (!chatSelectedUser) return
+        let result = await axios.get(BACKEND_URL + "/api/users/chat/get-private-conversation/" + chatSelectedUser, { params: { _id: chatTopId }, headers: { Authorization: "Bearer " + token } })
+        let data = []
+        if (result.data.length == 0) {
+          return toast.success("You have reached the top")
+        }
+        for (const element of result.data) {
+          if (element.sender === current_user.email) {
+            element.avatar = "ME"
+            element.sender = "You"
+            element.isCurrentUser = true
+          }
+          data.push(element)
+        }
+        setIsUp(true)
+        setMessages((prev) => [...data, ...prev])
+      })()
+    } catch (error) {}
+  }
   return (
     <div className="flex h-screen bg-gray-900 text-gray-100">
       {/* Sidebar - SupportUsers List */}
@@ -441,13 +474,23 @@ const Supportchat = () => {
         </div>
 
         {/* Messages Area */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-900">
-          <button onClick={scrollToBottom} title="Bottom" className="p-2 shadow-xl backdrop-blur-sm fixed right-6 bottom-20 hover:bg-blue-500 bg-gray-500/20 rounded-lg">
+        <button onClick={handleChatPagination} className="p-2 flex justify-center shadow-xl backdrop-blur-sm  left-2 top-2 hover:bg-gray-500/10 bg-gray-800/20  ">
+          <MdOutlineKeyboardDoubleArrowUp />
+        </button>
+        <div ref={messageContainerRef} className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-900 relative">
+          <button
+            onClick={() => {
+              setIsUp(false)
+              scrollToBottom(false)
+            }}
+            title="Bottom"
+            className="p-2 shadow-xl backdrop-blur-sm fixed right-6 bottom-20 hover:bg-blue-500 bg-gray-500/20 rounded-lg"
+          >
             <IoMdArrowDown />
           </button>
           {chatSelectedUser ? (
             messages.map((msg) => (
-              <div key={msg.id} className={`flex ${msg.isCurrentUser ? "justify-end" : "justify-start"}`}>
+              <div key={msg._id} className={`flex ${msg.isCurrentUser ? "justify-end" : "justify-start"}`}>
                 <div className={`flex space-x-3 max-w-2xl ${msg.isCurrentUser ? "flex-row-reverse space-x-reverse" : ""}`}>
                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center font-semibold flex-shrink-0">{msg.avatar}</div>
                   <div className={`flex flex-col ${msg.isCurrentUser ? "items-end" : "items-start"}`}>

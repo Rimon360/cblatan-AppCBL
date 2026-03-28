@@ -29,6 +29,10 @@ const productSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  tool_note: {
+    type: String,
+    required: true
+  },
   seq: { type: Number, default: 0 },
   shop_id: {
     type: String,

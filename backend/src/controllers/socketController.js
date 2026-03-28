@@ -49,9 +49,21 @@ module.exports.getGroupConversation = async (req, res) => {
 module.exports.getPrivateConversation = async (req, res) => {
   try {
     const { toUserId } = req.params
+    const { _id } = req.query
     const from = new Date(Date.now() - 24 * 60 * 60 * 1000)
-    let result = await supportChatModel.find({ createdAt: { $gte: from }, $or: [{ to: toUserId }, { to: "all" }] }).limit(300)
-    res.status(200).json(result)
+    let result = []
+    if (_id) {
+      result = await supportChatModel
+        .find({ _id: { $lt: _id }, $or: [{ to: toUserId }, { to: "all" }] })
+        .sort({ _id: -1 })
+        .limit(30)
+    } else {
+      result = await supportChatModel
+        .find({ $or: [{ to: toUserId }, { to: "all" }] })
+        .sort({ _id: -1 })
+        .limit(30)
+    }
+    res.status(200).json(result.reverse())
   } catch (err) {
     console.log(err.message)
     res.status(403).json({ error: true, message: err.message })
@@ -110,7 +122,7 @@ module.exports.removeUnreadCount = async (user_id) => {
 }
 module.exports.getUnreadCount = async (user_id) => {
   try {
-    let { unread_count } = await unreadCountModel.findOne({ user_id }, { unread_count: 1 }) 
+    let { unread_count } = await unreadCountModel.findOne({ user_id }, { unread_count: 1 })
     return unread_count
   } catch (error) {
     return 0

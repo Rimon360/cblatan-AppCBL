@@ -427,7 +427,7 @@ hover:scale-105 transition  w-full justify-center"
                     <div className="w-full h-fit float-left bg-blue-900/10  rounded-xl mt-4" key={shop.shop_name}>
                       {shop.subtitles.map((sub, i) => (
                         <div key={i}>
-                          <h1 className="flex indent-4 items-center justify-start gap-2 text-xl  font-bold text-gray-400 mb-4 mt-8 border-b border-gray-700 pb-2">
+                          <h1 className="flex indent-4 items-center justify-start gap-2 text-xl  font-bold text-gray-400  mt-4 border-b border-gray-700 pb-2">
                             <span>{shop.shop_name}</span>
                             <IoIosArrowForward />
                             <span>{sub.subtitle}</span>
@@ -436,7 +436,7 @@ hover:scale-105 transition  w-full justify-center"
                             <div
                               onClick={() => handleWebsiteLogin(p.d, p.e, p.k, p.proxy, p.id, shop.isLock)}
                               key={i}
-                              className={`relative float-left cursor-pointer  hover:!border-blue-500  border-transparent border-1 backdrop:blur-3xl   rounded-xl w-[300px] text-white overflow-hidden shadow-lg hover:shadow-xl transition-shadow  !m-4 `}
+                              className={`relative float-left cursor-pointer  hover:!border-blue-500  border-transparent border-1 backdrop:blur-3xl   rounded-xl w-[300px] text-white overflow-hidden shadow-lg hover:shadow-xl transition-shadow  !m-1 !ml-6`}
                             >
                               <div className=" relative flex items-center justify-center bg-blue-500/5 backdrop-blur-md">
                                 {shop.isLock ? (
@@ -448,17 +448,18 @@ hover:scale-105 transition  w-full justify-center"
                                 )}
 
                                 <img loading="lazy" src={BACKEND_URL + "/" + p.m} className="w-fit h-[200px]" alt="image" crossOrigin="anonymous" />
+                                <span
+                                  className="absolute right-2 bottom-2  px-1 text-sm text-white rounded-xl bg-gray-400/20 hover:scale-115"
+                                  title={`${p.active_users?.join?.("\n") || ""}`}
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    navigator.clipboard.writeText(p.active_users?.join?.("\n") || "")
+                                  }}
+                                >
+                                  activa: {p.active_users?.length || 0}
+                                </span>
                               </div>
-                              <span
-                                className="absolute right-2 bottom-2  px-1 text-sm text-white rounded-xl bg-gray-400/20 hover:scale-115"
-                                title={`${p.active_users?.join?.("\n") || ""}`}
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  navigator.clipboard.writeText(p.active_users?.join?.("\n") || "")
-                                }}
-                              >
-                                activa: {p.active_users?.length || 0}
-                              </span>
+                              <div className=" p-2 text-center border-b-2 border-blue-200/25 max-h-[70px]  line-clamp-3 rounded-xl mt-2  text-sm">{p.tool_note}</div>
                             </div>
                           ))}
                         </div>

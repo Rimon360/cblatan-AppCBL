@@ -27,6 +27,7 @@ const {
   getParkedRequests,
   deleteParkedRequest,
   approveParkedRequest,
+  deleteOlderPrivateChat,
 } = require("../controllers/userController")
 const { authMiddleware, adminMiddleware, memberMiddleware } = require("../middlewares/authMiddleware")
 const rateLimit = require("express-rate-limit")
@@ -84,6 +85,7 @@ router.post("/change-password", changePassword)
 router.get("/chat/get-group-conversation", adminMiddleware, getGroupConversation)
 router.get("/chat/get-private-conversation/:toUserId", getPrivateConversation)
 router.get("/chat/get-users", adminMiddleware, getChatPrivateUsers)
+router.delete("/chat/private/delete/older",  deleteOlderPrivateChat)
 router.post("/chat/upload-in-private", upload.single("file"), handlePrivateChatFileUploading)
 router.post("/chat/change-user-supportstatus-private", adminMiddleware, handleUserSupportStatusChange)
 

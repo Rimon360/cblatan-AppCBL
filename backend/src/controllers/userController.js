@@ -10,6 +10,9 @@ const blockedIpModel = require("../models/blockedIpModel.js")
 const userApiActivityModel = require("../models/userApiActivityModel.js")
 const { assignModel, shopsModel } = require("../models/shopModel.js")
 const userUpdateParked = require("../models/userUpdateParkedModel.js")
+const supportChatModel = require("../models/supportChatModel.js")
+const fs = require("fs")
+const path = require("path")
 module.exports.registerUser = async (req, res) => {
   let {
     usagsLimit,
@@ -573,6 +576,33 @@ exports.deleteParkedRequest = async (req, res) => {
     await userUpdateParked.deleteOne({ _id: id })
     res.status(200).json({ message: "Deleted" })
   } catch (error) {
+    res.status(403).json({ message: error.message })
+  }
+}
+
+exports.deleteOlderPrivateChat = async (req, res) => {
+  try {
+    const oneYearAgo = new Date()
+    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1)
+
+    const oneMinuteAgo = new Date(Date.now() - 60 * 1000)
+
+    let result = await supportChatModel.find({ createdAt: { $lt: oneMinuteAgo } })
+
+    for (const chat of result) {
+      if (chat.content_type == "txt") continue
+      let filePath = path.join(__dirname, "..", "..", "uploads", chat.content)
+      let isExists = fs.existsSync(filePath)
+      if (isExists) {
+        fs.unlink(filePath, () => {})
+      }
+    }
+    let deleteCount = await supportChatModel.deleteMany({
+      createdAt: { $lt: oneMinuteAgo },
+    })
+    res.status(200).json({ message: deleteCount.deletedCount })
+  } catch (error) {
+    console.log(error.message)
     res.status(403).json({ message: error.message })
   }
 }

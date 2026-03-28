@@ -24,6 +24,7 @@ const Shops = () => {
   const [proxy, setProxy] = useState("")
   const [courseName, setCourseName] = useState("")
   const [password, setPassword] = useState("")
+  const [tool_note, setToolNote] = useState("")
   const { current_user } = useGlobal()
   const [shops, setShops] = useState([])
   const shop_id = localStorage.getItem("selectedTitleId")
@@ -168,6 +169,7 @@ const Shops = () => {
       formData.append("domain", domain)
       formData.append("proxy", proxy)
       formData.append("password", password)
+      formData.append("tool_note", tool_note)
       formData.append("course_name", courseName)
       formData.append("file", file)
       if (!file) {
@@ -180,6 +182,7 @@ const Shops = () => {
           setProductName("")
           setProducts((prev) => [...prev, res.data.products])
           setEmail("")
+          setToolNote("")
           setDomain("")
           setProxy("")
           setCourseName("")
@@ -192,11 +195,12 @@ const Shops = () => {
         })
     } else {
       axios
-        .post(productUpdateURL, { course_name: courseName, domain, email, proxy, password, id: editAbleData.id }, { headers: { Authorization: "Bearer " + token } })
+        .post(productUpdateURL, { course_name: courseName, domain, email, proxy, password, id: editAbleData.id, tool_note }, { headers: { Authorization: "Bearer " + token } })
         .then((res) => {
           setProductName("")
           // setProducts((prev) => [...prev, res.data.products]);
           setEmail("")
+          setToolNote("")
           setDomain("")
           setProxy("")
           setCourseName("")
@@ -218,6 +222,7 @@ const Shops = () => {
   useEffect(() => {
     if (editAbleData.id) {
       setEmail(editAbleData.email)
+      setToolNote(editAbleData.tool_note)
       setDomain(editAbleData.domain)
       setProxy(editAbleData.proxy)
       setPassword(editAbleData.password)
@@ -225,8 +230,8 @@ const Shops = () => {
     }
   }, [editAbleData])
 
-  const handleProductUpdate = (id, course_name, domain, email, password, proxy) => {
-    setEditAbleData({ id, course_name, domain, email, password, proxy })
+  const handleProductUpdate = (id, course_name, domain, email, password, proxy, tool_note) => {
+    setEditAbleData({ id, course_name, domain, email, password, proxy, tool_note })
 
     // if (result.isConfirmed) {
     //   axios
@@ -355,7 +360,7 @@ const Shops = () => {
           headers: {
             Authorization: "Bearer " + token,
           },
-        }
+        },
       )
       .then((res) => {
         toast.success("Updated successfully!")
@@ -379,7 +384,7 @@ const Shops = () => {
           headers: {
             Authorization: "Bearer " + token,
           },
-        }
+        },
       )
       .then((res) => {
         toast.success("Updated successfully!")
@@ -412,7 +417,7 @@ const Shops = () => {
           headers: {
             Authorization: "Bearer " + token,
           },
-        }
+        },
       )
       .then((res) => {
         toast.success("Created successfully!")
@@ -436,7 +441,7 @@ const Shops = () => {
           headers: {
             Authorization: "Bearer " + token,
           },
-        }
+        },
       )
       .then((res) => {
         toast.success("Product copied successfully!")
@@ -640,6 +645,18 @@ const Shops = () => {
                       placeholder="Enter passsword"
                     />
                   </label>
+                  <label>
+                    Note:
+                    <input
+                      value={tool_note || ""}
+                      onChange={(e) => {
+                        setToolNote(e.target.value)
+                      }}
+                      className="mb-2  sticky top-0 bg-white"
+                      type="text"
+                      placeholder="Write note..."
+                    />
+                  </label>
                   {!editAbleData.id ? (
                     <label tabIndex="0" htmlFor="file" className=" sticky top-0 bg-green-500 text-white hover:text-white hover:bg-green-600 cursor-pointer rounded-md p-2 mt-5">
                       Upload media
@@ -658,6 +675,7 @@ const Shops = () => {
                         onClick={() => {
                           setEditAbleData({})
                           setEmail("")
+                          setToolNote("")
                           setDomain("")
                           setProxy("")
                           setPassword("")
@@ -749,7 +767,7 @@ const Shops = () => {
                             <div className="flex items-center justify-center">
                               <button
                                 onClick={() => {
-                                  handleProductUpdate(p._id, p.course_name, p.domain, p.email, p.password, p.proxy)
+                                  handleProductUpdate(p._id, p.course_name, p.domain, p.email, p.password, p.proxy, p.tool_note)
                                 }}
                                 className="px-2 py-2 text-green-400 rounded hover:bg-green-200"
                               >

@@ -8,10 +8,10 @@ let socket = null
 
 export const getSocket = async () => {
   if (!socket) {
-    const token = await getToken() 
-    if (!token) return null 
+    const token = await getToken()
+    if (!token) return null
     socket = io(SOCKET_URL, {
-      path:"/s/socket.io",
+      path: "/s/socket.io",
       transports: ["websocket"],
       auth: { token },
     })
