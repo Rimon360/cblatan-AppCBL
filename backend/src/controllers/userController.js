@@ -587,7 +587,7 @@ exports.deleteOlderPrivateChat = async (req, res) => {
 
     const oneMinuteAgo = new Date(Date.now() - 60 * 1000)
 
-    let result = await supportChatModel.find({ createdAt: { $lt: oneMinuteAgo } })
+    let result = await supportChatModel.find({ createdAt: { $lt: oneYearAgo } })
 
     for (const chat of result) {
       if (chat.content_type == "txt") continue
@@ -598,7 +598,7 @@ exports.deleteOlderPrivateChat = async (req, res) => {
       }
     }
     let deleteCount = await supportChatModel.deleteMany({
-      createdAt: { $lt: oneMinuteAgo },
+      createdAt: { $lt: oneYearAgo },
     })
     res.status(200).json({ message: deleteCount.deletedCount })
   } catch (error) {
